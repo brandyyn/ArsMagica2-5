@@ -1,5 +1,7 @@
 package am2.entities.renderers;
 
+import am2.utility.AMHooks;
+
 import am2.entities.models.ModelPlayerSpecial;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -11,7 +13,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
-import static net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesMagicka.playerModelMap;
+import static am2.utility.AMHooks.playerModelMap;
 
 @SideOnly(Side.CLIENT)
 public class RenderPlayerSpecial extends RenderPlayer {

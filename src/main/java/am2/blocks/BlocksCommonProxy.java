@@ -1,5 +1,6 @@
 package am2.blocks;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import am2.AMCreativeTab;
 import am2.api.blocks.IKeystoneLockable;
 import am2.api.math.AMVector3;
@@ -119,10 +120,10 @@ public class BlocksCommonProxy{
 
 	private static ArrayList<Block> arsMagicaBlocksList;
 
-	public static HashMap<Integer, ArrayList<AMVector3>> KeystonePortalLocations;
+	public static Int2ObjectOpenHashMap<ArrayList<AMVector3>> KeystonePortalLocations;
 
 	public BlocksCommonProxy(){
-		KeystonePortalLocations = new HashMap<Integer, ArrayList<AMVector3>>();
+		KeystonePortalLocations = new Int2ObjectOpenHashMap<ArrayList<AMVector3>>();
 		if (blockTab == null)
 			blockTab = new AMCreativeTab("Ars Magica Blocks");
 

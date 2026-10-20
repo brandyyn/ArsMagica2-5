@@ -22,6 +22,8 @@ import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -211,7 +213,8 @@ public class EntityManager implements IEntityManager{
 
 	}
 	public static BiomeGenBase[] getBiomes(Class<? extends Entity> entity){
-		List<BiomeGenBase> array = new ArrayList<>();
+		// a set: biomes carrying several of the listed types must be registered once, or their spawn weight doubles
+		Set<BiomeGenBase> array = new LinkedHashSet<>();
 		if(entity == EntityDryad.class){
 			Type[] types = {Type.FOREST, Type.MAGICAL, Type.HILLS, Type.JUNGLE, Type.MOUNTAIN, Type.PLAINS};
 			for(Type type : types){

@@ -1,5 +1,7 @@
 package am2.entities.ai;
 
+import it.unimi.dsi.fastutil.objects.Reference2IntMap;
+import it.unimi.dsi.fastutil.objects.Reference2IntLinkedOpenHashMap;
 import am2.blocks.BlocksCommonProxy;
 import am2.items.ItemsCommonProxy;
 import cpw.mods.fml.common.registry.VillagerRegistry.IVillageTradeHandler;
@@ -35,7 +37,7 @@ public class MageVillagerTrade implements IVillageTradeHandler{
 	private ItemStack getRandomChoiceForTrade(Random random){
 		int itemSeed = random.nextInt(1000);
 
-		HashMap<ItemStack, Integer> weightedRandomChoices = new HashMap<ItemStack, Integer>();
+		Reference2IntLinkedOpenHashMap<ItemStack> weightedRandomChoices = new Reference2IntLinkedOpenHashMap<ItemStack>();
 		ItemStack choice = null;
 
 		//15% chance for an essence/ash
@@ -133,21 +135,20 @@ public class MageVillagerTrade implements IVillageTradeHandler{
 		return choice;
 	}
 
-	private ItemStack pickRandomWeightedItem(Random random, HashMap<ItemStack, Integer> weightedChoices){
+	private ItemStack pickRandomWeightedItem(Random random, Reference2IntLinkedOpenHashMap<ItemStack> weightedChoices){
 		int totalWeight = 0;
 
-		for (Integer weight : weightedChoices.values()){
-			totalWeight += weight;
+		for (Reference2IntMap.Entry<ItemStack> entry : weightedChoices.reference2IntEntrySet()){
+			totalWeight += entry.getIntValue();
 		}
 
 		int randWeight = random.nextInt(totalWeight);
 		ItemStack choice = null;
 
-		for (ItemStack item : weightedChoices.keySet()){
-			int weight = weightedChoices.get(item);
-			randWeight -= weight;
+		for (Reference2IntMap.Entry<ItemStack> entry : weightedChoices.reference2IntEntrySet()){
+			randWeight -= entry.getIntValue();
 			if (randWeight <= 0){
-				choice = item;
+				choice = entry.getKey();
 				break;
 			}
 		}

@@ -1,5 +1,6 @@
 package am2.blocks.tileentities;
 
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import am2.AMCore;
 import am2.api.blocks.BlockDec;
 import am2.api.blocks.MultiblockStructureDefinition;
@@ -554,8 +555,8 @@ public class TileEntityCraftingAltar extends TileEntityAMPower implements IMulti
 
 		instability += ((float)this.getNumPartsInSpell() / 2); // half of number of spell components
 		if (outputCombo != null){
-			Set<Integer> unique = new HashSet<>();
-			Set<Integer> duplicate = new HashSet<>(); // Stacking 3 solar? bad boy
+			IntOpenHashSet unique = new IntOpenHashSet();
+			IntOpenHashSet duplicate = new IntOpenHashSet(); // Stacking 3 solar? bad boy
 			for (int i : outputCombo){
 				if (duplicate.contains(i)){ // second time being duplicated
 					instability += 1.5F;
@@ -570,8 +571,8 @@ public class TileEntityCraftingAltar extends TileEntityAMPower implements IMulti
 
 		if (shapeGroupGuide != null){
 			for (int[] shapeGroup : shapeGroupGuide){
-				Set<Integer> unique = new HashSet<>();
-				Set<Integer> duplicate = new HashSet<>();
+				IntOpenHashSet unique = new IntOpenHashSet();
+				IntOpenHashSet duplicate = new IntOpenHashSet();
 				for (int i : shapeGroup){
 					if (duplicate.contains(i)){
 						instability += 0.75F;

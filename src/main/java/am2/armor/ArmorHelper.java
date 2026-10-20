@@ -1,5 +1,6 @@
 package am2.armor;
 
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import am2.AMCore;
 import am2.api.items.armor.IArmorImbuement;
 import am2.api.items.armor.ImbuementTiers;
@@ -18,13 +19,13 @@ import java.util.HashMap;
 
 public class ArmorHelper{
 
-	private static final HashMap<String, Integer> armorRenderPrefixes = new HashMap<String, Integer>();
+	private static final Object2IntOpenHashMap<String> armorRenderPrefixes = new Object2IntOpenHashMap<String>();
 
 	private static final int IMBUE_TIER_COST = 12;
 
 	public static int getArmorRenderIndex(String armorName){
 		if (armorRenderPrefixes.containsKey(armorName)){
-			return armorRenderPrefixes.get(armorName);
+			return armorRenderPrefixes.getInt(armorName);
 		}
 		int newPrefix = AMCore.instance.proxy.getArmorRenderIndex(armorName);
 		armorRenderPrefixes.put(armorName, newPrefix);
@@ -257,10 +258,27 @@ public class ArmorHelper{
 		for (int i = 0; i < 4; ++i)
 			if (player.getCurrentArmor(i) != null)
 				numPieces++;
+		if (numPieces == 0)
+			return;
 		float xpPerPiece = totalAmt / numPieces;
 		for (int i = 0; i < 4; ++i){
 			addXPToArmor(xpPerPiece, player.getCurrentArmor(i));
 		}
+	}
+
+	/**
+	 * XP amounts come from damage and max health values, which other mods can make NaN or infinite. One such value used
+	 * to turn the stored XP into NaN (shown as "NaN") and reset the level to 0; NaN plus anything stays NaN, so the
+	 * armour never levelled again.
+	 */
+	private static boolean isValidXP(float amt){
+		return amt > 0 && !Float.isInfinite(amt);
+	}
+
+	/** Stored XP, with armour corrupted by the bug above repaired to 0 so it can level again. */
+	private static double getStoredXP(NBTTagCompound armorProps){
+		double xp = armorProps.getDouble(AMArmor.NBT_KEY_TOTALXP);
+		return Double.isNaN(xp) || Double.isInfinite(xp) || xp < 0 ? 0 : xp;
 	}
 
 	public static void deductXPFromArmor(float amt, ItemStack armor){
@@ -270,7 +288,9 @@ public class ArmorHelper{
 			NBTTagCompound armorProps = (NBTTagCompound)armor.stackTagCompound.getTag(AMArmor.NBT_KEY_AMPROPS);
 			if (armorProps == null)
 				armorProps = new NBTTagCompound();
-			armorProps.setDouble(AMArmor.NBT_KEY_TOTALXP, Math.max(armorProps.getDouble(AMArmor.NBT_KEY_TOTALXP) - amt, 0));
+			if (!isValidXP(amt))
+				return;
+			armorProps.setDouble(AMArmor.NBT_KEY_TOTALXP, Math.max(getStoredXP(armorProps) - amt, 0));
 			armorProps.setInteger(AMArmor.NBT_KEY_ARMORLEVEL, EntityUtilities.getLevelFromXP((float)armorProps.getDouble(AMArmor.NBT_KEY_TOTALXP)));
 			armor.stackTagCompound.setTag(AMArmor.NBT_KEY_AMPROPS, armorProps);
 		}
@@ -283,7 +303,9 @@ public class ArmorHelper{
 			NBTTagCompound armorProps = (NBTTagCompound)armor.stackTagCompound.getTag(AMArmor.NBT_KEY_AMPROPS);
 			if (armorProps == null)
 				armorProps = new NBTTagCompound();
-			armorProps.setDouble(AMArmor.NBT_KEY_TOTALXP, armorProps.getDouble(AMArmor.NBT_KEY_TOTALXP) + amt);
+			if (!isValidXP(amt))
+				return;
+			armorProps.setDouble(AMArmor.NBT_KEY_TOTALXP, getStoredXP(armorProps) + amt);
 			armorProps.setInteger(AMArmor.NBT_KEY_ARMORLEVEL, EntityUtilities.getLevelFromXP((float)armorProps.getDouble(AMArmor.NBT_KEY_TOTALXP)));
 			armor.stackTagCompound.setTag(AMArmor.NBT_KEY_AMPROPS, armorProps);
 		}

@@ -1,5 +1,8 @@
 package am2.blocks.tileentities;
 
+import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import am2.AMCore;
 import am2.LogHelper;
 import am2.api.events.SpellRecipeItemsEvent;
@@ -59,7 +62,7 @@ public class TileEntityInscriptionTable extends TileEntity implements IInventory
 	public static int inkIndex = 3;
 	private EntityPlayer currentPlayerUsing;
 	private int ticksToNextParticle = 20;
-	private final HashMap<SpellModifiers, Integer> modifierCount;
+	private final Reference2IntOpenHashMap<SpellModifiers> modifierCount;
 	private String currentSpellName;
 	private boolean currentSpellIsReadOnly;
 
@@ -78,7 +81,7 @@ public class TileEntityInscriptionTable extends TileEntity implements IInventory
 			shapeGroups.add(new ArrayList<>());
 		}
 
-		modifierCount = new HashMap<>();
+		modifierCount = new Reference2IntOpenHashMap<SpellModifiers>();
 		resetModifierCount();
 	}
 
@@ -568,8 +571,7 @@ public class TileEntityInscriptionTable extends TileEntity implements IInventory
 			if (part instanceof ISpellModifier){
 				EnumSet<SpellModifiers> modifiers = ((ISpellModifier)part).getAspectsModified();
 				for (SpellModifiers modifier : modifiers){
-					int count = modifierCount.get(modifier) + 1;
-					modifierCount.put(modifier, count);
+					modifierCount.addTo(modifier, 1);
 				}
 			}
 		}
@@ -583,7 +585,7 @@ public class TileEntityInscriptionTable extends TileEntity implements IInventory
 	}
 
 	public int getModifierCount(SpellModifiers modifier){
-		return modifierCount.get(modifier);
+		return modifierCount.getInt(modifier);
 	}
 
 	public void createSpellForPlayer(EntityPlayer player){
@@ -630,7 +632,7 @@ public class TileEntityInscriptionTable extends TileEntity implements IInventory
 			else if (bookstack.getTagCompound().getBoolean("spellFinalized")) //don't overwrite a completed spell
 				return bookstack;
 
-			LinkedHashMap<String, Integer> materialsList = new LinkedHashMap<String, Integer>();
+			Object2IntLinkedOpenHashMap<String> materialsList = new Object2IntLinkedOpenHashMap<String>();
 
 			materialsList.put(ItemsCommonProxy.rune.getItemStackDisplayName(new ItemStack(ItemsCommonProxy.rune, 1, ItemRune.META_BLANK)), 1);
 
@@ -715,13 +717,7 @@ public class TileEntityInscriptionTable extends TileEntity implements IInventory
 						}
 					}
 
-					if (materialsList.containsKey(materialkey.toString())){
-						int old = materialsList.get(materialkey.toString());
-						old += qty;
-						materialsList.put(materialkey.toString(), old);
-					}else{
-						materialsList.put(materialkey.toString(), qty);
-					}
+					materialsList.addTo(materialkey.toString(), qty);
 
 					if (recipeStack != null)
 						componentRecipeList.add(recipeStack);
@@ -749,8 +745,8 @@ public class TileEntityInscriptionTable extends TileEntity implements IInventory
 
 			sb = new StringBuilder();
 			sb.append("\n\nMaterials List:\n\n");
-			for (String s : materialsList.keySet()){
-				sb.append(materialsList.get(s)).append(" x ").append(s).append("\n");
+			for (Object2IntMap.Entry<String> material : materialsList.object2IntEntrySet()){
+				sb.append(material.getIntValue()).append(" x ").append(material.getKey()).append("\n");
 			}
 
 			pages.addAll(Story.splitStoryPartIntoPages(sb.toString()));
@@ -758,27 +754,22 @@ public class TileEntityInscriptionTable extends TileEntity implements IInventory
 			sb = new StringBuilder();
 			sb.append("Affinity Breakdown:\n\n");
 			it = currentRecipe.iterator();
-			HashMap<Affinity, Integer> affinityData = new HashMap<Affinity, Integer>();
+			Reference2IntOpenHashMap<Affinity> affinityData = new Reference2IntOpenHashMap<Affinity>();
 			int cpCount = 0;
 			while (it.hasNext()){
 				ISpellPart part = it.next();
 				if (part instanceof ISpellComponent){
 					EnumSet<Affinity> aff = ((ISpellComponent)part).getAffinity();
 					for (Affinity affinity : aff){
-						int qty = 1;
-						if (affinityData.containsKey(affinity)){
-							qty = 1 + affinityData.get(affinity);
-						}
-						affinityData.put(affinity, qty);
+						affinityData.addTo(affinity, 1);
 					}
 					cpCount++;
 				}
 			}
-			ValueComparator vc = new ValueComparator(affinityData);
-			TreeMap<Affinity, Integer> sorted = new TreeMap<Affinity, Integer>(vc);
-			sorted.putAll(affinityData);
-			for (Affinity aff : sorted.keySet()){
-				float pct = (float)sorted.get(aff) / (float)cpCount * 100f;
+			ArrayList<Affinity> sorted = new ArrayList<Affinity>(affinityData.keySet());
+			Collections.sort(sorted, new ValueComparator(affinityData));
+			for (Affinity aff : sorted){
+				float pct = (float)affinityData.getInt(aff) / (float)cpCount * 100f;
 				sb.append(String.format("%s: %.2f%%", aff.toString(), pct));
 				sb.append("\n");
 			}
@@ -881,20 +872,17 @@ public class TileEntityInscriptionTable extends TileEntity implements IInventory
 
 	static class ValueComparator implements Comparator<Affinity>{
 
-		Map<Affinity, Integer> base;
+		final Reference2IntOpenHashMap<Affinity> base;
 
-		ValueComparator(Map<Affinity, Integer> base){
+		ValueComparator(Reference2IntOpenHashMap<Affinity> base){
 			this.base = base;
 		}
 
 		@Override
 		public int compare(Affinity a, Affinity b){
-			Integer x = base.get(a);
-			Integer y = base.get(b);
-			if (x.equals(y)){
-				return a.compareTo(b);
-			}
-			return x.compareTo(y);
+			int x = base.getInt(a);
+			int y = base.getInt(b);
+			return x == y ? a.compareTo(b) : Integer.compare(x, y);
 		}
 	}
 

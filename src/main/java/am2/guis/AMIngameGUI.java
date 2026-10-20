@@ -23,6 +23,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemSnowball;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
@@ -39,6 +40,26 @@ import java.util.Iterator;
 import static am2.blocks.liquid.BlockLiquidEssence.liquidEssenceMaterial;
 
 public class AMIngameGUI{
+	// The held spell (a spell book decodes its whole inventory from NBT to find it) and its mana cost are resolved
+	// at most once per tick instead of on every frame.
+	private ItemStack heldItem;
+	private int heldTick = -1;
+	private ItemStack heldSpell;
+	private String costString;
+
+	private ItemStack getHeldSpell(EntityPlayer player){
+		ItemStack curItem = player.getCurrentEquippedItem();
+		if (curItem != heldItem || player.ticksExisted != heldTick){
+			heldItem = curItem;
+			heldTick = player.ticksExisted;
+			costString = null;
+			heldSpell = null;
+			if (curItem != null && (curItem.getItem() == ItemsCommonProxy.spell || curItem.getItem() == ItemsCommonProxy.spellBook || curItem.getItem() == ItemsCommonProxy.arcaneSpellbook))
+				heldSpell = curItem.getItem() == ItemsCommonProxy.spell ? curItem : ((ItemSpellBook)curItem.getItem()).GetActiveItemStack(curItem);
+		}
+		return heldSpell;
+	}
+
 	private final Minecraft mc;
 	private float zLevel;
 
@@ -259,9 +280,8 @@ public class AMIngameGUI{
 					GL11.glColor3f(0.2f, 0.9f, 0.6f);
 			}
 
-			ItemStack curItem = Minecraft.getMinecraft().thePlayer.getCurrentEquippedItem();
-			if (curItem != null && (curItem.getItem() == ItemsCommonProxy.spell || curItem.getItem() == ItemsCommonProxy.spellBook || curItem.getItem() == ItemsCommonProxy.arcaneSpellbook)){
-				ItemStack spellStack = curItem.getItem() == ItemsCommonProxy.spell ? curItem : ((ItemSpellBook)curItem.getItem()).GetActiveItemStack(curItem);
+			{
+				ItemStack spellStack = getHeldSpell(Minecraft.getMinecraft().thePlayer);
 				if (spellStack != null){
 					int[] parts = SpellUtils.instance.getShapeGroupParts(spellStack);
 					int sx = mana_hud.iX - 2 * parts.length / 2;
@@ -307,23 +327,21 @@ public class AMIngameGUI{
 
 		if (AMCore.config.getShowNumerics()){
 			EntityClientPlayerMP player = Minecraft.getMinecraft().thePlayer;
-			ItemStack curItem = player.getCurrentEquippedItem();
-			ItemStack spellStack = null;
-			if (curItem != null && (curItem.getItem() == ItemsCommonProxy.spell || curItem.getItem() == ItemsCommonProxy.spellBook || curItem.getItem() == ItemsCommonProxy.arcaneSpellbook))
-				spellStack = curItem.getItem() == ItemsCommonProxy.spell ? curItem : ((ItemSpellBook)curItem.getItem()).GetActiveItemStack(curItem);
+			ItemStack spellStack = getHeldSpell(player);
 
 			String manaStr = StatCollector.translateToLocal("am2.gui.mana") + ": " + (int)(mana + bonusMana) + "/" + (int)maxMana;
 			String burnoutStr = StatCollector.translateToLocal("am2.gui.burnout") + ": " + (int)props.getCurrentFatigue() + "/" + (int)props.getMaxFatigue();
 			AMVector2 manaNumericPos = getShiftedVector(AMCore.config.getManaNumericPosition(), i, j);
 			AMVector2 burnoutNumericPos = getShiftedVector(AMCore.config.getBurnoutNumericPosition(), i, j);
 			if(spellStack != null){
-				SpellUtils.SpellRequirements spellRequirements = SpellUtils.instance.getSpellRequirements(spellStack, player);
-				float manacost = spellRequirements.manaCost;
-				ManaCostEvent mce = new ManaCostEvent(spellStack, player, manacost, 0);
-				MinecraftForge.EVENT_BUS.post(mce);
-				manacost = mce.manaCost;
-				String manacostStr = I18n.format("(%s)",(int)manacost);
-				fontRenderer.drawString(manacostStr,manaNumericPos.iX + 100, manaNumericPos.iY,0x1fb5d5);
+				// the cost walks every spell part and posts an event; refresh it once per tick, not every frame
+				if (costString == null){
+					SpellUtils.SpellRequirements spellRequirements = SpellUtils.instance.getSpellRequirements(spellStack, player);
+					ManaCostEvent mce = new ManaCostEvent(spellStack, player, spellRequirements.manaCost, 0);
+					MinecraftForge.EVENT_BUS.post(mce);
+					costString = I18n.format("(%s)",(int)mce.manaCost);
+				}
+				fontRenderer.drawString(costString,manaNumericPos.iX + 100, manaNumericPos.iY,0x1fb5d5);
 			}
 			fontRenderer.drawString(manaStr, manaNumericPos.iX, manaNumericPos.iY, bonusMana > 0 ? 0xeae31c : 0x2080FF);
 			fontRenderer.drawString(burnoutStr, burnoutNumericPos.iX + 25 - fontRenderer.getStringWidth(burnoutStr), burnoutNumericPos.iY, 0xFF2020);

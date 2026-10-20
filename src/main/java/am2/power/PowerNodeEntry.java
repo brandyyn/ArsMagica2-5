@@ -1,5 +1,7 @@
 package am2.power;
 
+import it.unimi.dsi.fastutil.objects.Reference2FloatOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2FloatMap;
 import am2.api.math.AMVector3;
 import am2.api.power.IPowerNode;
 import am2.api.power.PowerTypes;
@@ -17,11 +19,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 public class PowerNodeEntry{
-	HashMap<PowerTypes, Float> powerAmounts;
+	Reference2FloatOpenHashMap<PowerTypes> powerAmounts;
 	private HashMap<PowerTypes, ArrayList<LinkedList<AMVector3>>> nodePaths;
 
 	public PowerNodeEntry(){
-		powerAmounts = new HashMap<PowerTypes, Float>();
+		powerAmounts = new Reference2FloatOpenHashMap<PowerTypes>();
 		nodePaths = new HashMap<PowerTypes, ArrayList<LinkedList<AMVector3>>>();
 	}
 
@@ -61,8 +63,8 @@ public class PowerNodeEntry{
 
 		//AMCore.log.info("Path Exists");
 
-		if (powerAmounts.containsKey(type) && powerAmounts.get(type) + amount > capacity){
-			amount = capacity - powerAmounts.get(type);
+		if (powerAmounts.containsKey(type) && powerAmounts.getFloat(type) + amount > capacity){
+			amount = capacity - powerAmounts.getFloat(type);
 		}
 
 		float requested = 0f;
@@ -112,10 +114,10 @@ public class PowerNodeEntry{
 	public PowerTypes getHighestPowerType(){
 		float highest = 0;
 		PowerTypes hType = PowerTypes.NONE;
-		for (PowerTypes type : powerAmounts.keySet()){
-			if (powerAmounts.get(type) > highest){
-				highest = powerAmounts.get(type);
-				hType = type;
+		for (Reference2FloatMap.Entry<PowerTypes> entry : powerAmounts.reference2FloatEntrySet()){
+			if (entry.getFloatValue() > highest){
+				highest = entry.getFloatValue();
+				hType = entry.getKey();
 			}
 		}
 		return hType;
@@ -123,17 +125,16 @@ public class PowerNodeEntry{
 
 	public float getHighestPower(){
 		float highest = 0;
-		for (PowerTypes type : powerAmounts.keySet()){
-			if (powerAmounts.get(type) > highest){
-				highest = powerAmounts.get(type);
+		for (Reference2FloatMap.Entry<PowerTypes> entry : powerAmounts.reference2FloatEntrySet()){
+			if (entry.getFloatValue() > highest){
+				highest = entry.getFloatValue();
 			}
 		}
 		return highest;
 	}
 
 	public float getPower(PowerTypes type){
-		Float f = powerAmounts.get(type);
-		return f == null ? 0 : f;
+		return powerAmounts.getFloat(type);
 	}
 
 	public void setPower(PowerTypes type, float amt){
@@ -147,7 +148,8 @@ public class PowerNodeEntry{
 		//power amounts
 		//list of entries containing power type IDs and the associated amount
 		NBTTagList powerAmountStore = new NBTTagList();
-		for (PowerTypes type : this.powerAmounts.keySet()){
+		for (Reference2FloatMap.Entry<PowerTypes> entry : this.powerAmounts.reference2FloatEntrySet()){
+			PowerTypes type = entry.getKey();
 			if (type == null) //sanity check
 				continue;
 			//individual power type/amount entry
@@ -155,7 +157,7 @@ public class PowerNodeEntry{
 			//set power type ID
 			powerType.setInteger("powerType", type.ID());
 			//set power amount
-			powerType.setFloat("powerAmount", powerAmounts.get(type));
+			powerType.setFloat("powerAmount", entry.getFloatValue());
 			//attach the power node to the list
 			powerAmountStore.appendTag(powerType);
 		}

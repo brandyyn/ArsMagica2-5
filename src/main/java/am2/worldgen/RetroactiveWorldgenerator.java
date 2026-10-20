@@ -1,5 +1,6 @@
 package am2.worldgen;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import am2.AMCore;
 import am2.LogHelper;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class RetroactiveWorldgenerator{
-	public static final HashMap<Integer, ArrayList<ChunkCoordIntPair>> deferredChunkGeneration = new HashMap<Integer, ArrayList<ChunkCoordIntPair>>();
+	public static final Int2ObjectOpenHashMap<ArrayList<ChunkCoordIntPair>> deferredChunkGeneration = new Int2ObjectOpenHashMap<ArrayList<ChunkCoordIntPair>>();
 	public static final RetroactiveWorldgenerator instance = new RetroactiveWorldgenerator();
 
 	public void continueRetrogen(World world){

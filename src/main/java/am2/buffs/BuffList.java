@@ -1,5 +1,8 @@
 package am2.buffs;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import am2.AMCore;
 import am2.LogHelper;
 import am2.api.potion.IBuffHelper;
@@ -59,20 +62,20 @@ public class BuffList implements IBuffHelper{
 	private static final int maxParticlesPerBuff = 100;
 	public static final int default_buff_duration = 600;
 	private static int potionDefaultOffset = 0;
-	public static HashMap<Integer, Integer> particlesForBuffID;
-	private static HashMap<Integer, Class<? extends BuffEffect>> classesForBuffID;
+	public static Int2IntOpenHashMap particlesForBuffID;
+	private static Int2ObjectOpenHashMap<Class<? extends BuffEffect>> classesForBuffID;
 
 	//since sync code only applies the PotionEffect class, any inherited bonuses are lost.
 	//These dummy buffs can be used to apply the tick of the potion when the class type
 	//isn't transferred.
-	private static final HashMap<Integer, BuffEffect> utilityBuffs = new HashMap<Integer, BuffEffect>();
+	private static final Int2ObjectOpenHashMap<BuffEffect> utilityBuffs = new Int2ObjectOpenHashMap<BuffEffect>();
 	private static final ArrayList<ArsMagicaPotion> arsMagicaPotions = new ArrayList<ArsMagicaPotion>();
 	private static ArrayList<Integer> dispelBlacklist;
 	
 
 	public static final BuffList instance = new BuffList();
 
-	private static HashMap<Integer, Potion> ourInitialPotionAllocations;
+	private static Int2ObjectOpenHashMap<Potion> ourInitialPotionAllocations;
 
 	private BuffList(){
 
@@ -129,9 +132,9 @@ public class BuffList implements IBuffHelper{
 
 	public static void Init(){
 		dispelBlacklist = new ArrayList<Integer>();
-		particlesForBuffID = new HashMap<Integer, Integer>();
-		classesForBuffID = new HashMap<Integer, Class<? extends BuffEffect>>();
-		ourInitialPotionAllocations = new HashMap<Integer, Potion>();
+		particlesForBuffID = new Int2IntOpenHashMap();
+		classesForBuffID = new Int2ObjectOpenHashMap<Class<? extends BuffEffect>>();
+		ourInitialPotionAllocations = new Int2ObjectOpenHashMap<Potion>();
 
 		try{
 			extendPotionsArray();
@@ -149,9 +152,9 @@ public class BuffList implements IBuffHelper{
 
 	public static void postInit(){
 		// potion clash detection
-		for (Map.Entry<Integer, Potion> entry : ourInitialPotionAllocations.entrySet()){
-			if (Potion.potionTypes[entry.getKey()] != entry.getValue()){
-				LogHelper.warn("My potion, %s, at index %d has been over-written by another potion, %s. You have a conflict in your configuration files.", entry.getValue().getName(), entry.getKey(), Potion.potionTypes[entry.getKey()].getName());
+		for (Int2ObjectMap.Entry<Potion> entry : ourInitialPotionAllocations.int2ObjectEntrySet()){
+			if (Potion.potionTypes[entry.getIntKey()] != entry.getValue()){
+				LogHelper.warn("My potion, %s, at index %d has been over-written by another potion, %s. You have a conflict in your configuration files.", entry.getValue().getName(), entry.getIntKey(), Potion.potionTypes[entry.getIntKey()].getName());
 			}
 		}
 	}
@@ -197,8 +200,8 @@ public class BuffList implements IBuffHelper{
 		psychedelic = createAMPotion(potionDefaultOffset + 32, "Psychedelic", 1, 2, false, BuffEffectPsychedelic.class);
 		temporalAnchorBurnout = createAMPotion(potionDefaultOffset + 33, "Chrono Anchor Burnout",1, 4, false, BuffEffectTemporalAnchorBurnout.class);
 
-		for (int i : classesForBuffID.keySet()){
-			createDummyBuff(classesForBuffID.get(i), i);
+		for (Int2ObjectMap.Entry<Class<? extends BuffEffect>> entry : classesForBuffID.int2ObjectEntrySet()){
+			createDummyBuff(entry.getValue(), entry.getIntKey());
 		}
 	}
 
@@ -238,18 +241,18 @@ public class BuffList implements IBuffHelper{
 		psychedelic.setTextureSheet(ResourceManager.GetGuiTexturePath("buffs_2.png"));
 	}
 
-	/*
-	 * This is bad.  Don't ever use this unless you absolutely HAVE to!
-	 * The only reason I did was to remove the need to edit base classes.  You can REALLY mess up a program with this if not used properly...
-	 * Technically, you could change false to true.  I'm not even kidding.  The actual keyword would have a different value.  BE CAREFUL!
+	/**
+	 * Potion.potionTypes is made non-final by arsmagica2_at.cfg, so a plain reflective set works on every Java version.
+	 * The modifiers hack is only a fallback for development runs, where the jar's access transformer is not applied
+	 * (it does not work on Java 12+).
 	 */
 	private static void setFinalStatic(Field field, Object newValue) throws Exception{
 		field.setAccessible(true);
-
-		Field modifiersField = Field.class.getDeclaredField("modifiers");
-		modifiersField.setAccessible(true);
-		modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-
+		if (Modifier.isFinal(field.getModifiers())){
+			Field modifiersField = Field.class.getDeclaredField("modifiers");
+			modifiersField.setAccessible(true);
+			modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+		}
 		field.set(null, newValue);
 	}
 

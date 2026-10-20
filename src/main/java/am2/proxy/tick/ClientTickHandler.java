@@ -1,5 +1,7 @@
 package am2.proxy.tick;
 
+import am2.utility.AMHooks;
+
 import am2.AMCore;
 import am2.EntityItemWatcher;
 import am2.LogHelper;
@@ -41,6 +43,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -52,20 +55,18 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.sound.PlaySoundEvent17;
-import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesMagicka;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import static am2.spell.SpellHelper.lingeringSpellList;
+import static am2.spell.SpellHelper.lingeringSpellListClient;
 
 @SideOnly(Side.CLIENT)
 public class ClientTickHandler{
 
 	private final AMIngameGUI inGameGui = new AMIngameGUI();
-	public static HashMap<EntityLiving, EntityLivingBase> targetsToSet = new HashMap<EntityLiving, EntityLivingBase>();
 	private int mouseWheelValue = 0;
 	private int currentSlot = -1;
 	private boolean usingItem;
@@ -87,49 +88,44 @@ public class ClientTickHandler{
 	private PowerNodeEntry powerData = null;
 
 	private String lastWorldName;
+	private WorldClient lastWorld;
 
 	private void gameTick_Start(){
 
 		if (!CompendiumEntryTypes.instance.hasInitialized())
 			CompendiumEntryTypes.instance.initTextures();
 
-		if (Minecraft.getMinecraft().isIntegratedServerRunning()){
-			if (worldName == null || !worldName.equals(Minecraft.getMinecraft().getIntegratedServer().getWorldName().replace(" ", "_"))){
-				worldName = Minecraft.getMinecraft().getIntegratedServer().getWorldName().replace(" ", "_");
-				firstTick = true;
-			}
-		}else{
-			if (worldName != null && (lastWorldName == null || lastWorldName != worldName.replace(" ", "_"))){
-				lastWorldName = worldName.replace(" ", "_");
-				firstTick = true;
+		// Compendium unlocks are per save, so they are (re)requested only when the client joins a world or the
+		// save name changes. This used to compare a freshly built string by reference, which re-ran the
+		// request (a packet to the server) and a full creature scan on every multiplayer client tick.
+		Minecraft mc = Minecraft.getMinecraft();
+		if (mc.theWorld != lastWorld){
+			if (lastWorld == null)
+				compendiumLoad = true;
+			lastWorld = mc.theWorld;
+			if (lastWorld != null && mc.isIntegratedServerRunning()){
+				String name = mc.getIntegratedServer().getWorldName().replace(" ", "_");
+				if (!name.equals(worldName)){
+					worldName = name;
+					compendiumLoad = true;
+				}
 			}
 		}
-
-		if (firstTick){
-			ItemsCommonProxy.crystalPhylactery.getSpawnableEntities(Minecraft.getMinecraft().theWorld);
+		// in multiplayer the save name is pushed by the server; the reference only changes when that packet arrives
+		if (worldName != lastWorldName){
+			lastWorldName = worldName;
 			compendiumLoad = true;
-			firstTick = false;
 		}
 
-		if (compendiumLoad){
+		if (compendiumLoad && mc.thePlayer != null){
 			ArcaneCompendium.instance.loadUnlockData();
 			compendiumLoad = false;
 		}
 	}
 
-	private void applyDeferredPotionEffects(){
-		for (EntityLivingBase ent : AMCore.proxy.getDeferredPotionEffects().keySet()){
-			ArrayList<PotionEffect> potions = AMCore.proxy.getDeferredPotionEffects().get(ent);
-			for (PotionEffect effect : potions)
-				ent.addPotionEffect(effect);
-		}
-
-		AMCore.proxy.clearDeferredPotionEffects();
-	}
-
 	@SubscribeEvent
 	public void onGuiOpen(GuiOpenEvent event) { // you're a ghost, how are you looking inside yourself
-		if (MysteriumPatchesFixesMagicka.isPlayerEthereal(Minecraft.getMinecraft().thePlayer) && event.gui instanceof GuiInventory) event.setCanceled(true);
+		if (AMHooks.isPlayerEthereal(Minecraft.getMinecraft().thePlayer) && event.gui instanceof GuiInventory) event.setCanceled(true);
 	}
 
 	@SubscribeEvent
@@ -139,24 +135,12 @@ public class ClientTickHandler{
 		}
 	}
 
-	private void applyDeferredDimensionTransfers(){
-		for (EntityLivingBase ent : AMCore.proxy.getDeferredDimensionTransfers().keySet()){
-			DimensionUtilities.doDimensionTransfer(ent, AMCore.proxy.getDeferredDimensionTransfers().get(ent));
-		}
-
-		AMCore.proxy.clearDeferredDimensionTransfers();
-	}
-
 	private void gameTick_End(){
 
+		// server-side helpers (item rings, meteors, deferred effects) run in ServerTickHandler, which is also
+		// registered in singleplayer; running them here duplicated them on the client thread against server worlds
 		AMGuiHelper.instance.tick();
-		EntityItemWatcher.instance.tick();
 		checkMouseDWheel();
-
-		if (Minecraft.getMinecraft().isIntegratedServerRunning()){
-			MeteorSpawnHelper.instance.tick();
-			applyDeferredPotionEffects();
-		}
 
 		if (!powerWatch.equals(AMVector3.zero())){
 			if (powerWatchSyncTick++ == 0){
@@ -327,10 +311,6 @@ public class ClientTickHandler{
 		}
 	}
 
-	private void localServerTick_End(){
-		BossSpawnHelper.instance.tick();
-	}
-
 	@SubscribeEvent
 	public void onClientTick(TickEvent.ClientTickEvent event){
 		if (event.phase == TickEvent.Phase.START){
@@ -347,7 +327,8 @@ public class ClientTickHandler{
 				spawnPowerPathVisuals();
 		}
 
-		if (Minecraft.getMinecraft().thePlayer != null){
+		// once per tick; this used to run for both phases
+		if (event.phase == TickEvent.Phase.END && Minecraft.getMinecraft().thePlayer != null){
 			if (AMPacketProcessorClient.cloaking > 0) AMPacketProcessorClient.cloaking--;
 			if (AMPacketProcessorClient.cloaking < 0) AMPacketProcessorClient.cloaking = 0;
 			if (AMPacketProcessorClient.deaf > 0) AMPacketProcessorClient.deaf--;
@@ -381,21 +362,8 @@ public class ClientTickHandler{
 			}
 
 			if (Minecraft.getMinecraft().theWorld != null) {
-				//update lingering spells
-				if (!lingeringSpellList.isEmpty()){
-					SpellHelper.LingeringSpell[] toRemove = new SpellHelper.LingeringSpell[lingeringSpellList.size()];
-					for (int i = 0; i < lingeringSpellList.size(); i++){
-						boolean toRemoveThis = lingeringSpellList.get(i).doUpdate();
-						if (toRemoveThis) toRemove[i] = lingeringSpellList.get(i);
-						else toRemove[i] = null;
-					}
-
-					for (SpellHelper.LingeringSpell lingeringSpell : toRemove){
-						if (lingeringSpell != null){
-							lingeringSpellList.remove(lingeringSpell);
-						}
-					}
-				}
+				if (!lingeringSpellListClient.isEmpty())
+					SpellHelper.tickLingeringSpells(lingeringSpellListClient, null);
 			}
 		}
 	}
@@ -405,27 +373,10 @@ public class ClientTickHandler{
 	@SubscribeEvent
 	public void onRenderTick(TickEvent.RenderTickEvent event){
 		if (event.phase == TickEvent.Phase.START){
+			am2.animation.AnimationSync.partialTicks = event.renderTickTime;
 			renderTick_Start();
 		}else if (event.phase == TickEvent.Phase.END){
 			renderTick_End();
-		}
-	}
-
-	@SubscribeEvent
-	public void onWorldTick(TickEvent.WorldTickEvent event){
-		if (Minecraft.getMinecraft().isIntegratedServerRunning()){
-			if (AMCore.config.retroactiveWorldgen())
-				RetroactiveWorldgenerator.instance.continueRetrogen(event.world);
-		}
-		if (event.phase == TickEvent.Phase.END){
-			applyDeferredDimensionTransfers();
-		}
-	}
-
-	@SubscribeEvent
-	public void onServerTick(TickEvent.ServerTickEvent event){
-		if (event.phase == TickEvent.Phase.END){
-			localServerTick_End();
 		}
 	}
 
@@ -467,7 +418,7 @@ public class ClientTickHandler{
 	}
 
 	public void addDeferredTarget(EntityLiving ent, EntityLivingBase target){
-		targetsToSet.put(ent, target);
+		// nothing on the client ever applied these: storing them only kept every entity alive forever
 	}
 
 	private boolean canSeePaths(EntityPlayer player) {

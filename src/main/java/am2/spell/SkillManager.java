@@ -1,5 +1,8 @@
 package am2.spell;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import am2.LogHelper;
 import am2.api.spell.ISpellPartManager;
 import am2.api.spell.component.interfaces.*;
@@ -20,9 +23,10 @@ public class SkillManager implements ISpellPartManager{
 	public static final int MODIFIER_OFFSET = 5000;
 	public static final int TALENT_OFFSET = 6000;
 
-	private final HashMap<Integer, ISkillTreeEntry> registeredParts;
+	/** Linked: listings follow registration order. */
+	private final Int2ObjectLinkedOpenHashMap<ISkillTreeEntry> registeredParts;
 	private final CaseInsensitiveMap<String, Integer> registeredPartNames;
-	private final HashMap<Integer, String> reversedPartNames;
+	private final Int2ObjectOpenHashMap<String> reversedPartNames;
 
 	public static SkillManager instance = new SkillManager();
 
@@ -31,9 +35,9 @@ public class SkillManager implements ISpellPartManager{
 	public ISpellModifier missingModifier;
 
 	private SkillManager(){
-		registeredParts = new HashMap<Integer, ISkillTreeEntry>();
+		registeredParts = new Int2ObjectLinkedOpenHashMap<ISkillTreeEntry>();
 		registeredPartNames = new CaseInsensitiveMap<String, Integer>();
-		reversedPartNames = new HashMap<Integer, String>();
+		reversedPartNames = new Int2ObjectOpenHashMap<String>();
 
 		missingComponent = new MissingComponent();
 		missingModifier = new MissingModifier();
@@ -42,9 +46,9 @@ public class SkillManager implements ISpellPartManager{
 
 	public ArrayList<Integer> getAllShapes(){
 		ArrayList<Integer> shapes = new ArrayList<Integer>();
-		for (Integer i : registeredParts.keySet()){
-			if (registeredParts.get(i) instanceof ISpellShape){
-				shapes.add(i);
+		for (Int2ObjectMap.Entry<ISkillTreeEntry> entry : registeredParts.int2ObjectEntrySet()){
+			if (entry.getValue() instanceof ISpellShape){
+				shapes.add(entry.getIntKey());
 			}
 		}
 		return shapes;
@@ -52,9 +56,9 @@ public class SkillManager implements ISpellPartManager{
 
 	public ArrayList<Integer> getAllComponents(){
 		ArrayList<Integer> components = new ArrayList<Integer>();
-		for (Integer i : registeredParts.keySet()){
-			if (registeredParts.get(i) instanceof ISpellComponent){
-				components.add(i);
+		for (Int2ObjectMap.Entry<ISkillTreeEntry> entry : registeredParts.int2ObjectEntrySet()){
+			if (entry.getValue() instanceof ISpellComponent){
+				components.add(entry.getIntKey());
 			}
 		}
 		return components;
@@ -62,9 +66,9 @@ public class SkillManager implements ISpellPartManager{
 
 	public ArrayList<Integer> getAllModifiers(){
 		ArrayList<Integer> modifiers = new ArrayList<Integer>();
-		for (Integer i : registeredParts.keySet()){
-			if (registeredParts.get(i) instanceof ISpellModifier){
-				modifiers.add(i);
+		for (Int2ObjectMap.Entry<ISkillTreeEntry> entry : registeredParts.int2ObjectEntrySet()){
+			if (entry.getValue() instanceof ISpellModifier){
+				modifiers.add(entry.getIntKey());
 			}
 		}
 		return modifiers;
@@ -72,9 +76,10 @@ public class SkillManager implements ISpellPartManager{
 
 	public ArrayList<Integer> getAllTalents(){
 		ArrayList<Integer> modifiers = new ArrayList<Integer>();
-		for (Integer i : registeredParts.keySet()){
-			if (!(registeredParts.get(i) instanceof ISpellShape) && !(registeredParts.get(i) instanceof ISpellComponent) && !(registeredParts.get(i) instanceof ISpellModifier)){
-				modifiers.add(i);
+		for (Int2ObjectMap.Entry<ISkillTreeEntry> entry : registeredParts.int2ObjectEntrySet()){
+			ISkillTreeEntry part = entry.getValue();
+			if (!(part instanceof ISpellShape) && !(part instanceof ISpellComponent) && !(part instanceof ISpellModifier)){
+				modifiers.add(entry.getIntKey());
 			}
 		}
 		return modifiers;
@@ -160,10 +165,9 @@ public class SkillManager implements ISpellPartManager{
 	}
 
 	public int getSpellPartID(Class clazz){
-		for (Integer id : registeredParts.keySet()){
-			ISkillTreeEntry entry = registeredParts.get(id);
-			if (clazz.isAssignableFrom(entry.getClass()))
-				return id;
+		for (Int2ObjectMap.Entry<ISkillTreeEntry> part : registeredParts.int2ObjectEntrySet()){
+			if (clazz.isAssignableFrom(part.getValue().getClass()))
+				return part.getIntKey();
 		}
 		LogHelper.warn("Spell Part not found!");
 		return -1;

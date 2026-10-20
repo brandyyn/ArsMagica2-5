@@ -1,5 +1,9 @@
 package am2.items;
 
+import net.minecraft.item.crafting.CraftingManager;
+
+import net.minecraftforge.oredict.RecipeSorter;
+
 import am2.AMCore;
 import am2.AMCreativeTab;
 import am2.LogHelper;
@@ -545,6 +549,10 @@ public class ItemsCommonProxy{
 	}
 
 	public void InitRecipes(){
+		// staff/spell/bound armour combinations; checked before every other recipe
+		RecipeSorter.register("arsmagica2:spellattachment", SpellAttachmentRecipe.class, RecipeSorter.Category.SHAPELESS, "before:minecraft:shaped");
+		CraftingManager.getInstance().getRecipeList().add(0, new SpellAttachmentRecipe());
+
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(
 				new ItemStack(bookAffinity, 1, ItemAffinityBook.META_GENERAL),

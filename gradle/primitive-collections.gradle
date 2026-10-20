@@ -1,0 +1,101 @@
+// Reject new boxed primitive hash collections without modifying fixed mixin field descriptors.
+def primitiveWrapper = '(?:Byte|Short|Integer|Long|Float|Double|Character|Boolean)'
+def primitiveHashKey = java.util.regex.Pattern.compile(
+        '\\b(?:HashMap|LinkedHashMap|HashSet|LinkedHashSet)\\s*<\\s*(?:java\\.lang\\.)?' + primitiveWrapper + '\\b')
+def primitiveHashValue = java.util.regex.Pattern.compile(
+        '\\b(?:HashMap|LinkedHashMap)\\s*<[^<>]*,\\s*(?:java\\.lang\\.)?' + primitiveWrapper + '\\s*>')
+def primitiveInterfaceKey = java.util.regex.Pattern.compile(
+        '\\b(?:Map|Set)\\s*<\\s*(?:java\\.lang\\.)?' + primitiveWrapper + '\\b')
+def primitiveInterfaceValue = java.util.regex.Pattern.compile(
+        '\\bMap\\s*<[^<>]*,\\s*(?:java\\.lang\\.)?' + primitiveWrapper + '\\s*>')
+def primitiveTableKey = java.util.regex.Pattern.compile(
+        '\\b(?:Table|HashBasedTable)\\s*<\\s*(?:[^<>,]+,\\s*)?(?:java\\.lang\\.)?' + primitiveWrapper + '\\b')
+def primitiveCompositeKey = java.util.regex.Pattern.compile(
+        '\\b(?:HashMap|LinkedHashMap|HashSet|LinkedHashSet|Map|Set)\\s*<\\s*Pair\\s*<[^<>]*\\b' + primitiveWrapper + '\\b')
+def ordinaryHashInitializer = java.util.regex.Pattern.compile(
+        '=\\s*(?:new\\s+(?:java\\.util\\.)?(?:HashMap|LinkedHashMap|HashSet|LinkedHashSet)\\b'
+                + '|(?:com\\.google\\.common\\.collect\\.)?(?:Maps|Sets)\\.(?:<[^;()]*>\\s*)?new(?:HashMap|LinkedHashMap|HashSet|LinkedHashSet)\\b)')
+def hashTableInitializer = java.util.regex.Pattern.compile(
+        '=\\s*(?:com\\.google\\.common\\.collect\\.)?HashBasedTable\\.create\\b')
+
+def findBoxedHashCollections = { String text ->
+    def failures = []
+    String code = text.replaceAll(/(?s)\/\*.*?\*\/|\/\/[^\r\n]*|"(?:\\.|[^"\\])*"/) { matched ->
+        matched.replaceAll(/[^\r\n]/, ' ')
+    }
+    [primitiveHashKey, primitiveHashValue, primitiveInterfaceKey, primitiveInterfaceValue,
+            primitiveTableKey, primitiveCompositeKey].each { pattern ->
+        def matches = pattern.matcher(code)
+        while (matches.find()) {
+            int at = matches.start()
+            int declarationEnd = code.indexOf(';', matches.end())
+            String declaration = code.substring(at, declarationEnd < 0 ? code.length() : declarationEnd)
+            if ((pattern == primitiveInterfaceKey || pattern == primitiveInterfaceValue
+                    || pattern == primitiveCompositeKey) && !ordinaryHashInitializer.matcher(declaration).find()) {
+                continue
+            }
+            if (pattern == primitiveTableKey && !hashTableInitializer.matcher(declaration).find()) {
+                continue
+            }
+            int declarationStart = Math.max(code.lastIndexOf(';', at),
+                    Math.max(code.lastIndexOf('{', at), code.lastIndexOf('}', at))) + 1
+            String prefix = code.substring(declarationStart, at)
+            // @Shadow keeps a mixin target's exact type; @SuppressWarnings("boxed-collection") marks a declaration whose
+            // bytecode another mod patches by type (the reason is documented at the declaration)
+            String rawPrefix = text.substring(declarationStart, at)
+            if (!(prefix =~ /@(?:org\.spongepowered\.asm\.mixin\.)?Shadow\b/).find()
+                    && !rawPrefix.contains('@SuppressWarnings("boxed-collection")')) {
+                failures.add([1 + code.substring(0, at).count('\n'), text.substring(at, matches.end())])
+            }
+        }
+    }
+    failures.unique()
+}
+
+tasks.create('testPrimitiveCollectionRule') {
+    group = 'verification'
+    description = 'Verify rejection, lexical masking, line numbers and mixin-shadow exceptions.'
+    doLast {
+        assert !findBoxedHashCollections('HashMap<Integer, Object> bad;').isEmpty()
+        assert !findBoxedHashCollections('LinkedHashSet<Long> bad;').isEmpty()
+        assert !findBoxedHashCollections('HashMap<String, Double> bad;').isEmpty()
+        assert findBoxedHashCollections('// HashMap<Integer, Object> example\nString s = "HashSet<Long>";').isEmpty()
+        assert findBoxedHashCollections('@Shadow\n// Exact external field descriptor.\nprivate HashMap<Integer, Object> field;').isEmpty()
+        assert !findBoxedHashCollections('@Shadow private HashMap<Integer, Object> field;\nHashMap<Integer, Object> owned;').isEmpty()
+        assert findBoxedHashCollections('/* comment\ncomment */\nHashSet<Integer> bad;')[0][0] == 3
+        assert findBoxedHashCollections('Int2ObjectOpenHashMap<Object> good;').isEmpty()
+        assert !findBoxedHashCollections('Map<Integer, Object> bad = new HashMap<>();').isEmpty()
+        assert !findBoxedHashCollections('Set<Long> bad = Sets.newHashSet();').isEmpty()
+        assert !findBoxedHashCollections('Map<Item, Integer> bad = Maps.newHashMap();').isEmpty()
+        assert !findBoxedHashCollections('Map<Integer, Object> bad = Maps.<Integer, Object>newHashMap();').isEmpty()
+        assert !findBoxedHashCollections('Set<Long> bad = Sets.<Long>newHashSet();').isEmpty()
+        assert !findBoxedHashCollections('Table<Item, Integer, Price> bad = HashBasedTable.create();').isEmpty()
+        assert !findBoxedHashCollections('Map<Pair<Item, Integer>, Price> bad = new HashMap<>();').isEmpty()
+        assert findBoxedHashCollections('Map<Integer, Object> external = api.getValues();').isEmpty()
+        assert findBoxedHashCollections('Map<Object, Integer> weak = new WeakHashMap<>();').isEmpty()
+        assert findBoxedHashCollections('Map<Object, Long> concurrent = new ConcurrentHashMap<>();').isEmpty()
+        assert findBoxedHashCollections('Map<Object, Boolean> identity = new IdentityHashMap<>();').isEmpty()
+        assert findBoxedHashCollections('@Shadow private Map<Integer, Object> exact = new HashMap<>();').isEmpty()
+    }
+}
+
+tasks.create('checkPrimitiveCollections') {
+    dependsOn 'testPrimitiveCollectionRule'
+    group = 'verification'
+    description = 'Reject boxed primitive keys/elements and values in ordinary hash collections.'
+    doLast {
+        def failures = []
+        fileTree('src/main/java').matching { include '**/*.java' }.files.sort().each { source ->
+            findBoxedHashCollections(source.getText('UTF-8')).each { violation ->
+                failures.add("${project.relativePath(source)}:${violation[0]}: ${violation[1]}")
+            }
+        }
+        if (!failures.isEmpty()) {
+            throw new GradleException('Boxed primitive hash collections are forbidden. Use matching FastUtil primitive collections.\n'
+                    + failures.unique().join('\n'))
+        }
+    }
+}
+
+tasks.compileJava.dependsOn tasks.checkPrimitiveCollections
+tasks.check.dependsOn tasks.checkPrimitiveCollections

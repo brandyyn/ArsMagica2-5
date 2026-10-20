@@ -1,5 +1,7 @@
 package am2.spell.components;
 
+import am2.utility.AMHooks;
+
 import am2.api.spell.component.interfaces.ISpellComponent;
 import am2.api.spell.enums.Affinity;
 import am2.api.spell.enums.SpellModifiers;
@@ -14,7 +16,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesMagicka;
 
 import java.util.EnumSet;
 import java.util.Random;
@@ -30,7 +31,7 @@ public class RedstoneSignal implements ISpellComponent{
 
 		int activeTime = SpellUtils.instance.getModifiedInt_Mul(10, stack, caster, caster, world, 0, SpellModifiers.DURATION);
 		activeTime = SpellUtils.instance.modifyDurationBasedOnArmor(caster, activeTime);
-		MysteriumPatchesFixesMagicka.providingRedstone.add(new int[]{world.provider.dimensionId, blockx, blocky, blockz, activeTime});
+		AMHooks.provideRedstone(world, blockx, blocky, blockz, activeTime);
 		block.onNeighborBlockChange(world, blockx, blocky, blockz, Blocks.stonebrick);
 		return true;
 	}

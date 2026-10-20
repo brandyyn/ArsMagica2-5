@@ -122,7 +122,8 @@ public class AMGuiHelper{
 
 	public void tick(){
 
-		if (dummyItem == null){
+		// recreated per world so the previous world is not kept alive after leaving it
+		if (dummyItem == null || dummyItem.worldObj != Minecraft.getMinecraft().theWorld){
 			dummyItem = new EntityItem(Minecraft.getMinecraft().theWorld);
 		}else{
 			dummyItem.age++;

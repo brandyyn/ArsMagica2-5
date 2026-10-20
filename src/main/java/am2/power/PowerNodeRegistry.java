@@ -1,5 +1,8 @@
 package am2.power;
 
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import am2.LogHelper;
 import am2.api.math.AMVector3;
 import am2.api.power.IPowerNode;
@@ -17,8 +20,8 @@ import java.util.*;
 
 public class PowerNodeRegistry{
 
-	private static final HashMap<Integer, PowerNodeRegistry> serverDimensionPowerManagers = new HashMap<Integer, PowerNodeRegistry>();
-	private static final HashMap<Integer, PowerNodeRegistry> clientDimensionPowerManagers = new HashMap<Integer, PowerNodeRegistry>();
+	private static final Int2ObjectOpenHashMap<PowerNodeRegistry> serverDimensionPowerManagers = new Int2ObjectOpenHashMap<PowerNodeRegistry>();
+	private static final Int2ObjectOpenHashMap<PowerNodeRegistry> clientDimensionPowerManagers = new Int2ObjectOpenHashMap<PowerNodeRegistry>();
 	private static final PowerNodeRegistry dummyRegistry = new PowerNodeRegistry();
 
 	static final int POWER_SEARCH_RADIUS = 10; //The literal power search radius
@@ -29,72 +32,95 @@ public class PowerNodeRegistry{
 		if (world == null)
 			return dummyRegistry;
 
-		HashMap<Integer, PowerNodeRegistry> dimensionPowerManagers = world.isRemote ? clientDimensionPowerManagers : serverDimensionPowerManagers;
+		// called by every power node every tick: one primitive lookup
+		Int2ObjectOpenHashMap<PowerNodeRegistry> dimensionPowerManagers = world.isRemote ? clientDimensionPowerManagers : serverDimensionPowerManagers;
 
-		if (dimensionPowerManagers.containsKey(world.provider.dimensionId)){
-			return dimensionPowerManagers.get(world.provider.dimensionId);
-		}else{
-			PowerNodeRegistry reg = new PowerNodeRegistry();
+		PowerNodeRegistry reg = dimensionPowerManagers.get(world.provider.dimensionId);
+		if (reg == null){
+			reg = new PowerNodeRegistry();
 			dimensionPowerManagers.put(world.provider.dimensionId, reg);
-			return reg;
 		}
+		return reg;
 
 	}
 
 	private PowerNodeRegistry(){
-		ChunkCoordComparator comparator = new ChunkCoordComparator();
-		powerNodes = new TreeMap<ChunkCoordIntPair, HashMap<AMVector3, PowerNodeEntry>>(comparator);
 	}
 
-	private TreeMap<ChunkCoordIntPair, HashMap<AMVector3, PowerNodeEntry>> powerNodes;
+	/**
+	 * Chunk key (ChunkCoordIntPair.chunkXZ2Int) -> packed block position -> node data. Power nodes look themselves up
+	 * several times per tick; this replaces a TreeMap whose comparator was not a valid ordering (chunks could compare
+	 * greater than each other, so lookups missed and node lists were re-created over existing data) wrapping
+	 * AMVector3-keyed maps whose hash was x+y+z.
+	 */
+	private final Long2ObjectOpenHashMap<Long2ObjectOpenHashMap<PowerNodeEntry>> powerNodes = new Long2ObjectOpenHashMap<Long2ObjectOpenHashMap<PowerNodeEntry>>();
+
+	private static long chunkKey(int chunkX, int chunkZ){
+		return ChunkCoordIntPair.chunkXZ2Int(chunkX, chunkZ);
+	}
+
+	private static int chunkKeyX(long key){
+		return (int)key;
+	}
+
+	private static int chunkKeyZ(long key){
+		return (int)(key >>> 32);
+	}
+
+	private static long posKey(int x, int y, int z){
+		return ((long)(x & 0x3FFFFFF) << 38) | ((long)(z & 0x3FFFFFF) << 12) | (y & 0xFFF);
+	}
+
+	private static int posX(long key){
+		return (int)(key >> 38);
+	}
+
+	private static int posY(long key){
+		return (int)(key << 52 >> 52);
+	}
+
+	private static int posZ(long key){
+		return (int)(key << 26 >> 38);
+	}
 
 	public void registerPowerNode(IPowerNode node){
 		registerPowerNodeInternal(node);
 	}
 
 	PowerNodeEntry registerPowerNodeInternal(IPowerNode node){
-		ChunkCoordIntPair chunk = getChunkFromNode(node);
-		HashMap<AMVector3, PowerNodeEntry> nodeList;
 		TileEntity te = ((TileEntity)node);
 		World world = te.getWorldObj();
+		int chunkX = te.xCoord >> 4, chunkZ = te.zCoord >> 4;
+		long chunk = chunkKey(chunkX, chunkZ);
+		Long2ObjectOpenHashMap<PowerNodeEntry> nodeList = powerNodes.get(chunk);
 
-		if (powerNodes.containsKey(chunk)){
-			nodeList = powerNodes.get(chunk);
-			LogHelper.trace("Located Power Node list for chunk %d, %d", chunk.chunkXPos, chunk.chunkZPos);
-		}else{
+		if (nodeList == null){
 			LogHelper.trace("Node list not found.  Checking cache/files for prior data");
-			NBTTagCompound compound = PowerNodeCache.instance.getNBTForChunk(world, chunk);
-			nodeList = new HashMap<AMVector3, PowerNodeEntry>();
-			if (compound == null || !compound.hasKey("AM2PowerData")){
+			ChunkCoordIntPair pair = new ChunkCoordIntPair(chunkX, chunkZ);
+			NBTTagCompound compound = world == null ? null : PowerNodeCache.instance.getNBTForChunk(world, pair);
+			if (compound != null && compound.hasKey("AM2PowerData"))
+				LoadChunkFromNBT(pair, compound);
+			nodeList = powerNodes.get(chunk);
+			if (nodeList == null){
+				nodeList = new Long2ObjectOpenHashMap<PowerNodeEntry>();
 				powerNodes.put(chunk, nodeList);
-				LogHelper.trace("Prior node list not found.  Created Power Node list for chunk %d, %d", chunk.chunkXPos, chunk.chunkZPos);
-			}else{
-				LoadChunkFromNBT(chunk, compound);
-				nodeList = powerNodes.get(chunk);
-				//sanity check
-				if (nodeList == null)
-					nodeList = new HashMap<AMVector3, PowerNodeEntry>();
-				LogHelper.trace("Loaded power data for chunk %d, %d", chunk.chunkXPos, chunk.chunkZPos);
 			}
 		}
 
-		AMVector3 nodeLoc = new AMVector3((TileEntity)node);
-
+		long pos = posKey(te.xCoord, te.yCoord, te.zCoord);
 		//prevent duplicate registrations
-		if (nodeList.containsKey(nodeLoc))
-			return nodeList.get(nodeLoc);
-
-		PowerNodeEntry pnd = new PowerNodeEntry();
-
-		nodeList.put(nodeLoc, pnd);
-		LogHelper.trace("Successfully registered power node at {%d, %d, %d}", ((TileEntity)node).xCoord, ((TileEntity)node).yCoord, ((TileEntity)node).zCoord);
-
+		PowerNodeEntry pnd = nodeList.get(pos);
+		if (pnd == null){
+			pnd = new PowerNodeEntry();
+			nodeList.put(pos, pnd);
+			LogHelper.trace("Successfully registered power node at {%d, %d, %d}", te.xCoord, te.yCoord, te.zCoord);
+		}
 		return pnd;
 	}
 
 	public void removePowerNode(IPowerNode node){
-		ChunkCoordIntPair chunk = getChunkFromNode(node);
-		removePowerNode(chunk, new AMVector3((TileEntity)node));
+		TileEntity te = (TileEntity)node;
+		removePowerNode(chunkKey(te.xCoord >> 4, te.zCoord >> 4), posKey(te.xCoord, te.yCoord, te.zCoord));
 	}
 
 	/**
@@ -165,20 +191,15 @@ public class PowerNodeRegistry{
 		getPowerNodeData(node).clearNodePaths();
 	}
 
-	private void removePowerNode(ChunkCoordIntPair chunk, AMVector3 location){
-		HashMap<AMVector3, PowerNodeEntry> nodeList;
-		if (powerNodes.containsKey(chunk)){
-			nodeList = powerNodes.get(chunk);
-			nodeList.remove(location);
-
-			LogHelper.trace("Successfully removed a node from chunk %d, %d", chunk.chunkXPos, chunk.chunkZPos);
-			if (nodeList.size() == 0){
-				powerNodes.remove(chunk);
-				LogHelper.trace("No more nodes exist in chunk.  Removing tracking data for chunk.");
-			}
-		}else{
-			LogHelper.error("Power Node removal requested in a non-tracked chunk (%d, %d)!", chunk.chunkXPos, chunk.chunkZPos);
+	private void removePowerNode(long chunk, long pos){
+		Long2ObjectOpenHashMap<PowerNodeEntry> nodeList = powerNodes.get(chunk);
+		if (nodeList == null){
+			LogHelper.error("Power Node removal requested in a non-tracked chunk (%d, %d)!", chunkKeyX(chunk), chunkKeyZ(chunk));
+			return;
 		}
+		nodeList.remove(pos);
+		if (nodeList.isEmpty())
+			powerNodes.remove(chunk);
 	}
 
 	public float requestPower(IPowerNode destination, PowerTypes type, float amount){
@@ -284,13 +305,13 @@ public class PowerNodeRegistry{
 	}
 
 	PowerNodeEntry getPowerNodeData(IPowerNode node){
-		ChunkCoordIntPair pair = getChunkFromNode(node);
-		if (pair != null && powerNodes.containsKey(pair)){
-			PowerNodeEntry pnd = powerNodes.get(pair).get(new AMVector3((TileEntity)node));
+		TileEntity te = (TileEntity)node;
+		Long2ObjectOpenHashMap<PowerNodeEntry> nodeList = powerNodes.get(chunkKey(te.xCoord >> 4, te.zCoord >> 4));
+		if (nodeList != null){
+			PowerNodeEntry pnd = nodeList.get(posKey(te.xCoord, te.yCoord, te.zCoord));
 			if (pnd != null)
 				return pnd;
 		}
-
 		return registerPowerNodeInternal(node);
 	}
 
@@ -302,108 +323,60 @@ public class PowerNodeRegistry{
 	 * @return An array of IPowerNodes
 	 */
 	public IPowerNode[] getAllNearbyNodes(World world, AMVector3 location, PowerTypes power){
-		//get the list of chunks we'll need to search in
-		ChunkCoordIntPair[] search = getSearchChunks(location);
-
-		//build the list of nodes from that chunk
-		HashMap<AMVector3, PowerNodeEntry> nodesToSearch = new HashMap<AMVector3, PowerNodeEntry>();
-		for (ChunkCoordIntPair pair : search){
-			HashMap<AMVector3, PowerNodeEntry> nodesInChunk = powerNodes.get(pair);
-			if (nodesInChunk != null){
-				//Add only vectors that are less than or equal to POWER_SEARCH_RADIUS_SQ away
-				for (AMVector3 vector : nodesInChunk.keySet()){
-					if (location.distanceSqTo(vector) <= POWER_SEARCH_RADIUS_SQ && !vector.equals(location)){
-						nodesToSearch.put(vector, nodesInChunk.get(vector));
-					}
-				}
-			}
-		}
-
-		//spin through and create our list of providers
+		int cx = (int)location.x, cy = (int)location.y, cz = (int)location.z;
+		int chunkX = cx >> 4, chunkZ = cz >> 4;
 		ArrayList<IPowerNode> nodes = new ArrayList<IPowerNode>();
 		int deadNodesRemoved = 0;
-		for (AMVector3 vector : nodesToSearch.keySet()){
-			if (!world.checkChunksExist((int)vector.x, (int)vector.y, (int)vector.z, (int)vector.x, (int)vector.y, (int)vector.z)){
-				continue;
+		// the home chunk and the neighbours the search radius reaches into
+		for (int i = -1; i <= 1; ++i){
+			for (int j = -1; j <= 1; ++j){
+				if ((i != 0 || j != 0) && ((cx + POWER_SEARCH_RADIUS * i) >> 4 != chunkX + i || (cz + POWER_SEARCH_RADIUS * j) >> 4 != chunkZ + j))
+					continue;
+				long chunk = chunkKey(chunkX + i, chunkZ + j);
+				Long2ObjectOpenHashMap<PowerNodeEntry> nodesInChunk = powerNodes.get(chunk);
+				if (nodesInChunk == null)
+					continue;
+				long[] positions = nodesInChunk.keySet().toLongArray();
+				for (long pos : positions){
+					int x = posX(pos), y = posY(pos), z = posZ(pos);
+					int dx = x - cx, dy = y - cy, dz = z - cz;
+					if (dx * dx + dy * dy + dz * dz > POWER_SEARCH_RADIUS_SQ || (dx == 0 && dy == 0 && dz == 0))
+						continue;
+					// never load a chunk to look for nodes
+					if (!world.blockExists(x, y, z))
+						continue;
+					TileEntity te = world.getTileEntity(x, y, z);
+					if (!(te instanceof IPowerNode)){
+						//opportune time to remove dead power nodes
+						removePowerNode(chunk, pos);
+						deadNodesRemoved++;
+						continue;
+					}
+					nodes.add((IPowerNode)te);
+				}
 			}
-			Chunk chunk = world.getChunkFromBlockCoords((int)vector.x, (int)vector.z);
-			if (!chunk.isChunkLoaded)
-				continue;
-			TileEntity te = world.getTileEntity((int)vector.x, (int)vector.y, (int)vector.z);
-			if (te == null || !(te instanceof IPowerNode)){
-				//opportune time to remove dead power nodes
-				removePowerNode(chunk.getChunkCoordIntPair(), vector);
-				deadNodesRemoved++;
-				continue;
-			}
-			IPowerNode node = (IPowerNode)te;
-			nodes.add(node);
 		}
 
 		if (deadNodesRemoved > 0)
 			LogHelper.trace("Removed %d dead power nodes", deadNodesRemoved);
 
-		IPowerNode[] nodeArray = nodes.toArray(new IPowerNode[nodes.size()]);
-
-		LogHelper.trace("Located %d nearby power providers", nodeArray.length);
-
-		return nodeArray;
-	}
-
-	private ChunkCoordIntPair[] getSearchChunks(AMVector3 location){
-		//Calculate the chunk X/Z location of the search center
-		int chunkX = (int)location.x >> 4;
-		int chunkZ = (int)location.z >> 4;
-
-		ArrayList<ChunkCoordIntPair> searchChunks = new ArrayList<ChunkCoordIntPair>();
-		//always search the chunk you're already in!
-		searchChunks.add(new ChunkCoordIntPair(chunkX, chunkZ));
-
-		for (int i = -1; i <= 1; ++i){
-			for (int j = -1; j <= 1; ++j){
-				//don't include the home chunk, this has already been added.  We're only concerned with neighboring chunks.
-				if (i == 0 && j == 0) continue;
-				//create the new CCIP at the offset location
-				ChunkCoordIntPair newPair = new ChunkCoordIntPair(chunkX + i, chunkZ + j);
-				//offset the x/z locations by POWER_SEARCH_RADIUS * i/j respectively and calculate the chunk that would fall in.
-				//If it matches the new chunk coordinates, we add that chunk to the list of chunks to search.
-				if (((int)location.x + (POWER_SEARCH_RADIUS * i)) >> 4 == newPair.chunkXPos && ((int)location.z + (POWER_SEARCH_RADIUS * j)) >> 4 == newPair.chunkZPos){
-					searchChunks.add(newPair);
-				}
-			}
-		}
-
-		return searchChunks.toArray(new ChunkCoordIntPair[searchChunks.size()]);
-	}
-
-	private ChunkCoordIntPair getChunkFromNode(IPowerNode node){
-		TileEntity te = (TileEntity)node;
-		if (te.getWorldObj() == null)
-			return null;
-		if (!te.getWorldObj().checkChunksExist(te.xCoord, 0, te.zCoord, te.xCoord, te.getWorldObj().getActualHeight(), te.zCoord))
-			return new ChunkCoordIntPair(te.xCoord >> 4, te.zCoord >> 4);
-		return te.getWorldObj().getChunkFromBlockCoords(te.xCoord, te.zCoord).getChunkCoordIntPair();
-	}
-
-	private ChunkCoordIntPair getChunkFromPosition(World world, AMVector3 location){
-		return new ChunkCoordIntPair((int)location.x >> 4, (int)location.z >> 4);
+		return nodes.toArray(new IPowerNode[nodes.size()]);
 	}
 
 	public void SaveChunkToNBT(ChunkCoordIntPair chunk, NBTTagCompound compound){
-		HashMap<AMVector3, PowerNodeEntry> nodeData = powerNodes.get(chunk);
+		Long2ObjectOpenHashMap<PowerNodeEntry> nodeData = powerNodes.get(chunkKey(chunk.chunkXPos, chunk.chunkZPos));
 		if (nodeData == null){
 			//we're not tracking anything in this chunk
 			return;
 		}
 		NBTTagList powerNodeTagList = new NBTTagList();
-		for (AMVector3 location : nodeData.keySet()){
+		for (Long2ObjectMap.Entry<PowerNodeEntry> entry : nodeData.long2ObjectEntrySet()){
+			long pos = entry.getLongKey();
 			NBTTagCompound nodeCompound = new NBTTagCompound();
-			nodeCompound.setInteger("xCoord", (int)location.x);
-			nodeCompound.setInteger("yCoord", (int)location.y);
-			nodeCompound.setInteger("zCoord", (int)location.z);
-			PowerNodeEntry pnd = nodeData.get(location);
-			nodeCompound.setTag("nodeData", pnd.saveToNBT());
-
+			nodeCompound.setInteger("xCoord", posX(pos));
+			nodeCompound.setInteger("yCoord", posY(pos));
+			nodeCompound.setInteger("zCoord", posZ(pos));
+			nodeCompound.setTag("nodeData", entry.getValue().saveToNBT());
 			powerNodeTagList.appendTag(nodeCompound);
 		}
 
@@ -416,43 +389,25 @@ public class PowerNodeRegistry{
 		if (!compound.hasKey("AM2PowerData"))
 			return; //nothing was saved in this chunk for the power system
 		NBTTagList powerNodeTagList = compound.getTagList("AM2PowerData", Constants.NBT.TAG_COMPOUND);
-		HashMap<AMVector3, PowerNodeEntry> chunkPowerData = new HashMap<AMVector3, PowerNodeEntry>();
+		Long2ObjectOpenHashMap<PowerNodeEntry> chunkPowerData = new Long2ObjectOpenHashMap<PowerNodeEntry>();
 		for (int i = 0; i < powerNodeTagList.tagCount(); ++i){
-			NBTTagCompound nodeCompound = (NBTTagCompound)powerNodeTagList.getCompoundTagAt(i);
-			AMVector3 nodeLocation = new AMVector3(nodeCompound.getInteger("xCoord"), nodeCompound.getInteger("yCoord"), nodeCompound.getInteger("zCoord"));
+			NBTTagCompound nodeCompound = powerNodeTagList.getCompoundTagAt(i);
 			PowerNodeEntry pnd = new PowerNodeEntry();
 			pnd.readFromNBT(nodeCompound.getCompoundTag("nodeData"));
-
-			chunkPowerData.put(nodeLocation, pnd);
+			chunkPowerData.put(posKey(nodeCompound.getInteger("xCoord"), nodeCompound.getInteger("yCoord"), nodeCompound.getInteger("zCoord")), pnd);
 		}
 
 		LogHelper.trace("Loaded %d power node entries", chunkPowerData.size());
 
-		powerNodes.put(chunk, chunkPowerData);
+		powerNodes.put(chunkKey(chunk.chunkXPos, chunk.chunkZPos), chunkPowerData);
 	}
 
 	public void unloadChunk(Chunk chunk){
-		powerNodes.remove(chunk.getChunkCoordIntPair());
+		powerNodes.remove(chunkKey(chunk.xPosition, chunk.zPosition));
 	}
 
 	public boolean hasDataForChunk(Chunk chunk){
-		return powerNodes.containsKey(chunk.getChunkCoordIntPair());
-	}
-
-	private class ChunkCoordComparator implements Comparator<ChunkCoordIntPair>{
-
-		@Override
-		public int compare(ChunkCoordIntPair a, ChunkCoordIntPair b){
-			if (a.chunkXPos == b.chunkXPos && a.chunkZPos == b.chunkZPos)
-				return 0;
-
-			if (a.chunkXPos > b.chunkXPos)
-				return 1;
-			else if (a.chunkZPos > b.chunkZPos)
-				return 1;
-			return -1;
-		}
-
+		return powerNodes.containsKey(chunkKey(chunk.xPosition, chunk.zPosition));
 	}
 
 	private class IPowerNodeComparer implements Comparator<IPowerNode>{
@@ -504,7 +459,8 @@ public class PowerNodeRegistry{
 
 	public HashMap<ChunkCoordIntPair, NBTTagCompound> saveAll(){
 		HashMap<ChunkCoordIntPair, NBTTagCompound> allData = new HashMap<ChunkCoordIntPair, NBTTagCompound>();
-		for (ChunkCoordIntPair pair : this.powerNodes.keySet()){
+		for (long key : powerNodes.keySet()){
+			ChunkCoordIntPair pair = new ChunkCoordIntPair(chunkKeyX(key), chunkKeyZ(key));
 			NBTTagCompound chunkCompound = new NBTTagCompound();
 			SaveChunkToNBT(pair, chunkCompound);
 			allData.put(pair, chunkCompound);

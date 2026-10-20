@@ -1,5 +1,6 @@
 package am2.blocks.tileentities;
 
+import it.unimi.dsi.fastutil.objects.Reference2FloatOpenHashMap;
 import am2.AMCore;
 import am2.api.blocks.MultiblockStructureDefinition;
 import am2.api.blocks.MultiblockStructureDefinition.StructureGroup;
@@ -39,7 +40,7 @@ public class TileEntityCelestialPrism extends TileEntityObelisk implements IMult
 
 		pillars = structure.createGroup("pillars", 4);
 
-		caps = new HashMap<>();
+		caps = new Reference2FloatOpenHashMap<StructureGroup>();
 		caps.put(glass, 1.1f);
 		caps.put(gold, 1.4f);
 		caps.put(diamond, 2f);
@@ -96,12 +97,9 @@ public class TileEntityCelestialPrism extends TileEntityObelisk implements IMult
 			else if (group == wizardChalkCircle)
 				wizChalkFound = true;
 
-			for (StructureGroup cap : caps.keySet()){
-				if (group == cap){
-					capsLevel = caps.get(cap);
-					onlyChargeAtNight = group == moonstone;
-					break;
-				}
+			if (caps.containsKey(group)){
+				capsLevel = caps.getFloat(group);
+				onlyChargeAtNight = group == moonstone;
 			}
 		}
 

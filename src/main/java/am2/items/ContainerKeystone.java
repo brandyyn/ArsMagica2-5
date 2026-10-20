@@ -1,5 +1,7 @@
 package am2.items;
 
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import am2.containers.slots.SlotLock;
 import am2.containers.slots.SlotRuneOnly;
 import am2.items.ItemKeystone.KeystoneCombination;
@@ -247,48 +249,30 @@ public class ContainerKeystone extends Container{
 	}
 
 	private boolean inventoryContainsAllMetas(int[] metas){
-		HashMap<Integer, Integer> metaQuantities = new HashMap<Integer, Integer>();
-		HashMap<Integer, Integer> invQuantities = new HashMap<Integer, Integer>();
+		Int2IntOpenHashMap metaQuantities = new Int2IntOpenHashMap();
+		Int2IntOpenHashMap invQuantities = new Int2IntOpenHashMap();
 
 		for (int i : metas){
 			if (i == -1) continue;
-			if (metaQuantities.containsKey(i)){
-				int qty = metaQuantities.get(i);
-				metaQuantities.put(i, ++qty);
-			}else{
-				metaQuantities.put(i, 1);
-			}
+			metaQuantities.addTo(i, 1);
 		}
 
 		for (int i = 0; i < keyStoneInventory.getSizeInventory(); ++i){
 			ItemStack stack = keyStoneInventory.getStackInSlot(i);
 			if (stack == null) continue;
-			int meta = stack.getItemDamage();
-			if (invQuantities.containsKey(meta)){
-				int qty = invQuantities.get(meta);
-				invQuantities.put(meta, ++qty);
-			}else{
-				invQuantities.put(meta, 1);
-			}
+			invQuantities.addTo(stack.getItemDamage(), 1);
 		}
 
 		if (runeBag != null){
 			for (int i = 0; i < runeBag.getSizeInventory(); ++i){
 				ItemStack stack = runeBag.getStackInSlot(i);
 				if (stack == null) continue;
-				int meta = stack.getItemDamage();
-				if (invQuantities.containsKey(meta)){
-					int qty = invQuantities.get(meta);
-					invQuantities.put(meta, ++qty);
-				}else{
-					invQuantities.put(meta, 1);
-				}
+				invQuantities.addTo(stack.getItemDamage(), 1);
 			}
 		}
 
-		for (int i : metaQuantities.keySet()){
-			if (!invQuantities.containsKey(i)) return false;
-			if (invQuantities.get(i) < metaQuantities.get(i)) return false;
+		for (Int2IntMap.Entry needed : metaQuantities.int2IntEntrySet()){
+			if (invQuantities.get(needed.getIntKey()) < needed.getIntValue()) return false;
 		}
 
 		return true;

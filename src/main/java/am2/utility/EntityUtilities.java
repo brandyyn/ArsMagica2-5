@@ -1,5 +1,6 @@
 package am2.utility;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import am2.AMCore;
 import am2.api.math.AMVector3;
 import am2.blocks.tileentities.TileEntitySummoner;
@@ -10,6 +11,7 @@ import am2.entities.ai.selectors.SummonEntitySelector;
 import am2.items.ItemCrystalPhylactery;
 import am2.items.ItemsCommonProxy;
 import am2.playerextensions.ExtendedProperties;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
@@ -37,8 +39,8 @@ import java.util.HashMap;
 import java.util.List;
 
 public class EntityUtilities{
-	private static final HashMap<Integer, ArrayList> storedTasks = new HashMap<>();
-	private static final HashMap<Integer, ArrayList> storedAITasks = new HashMap<>();
+	private static final Int2ObjectOpenHashMap<ArrayList> storedTasks = new Int2ObjectOpenHashMap<ArrayList>();
+	private static final Int2ObjectOpenHashMap<ArrayList> storedAITasks = new Int2ObjectOpenHashMap<ArrayList>();
 	private static final String isSummonKey = "AM2_Entity_Is_Made_Summon";
 	private static final String summonEntityIDs = "AM2_Summon_Entity_IDs";
 	private static final String summonDurationKey = "AM2_Summon_Duration";
@@ -194,7 +196,9 @@ public class EntityUtilities{
 	}
 
 	public static boolean isSummon(EntityLivingBase entityliving){
-		return entityliving.getEntityData().getBoolean(isSummonKey);
+		// runs for every entity every tick: read Forge's data without creating it
+		NBTTagCompound data = ((IForgeEntityData)entityliving).am2$getCustomEntityData();
+		return data != null && data.getBoolean(isSummonKey);
 	}
 
 	public static void setOwner(EntityLivingBase entityliving, EntityLivingBase owner){

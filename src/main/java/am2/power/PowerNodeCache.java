@@ -1,5 +1,6 @@
 package am2.power;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import am2.AMCore;
 import am2.LogHelper;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -23,7 +24,7 @@ public class PowerNodeCache{
 	public static String folder = "AM2PowerData";
 	private static final String pndID = "pnd_%d_%d";
 
-	private static HashMap<Integer, File> saveDirs = new HashMap<Integer, File>();
+	private static final Int2ObjectOpenHashMap<File> saveDirs = new Int2ObjectOpenHashMap<File>();
 	private static HashMap<String, File> saveFilesCached = new HashMap<String, File>();
 	private static HashMap<RegionCoordinates, NBTTagCompound> dataCache = new HashMap<RegionCoordinates, NBTTagCompound>();
 

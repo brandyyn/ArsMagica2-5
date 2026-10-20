@@ -1,5 +1,6 @@
 package am2.spell.shapes;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import am2.AMCore;
 import am2.api.power.PowerTypes;
 import am2.api.spell.ItemSpellBase;
@@ -32,10 +33,10 @@ import java.util.HashMap;
 
 public class Beam implements ISpellShape{
 
-	private final HashMap<Integer, AMBeam> beams;
+	private final Int2ObjectOpenHashMap<AMBeam> beams;
 
 	public Beam(){
-		beams = new HashMap<>();
+		beams = new Int2ObjectOpenHashMap<AMBeam>();
 	}
 
 	@Override

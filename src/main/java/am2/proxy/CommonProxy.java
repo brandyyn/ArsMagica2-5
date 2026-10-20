@@ -1,5 +1,10 @@
 package am2.proxy;
 
+import am2.utility.DimensionUtilities;
+import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2IntMaps;
+import it.unimi.dsi.fastutil.objects.Reference2IntMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import am2.*;
 import am2.affinity.AffinityHelper;
 import am2.api.math.AMVector3;
@@ -56,6 +61,7 @@ import net.minecraftforge.common.MinecraftForge;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import static am2.blocks.BlocksCommonProxy.AMOres;
 
@@ -77,7 +83,7 @@ public class CommonProxy{
 	private ServerTickHandler serverTickHandler;
 
 	private final HashMap<EntityLivingBase, ArrayList<PotionEffect>> deferredPotionEffects = new HashMap<EntityLivingBase, ArrayList<PotionEffect>>();
-	private final HashMap<EntityLivingBase, Integer> deferredDimensionTransfers = new HashMap<EntityLivingBase, Integer>();
+	private Reference2IntOpenHashMap<EntityLivingBase> deferredDimensionTransfers = new Reference2IntOpenHashMap<EntityLivingBase>();
 
 	private int totalFlickerCount = 0;
 
@@ -97,8 +103,10 @@ public class CommonProxy{
 		BuffList.postInit();
 
 		MinecraftForge.EVENT_BUS.register(new AMEventHandler());
+		MinecraftForge.EVENT_BUS.register(new am2.utility.Soulbound());
 		FMLCommonHandler.instance().bus().register(new AMEventHandler());
 		MinecraftForge.EVENT_BUS.register(PowerNodeCache.instance);
+		MinecraftForge.EVENT_BUS.register(itemFrameWatcher);
 		MinecraftForge.EVENT_BUS.register(new AffinityHelper());
 		MinecraftForge.EVENT_BUS.register(new SpellUnlockManager());
 		MinecraftForge.EVENT_BUS.register(new ArmorEventHandler());
@@ -106,8 +114,7 @@ public class CommonProxy{
 		MinecraftForge.EVENT_BUS.register(EntityManager.instance);
 		MinecraftForge.EVENT_BUS.register(new AMWorldEventHandler());
 		serverTickHandler = new ServerTickHandler();
-		FMLCommonHandler.instance().bus().register(new ServerTickHandler());
-		MinecraftForge.EVENT_BUS.register(new ServerTickHandler());
+		FMLCommonHandler.instance().bus().register(serverTickHandler);
 
 		if (!SkillTreeManager.instance.isSkillDisabled(SkillManager.instance.getSkill("Shrink")))
 			MinecraftForge.EVENT_BUS.register(new ShrinkHandler());
@@ -217,16 +224,9 @@ public class CommonProxy{
 	}
 
 	public Entity getEntityByID(World world, int ID){
-		Entity ent = null;
-		for (Object o : world.loadedEntityList){
-			if (o instanceof EntityLivingBase){
-				ent = (EntityLivingBase)o;
-				if (ent.getEntityId() == ID){
-					return ent;
-				}
-			}
-		}
-		return null;
+		// the world's id map instead of a scan of every loaded entity
+		Entity ent = world.getEntityByID(ID);
+		return ent instanceof EntityLivingBase ? ent : null;
 	}
 
 	public WorldServer[] getWorldServers(){
@@ -298,20 +298,30 @@ public class CommonProxy{
 		deferredDimensionTransfers.put(ent, dimension);
 	}
 
-	public HashMap<EntityLivingBase, ArrayList<PotionEffect>> getDeferredPotionEffects(){
-		return (HashMap<EntityLivingBase, ArrayList<PotionEffect>>)deferredPotionEffects.clone();
-	}
-
-	public void clearDeferredDimensionTransfers(){
-		deferredDimensionTransfers.clear();
-	}
-
-	public HashMap<EntityLivingBase, Integer> getDeferredDimensionTransfers(){
-		return (HashMap<EntityLivingBase, Integer>)deferredDimensionTransfers.clone();
-	}
-
-	public void clearDeferredPotionEffects(){
+	/**
+	 * Applies the queued potion effects. Called every server tick, so it returns before copying anything while the
+	 * queue is empty (the queue used to be cloned twice per entity, every world tick).
+	 */
+	public void applyDeferredPotionEffects(){
+		if (deferredPotionEffects.isEmpty())
+			return;
+		ArrayList<Map.Entry<EntityLivingBase, ArrayList<PotionEffect>>> pending = new ArrayList<Map.Entry<EntityLivingBase, ArrayList<PotionEffect>>>(deferredPotionEffects.entrySet());
 		deferredPotionEffects.clear();
+		for (Map.Entry<EntityLivingBase, ArrayList<PotionEffect>> entry : pending)
+			for (PotionEffect effect : entry.getValue())
+				entry.getKey().addPotionEffect(effect);
+	}
+
+	/** Performs the queued dimension transfers; see {@link #applyDeferredPotionEffects()}. */
+	public void applyDeferredDimensionTransfers(){
+		if (deferredDimensionTransfers.isEmpty())
+			return;
+		Reference2IntOpenHashMap<EntityLivingBase> pending = deferredDimensionTransfers;
+		deferredDimensionTransfers = new Reference2IntOpenHashMap<EntityLivingBase>();
+		for (ObjectIterator<Reference2IntMap.Entry<EntityLivingBase>> it = Reference2IntMaps.fastIterator(pending); it.hasNext(); ){
+			Reference2IntMap.Entry<EntityLivingBase> entry = it.next();
+			DimensionUtilities.doDimensionTransfer(entry.getKey(), entry.getIntValue());
+		}
 	}
 
 	public void requestPowerPathVisuals(IPowerNode node, EntityPlayerMP player){

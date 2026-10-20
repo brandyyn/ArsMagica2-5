@@ -1,5 +1,7 @@
 package am2.blocks.tileentities.flickers;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import am2.api.flickers.IFlickerController;
 import am2.api.flickers.IFlickerFunctionality;
 import am2.api.power.PowerTypes;
@@ -18,7 +20,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import java.util.HashMap;
 
 public class TileEntityFlickerControllerBase extends TileEntityAMPower implements IFlickerController{
-	private HashMap<Integer, byte[]> sigilMetadata;
+	private Int2ObjectOpenHashMap<byte[]> sigilMetadata;
 	private IFlickerFunctionality operator;
 	private int tickCounter;
 	Affinity[] nearbyList = new Affinity[6];
@@ -27,7 +29,7 @@ public class TileEntityFlickerControllerBase extends TileEntityAMPower implement
 
 	public TileEntityFlickerControllerBase(){
 		super(500);
-		sigilMetadata = new HashMap<Integer, byte[]>();
+		sigilMetadata = new Int2ObjectOpenHashMap<byte[]>();
 	}
 
 	protected void setOperator(IFlickerFunctionality operator){
@@ -153,10 +155,10 @@ public class TileEntityFlickerControllerBase extends TileEntityAMPower implement
 		super.writeToNBT(par1nbtTagCompound);
 
 		NBTTagList sigilMetaStore = new NBTTagList();
-		for (Integer i : sigilMetadata.keySet()){
+		for (Int2ObjectMap.Entry<byte[]> entry : sigilMetadata.int2ObjectEntrySet()){
 			NBTTagCompound sigilMetaEntry = new NBTTagCompound();
-			sigilMetaEntry.setInteger("sigil_mask", i);
-			sigilMetaEntry.setByteArray("sigil_meta", sigilMetadata.get(i));
+			sigilMetaEntry.setInteger("sigil_mask", entry.getIntKey());
+			sigilMetaEntry.setByteArray("sigil_meta", entry.getValue());
 			sigilMetaStore.appendTag(sigilMetaEntry);
 		}
 
@@ -167,12 +169,12 @@ public class TileEntityFlickerControllerBase extends TileEntityAMPower implement
 	public void readFromNBT(NBTTagCompound par1nbtTagCompound){
 		super.readFromNBT(par1nbtTagCompound);
 
-		sigilMetadata = new HashMap<Integer, byte[]>();
+		sigilMetadata = new Int2ObjectOpenHashMap<byte[]>();
 
 		NBTTagList sigilMetaStore = par1nbtTagCompound.getTagList("sigil_metadata_collection", Constants.NBT.TAG_COMPOUND);
 		for (int i = 0; i < sigilMetaStore.tagCount(); ++i){
 			NBTTagCompound sigilMetaEntry = (NBTTagCompound)sigilMetaStore.getCompoundTagAt(i);
-			Integer mask = sigilMetaEntry.getInteger("sigil_mask");
+			int mask = sigilMetaEntry.getInteger("sigil_mask");
 			byte[] meta = sigilMetaEntry.getByteArray("sigil_meta");
 			sigilMetadata.put(mask, meta);
 		}

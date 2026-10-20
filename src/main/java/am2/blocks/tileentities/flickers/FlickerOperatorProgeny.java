@@ -1,5 +1,6 @@
 package am2.blocks.tileentities.flickers;
 
+import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
 import am2.AMCore;
 import am2.api.flickers.IFlickerController;
 import am2.api.flickers.IFlickerFunctionality;
@@ -36,7 +37,7 @@ public class FlickerOperatorProgeny implements IFlickerFunctionality{
 
 	@Override
 	public boolean DoOperation(World worldObj, IFlickerController habitat, boolean powered){
-		HashMap<Class, Integer> entityCount = new HashMap<Class, Integer>();
+		Reference2IntOpenHashMap<Class> entityCount = new Reference2IntOpenHashMap<Class>();
 		int radius = 8;
 		int diameter = radius * 2 + 1;
 		List<EntityAnimal> creatures = worldObj.getEntitiesWithinAABB(EntityAnimal.class, AxisAlignedBB.getBoundingBox(((TileEntity)habitat).xCoord - radius, ((TileEntity)habitat).yCoord - radius, ((TileEntity)habitat).zCoord - radius, ((TileEntity)habitat).xCoord + radius + 1, ((TileEntity)habitat).yCoord + radius + 1, ((TileEntity)habitat).zCoord + radius + 1));
@@ -44,9 +45,7 @@ public class FlickerOperatorProgeny implements IFlickerFunctionality{
 			Class clazz = creature.getClass();
 			if (!SpawnBlacklists.canProgenyAffect(clazz))
 				continue;
-			Integer count = entityCount.get(clazz);
-			if (count == null)
-				count = 0;
+			int count = entityCount.getInt(clazz);
 			if (!creature.isInLove() && creature.getGrowingAge() == 0)
 				count++;
 			entityCount.put(clazz, count);

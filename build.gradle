@@ -5,61 +5,66 @@ buildscript {
             name = "forge"
             url = "https://maven.minecraftforge.net/"
         }
+        maven {
+            url = "https://jitpack.io"
+        }
     }
     dependencies {
-        classpath ('com.anatawa12.forge:ForgeGradle:1.2-1.0.+') {
-            changing = true
+        classpath('com.github.GTNewHorizons:ForgeGradle:1.2.11') {
+            // Exclude transitive dependencies that mess things up
+            exclude group: "org.eclipse.equinox"
+            exclude group: "org.eclipse.jdt"
         }
     }
 }
 
-
 apply plugin: 'forge'
+apply from: 'gradle/primitive-collections.gradle'
 
 version = "1.8.5-RE"
-group= "am2" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+group = "am2" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "AM2.5"
+def modid = "arsmagica2"
+def gtnhLibJar = file('libs/gtnhlib-0.11.52-dev.jar')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 minecraft {
     version = "1.7.10-10.13.4.1614-1.7.10"
     runDir = "run"
-    //mappings = "stable_12"  //uncomment this line to use newest Forge mappings. Needs a lot of rework.
 }
 
-jar {
-	manifest {
-		attributes 'FMLCorePlugin' : 'net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixLoaderMagicka'
-		attributes 'FMLCorePluginContainsFMLMod' : 'true'
-        attributes 'FMLAT': 'arsmagica2_at.cfg'
-	}
-}
-
-task devJar(type: Jar) {
-	manifest {
-		attributes 'FMLCorePlugin' : 'net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixLoaderMagicka'
-		attributes 'FMLCorePluginContainsFMLMod' : 'true'
-        attributes 'FMLAT': 'arsmagica2_at.cfg'
-	}
-	classifier = 'dev'
-	from sourceSets.main.output
-}
-
-task sourceJar(type: Jar) {
-	manifest {}
-	classifier = 'sources'
-	from sourceSets.main.allSource
-}
-
-reobf {
-}
-
-artifacts {
-	archives devJar, sourceJar
+repositories {
+    mavenCentral()
+    maven {
+        // Fix ForgeGradle on 6+
+        name = "forge"
+        url = "https://maven.minecraftforge.net/"
+        metadataSources {
+            artifact()
+        }
+    }
+    maven {
+        url 'https://jitpack.io'
+    }
 }
 
 dependencies {
+    // GTNHLib provides fastutil and the coordinate collections at runtime
+    compile files(gtnhLibJar)
+    compile 'it.unimi.dsi:fastutil:8.5.18'
+}
+
+// ForgeGradle adds every jar in libs to compile automatically; keep GTNHLib as the single explicit entry.
+def forgeGradleLibDependency = configurations.compile.dependencies.find { dependency ->
+    dependency instanceof org.gradle.api.artifacts.SelfResolvingDependency &&
+            dependency.resolve().size() > 1 && dependency.resolve().contains(gtnhLibJar)
+}
+if (forgeGradleLibDependency != null) {
+    configurations.compile.dependencies.remove(forgeGradleLibDependency)
+    dependencies {
+        compile fileTree(dir: 'libs', include: ['*.jar'], exclude: ['gtnhlib-0.11.52-dev.jar'])
+    }
 }
 
 processResources
@@ -83,5 +88,73 @@ processResources
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+
+    // "name (2).png" texture backups (see AGENTS.md) stay in the repo, not in the jar
+    exclude '**/* (*).png'
 }
 
+// -- UniMixins --
+
+def unimixinsVersion = "0.1.14"
+
+dependencies {
+    implementation("com.github.LegacyModdingMC.UniMixins:unimixins-all-1.7.10:$unimixinsVersion:dev")
+    annotationProcessor("com.github.LegacyModdingMC.UniMixins:unimixins-all-1.7.10:$unimixinsVersion:dev")
+}
+
+configurations.compile.dependencies.each {
+    if (it instanceof ExternalModuleDependency) {
+        it.exclude module: "SpongeMixins"
+        it.exclude module: "SpongePoweredMixin"
+        it.exclude module: "00gasstation-mc1.7.10"
+        it.exclude module: "gtnhmixins"
+    }
+}
+
+runClient {
+    args("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
+}
+
+runServer {
+    args("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
+}
+
+def outSrgFile = "${tasks.compileJava.temporaryDir}/outSrg.srg"
+def outRefMapFile = "${tasks.compileJava.temporaryDir}/mixins.${modid}.refmap.json"
+
+def am2Manifest = {
+    attributes(
+            // Early mixins (vanilla classes) are registered by this loading plugin; it replaces the old ASM coremod.
+            'FMLCorePlugin': 'am2.mixin.AM2EarlyMixins',
+            'FMLCorePluginContainsFMLMod': 'true',
+            'ForceLoadAsMod': 'true',
+            'FMLAT': 'arsmagica2_at.cfg'
+    )
+}
+
+jar {
+    manifest am2Manifest
+    from outRefMapFile
+}
+
+task devJar(type: Jar) {
+    manifest am2Manifest
+    classifier = 'dev'
+    from sourceSets.main.output
+    from outRefMapFile
+}
+
+task sourceJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives devJar, sourceJar
+}
+
+tasks.compileJava.options.compilerArgs += ["-AreobfSrgFile=${tasks.reobf.srg}", "-AoutSrgFile=${outSrgFile}", "-AoutRefMapFile=${outRefMapFile}"]
+
+reobf {
+    addExtraSrgFile outSrgFile
+}

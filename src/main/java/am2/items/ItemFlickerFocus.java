@@ -1,5 +1,6 @@
 package am2.items;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import am2.api.flickers.IFlickerFunctionality;
 import am2.blocks.tileentities.flickers.FlickerOperatorRegistry;
 import am2.texture.ResourceManager;
@@ -18,7 +19,7 @@ import java.util.List;
 public class ItemFlickerFocus extends ArsMagicaItem{
 
 	@SideOnly(Side.CLIENT)
-	private HashMap<Integer, IIcon> flickerIcons;
+	private Int2ObjectOpenHashMap<IIcon> flickerIcons;
 
 	public ItemFlickerFocus(){
 		super();
@@ -41,7 +42,7 @@ public class ItemFlickerFocus extends ArsMagicaItem{
 
 	@Override
 	public void registerIcons(IIconRegister par1IconRegister){
-		flickerIcons = new HashMap<Integer, IIcon>();
+		flickerIcons = new Int2ObjectOpenHashMap<IIcon>();
 		for (int i : FlickerOperatorRegistry.instance.getMasks()){
 			IFlickerFunctionality operator = FlickerOperatorRegistry.instance.getOperatorForMask(i);
 			flickerIcons.put(i, ResourceManager.RegisterTexture(operator.getClass().getSimpleName(), par1IconRegister));

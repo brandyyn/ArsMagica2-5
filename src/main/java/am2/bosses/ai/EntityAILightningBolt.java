@@ -6,8 +6,8 @@ import am2.bosses.EntityLightningGuardian;
 import am2.damage.DamageSources;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
-import thehippomaster.AnimationAPI.AIAnimation;
-import thehippomaster.AnimationAPI.IAnimatedEntity;
+import am2.animation.AIAnimation;
+import am2.animation.IAnimatedEntity;
 
 public class EntityAILightningBolt extends AIAnimation{
 

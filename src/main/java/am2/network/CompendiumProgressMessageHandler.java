@@ -12,6 +12,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItemFrame;
 
 public class CompendiumProgressMessageHandler implements IMessageHandler<CompendiumProgressMessage, IMessage>{
@@ -26,7 +27,13 @@ public class CompendiumProgressMessageHandler implements IMessageHandler<Compend
 	@Override
 	public IMessage onMessage(CompendiumProgressMessage message, MessageContext ctx){
 		boolean complete = message.getComplete();
-		EntityItemFrame frame = (EntityItemFrame)Minecraft.getMinecraft().theWorld.getEntityByID(message.getEntityid());
+		// the frame can be out of this client's range, or gone, when the packet arrives
+		if (Minecraft.getMinecraft().theWorld == null)
+			return null;
+		Entity entity = Minecraft.getMinecraft().theWorld.getEntityByID(message.getEntityid());
+		if (!(entity instanceof EntityItemFrame))
+			return null;
+		EntityItemFrame frame = (EntityItemFrame)entity;
 
 		if(complete) spawnCompendiumCompleteParticles(frame);
 		else spawnCompendiumProgressParticles(frame, message.getX(), message.getY(), message.getZ());

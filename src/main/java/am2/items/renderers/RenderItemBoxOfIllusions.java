@@ -1,5 +1,7 @@
 package am2.items.renderers;
 
+import am2.utility.AMHooks;
+
 import am2.blocks.tileentities.TileEntityCelestialPrism;
 import am2.items.ItemsCommonProxy;
 import am2.network.AMDataWriter;
@@ -19,7 +21,6 @@ import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.client.model.AdvancedModelLoader;
 import net.minecraftforge.client.model.IModelCustom;
 import net.minecraftforge.client.model.obj.WavefrontObject;
-import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesMagicka;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Map;
@@ -144,86 +145,86 @@ public class RenderItemBoxOfIllusions implements IItemRenderer {
         EntityClientPlayerMP theplayer = Minecraft.getMinecraft().thePlayer;
         String player = theplayer.getCommandSenderName();
 
-        if (MysteriumPatchesFixesMagicka.playerModelMap.get(player) != null) {
-            MysteriumPatchesFixesMagicka.playerModelMap.remove(player);
+        if (AMHooks.playerModelMap.get(player) != null) {
+            AMHooks.playerModelMap.remove(player);
             return;
         }
         for (ItemStack stack : theplayer.inventory.mainInventory){
             if (stack != null) {
 
                 if (stack.getItem() == Items.spider_eye) {
-                    MysteriumPatchesFixesMagicka.playerModelMap.put(player, "spider");
+                    AMHooks.playerModelMap.put(player, "spider");
                     return;
                 } else if (stack.getItem() == Items.rotten_flesh) {
-                    MysteriumPatchesFixesMagicka.playerModelMap.put(player, "zombie");
+                    AMHooks.playerModelMap.put(player, "zombie");
                     return;
                 } else if (stack.getItem() == Items.glass_bottle) {
-                    MysteriumPatchesFixesMagicka.playerModelMap.put(player, "witch");
+                    AMHooks.playerModelMap.put(player, "witch");
                     return;
                 } else if (stack.getItem() == Items.snowball) {
-                    MysteriumPatchesFixesMagicka.playerModelMap.put(player, "snowman");
+                    AMHooks.playerModelMap.put(player, "snowman");
                     return;
                 } else if (stack.getItem() == Items.gunpowder) {
-                    MysteriumPatchesFixesMagicka.playerModelMap.put(player, "creeper");
+                    AMHooks.playerModelMap.put(player, "creeper");
                     return;
                 } else if (stack.getItem() == Items.feather) {
-                    MysteriumPatchesFixesMagicka.playerModelMap.put(player, "chicken");
+                    AMHooks.playerModelMap.put(player, "chicken");
                     return;
                 } else if (stack.getItem() == Items.leather) {
-                    MysteriumPatchesFixesMagicka.playerModelMap.put(player, "cow");
+                    AMHooks.playerModelMap.put(player, "cow");
                     return;
                 } else if (stack.getItem() == Items.ender_pearl) {
-                    MysteriumPatchesFixesMagicka.playerModelMap.put(player, "enderman");
+                    AMHooks.playerModelMap.put(player, "enderman");
                     return;
                 }else if (stack.getItem() == Items.bone) {
-                    MysteriumPatchesFixesMagicka.playerModelMap.put(player, "skeleton");
+                    AMHooks.playerModelMap.put(player, "skeleton");
                     return;
                 }else if (stack.getItem() == Items.magma_cream) {
-                    MysteriumPatchesFixesMagicka.playerModelMap.put(player, "magma");
+                    AMHooks.playerModelMap.put(player, "magma");
                     return;
                 }else if (stack.getItem() == Items.blaze_rod) {
-                    MysteriumPatchesFixesMagicka.playerModelMap.put(player, "blaze");
+                    AMHooks.playerModelMap.put(player, "blaze");
                     return;
                 }else if (stack.getItem() == Items.gold_nugget) {
-                    MysteriumPatchesFixesMagicka.playerModelMap.put(player, "pigman");
+                    AMHooks.playerModelMap.put(player, "pigman");
                     return;
                 }else if (stack.getItem() == Items.saddle) {
-                    MysteriumPatchesFixesMagicka.playerModelMap.put(player, "horse");
+                    AMHooks.playerModelMap.put(player, "horse");
                     return;
                 }else if (stack.getItem() == ItemsCommonProxy.essence) {
                     int damage = stack.getItemDamage();
                     switch(damage){
-                    case 0 : MysteriumPatchesFixesMagicka.playerModelMap.put(player, "arcane");
+                    case 0 : AMHooks.playerModelMap.put(player, "arcane");
                         return;
-                    case 1 : MysteriumPatchesFixesMagicka.playerModelMap.put(player, "earth");
+                    case 1 : AMHooks.playerModelMap.put(player, "earth");
                         return;
-                    case 2 : MysteriumPatchesFixesMagicka.playerModelMap.put(player, "air");
+                    case 2 : AMHooks.playerModelMap.put(player, "air");
                         return;
-                    case 3 : MysteriumPatchesFixesMagicka.playerModelMap.put(player, "fire");
+                    case 3 : AMHooks.playerModelMap.put(player, "fire");
                         return;
-                    case 4 : MysteriumPatchesFixesMagicka.playerModelMap.put(player, "water");
+                    case 4 : AMHooks.playerModelMap.put(player, "water");
                         return;
-                    case 5 : MysteriumPatchesFixesMagicka.playerModelMap.put(player, "nature");
+                    case 5 : AMHooks.playerModelMap.put(player, "nature");
                         return;
-                    case 6 : MysteriumPatchesFixesMagicka.playerModelMap.put(player, "ice");
+                    case 6 : AMHooks.playerModelMap.put(player, "ice");
                         return;
-                    case 7 : MysteriumPatchesFixesMagicka.playerModelMap.put(player, "lightning");
+                    case 7 : AMHooks.playerModelMap.put(player, "lightning");
                         return;
-                    case 8 : MysteriumPatchesFixesMagicka.playerModelMap.put(player, "life");
+                    case 8 : AMHooks.playerModelMap.put(player, "life");
                         return;
-                    case 9 : MysteriumPatchesFixesMagicka.playerModelMap.put(player, "end");
+                    case 9 : AMHooks.playerModelMap.put(player, "end");
                         return;
                     }
                 }else if (stack.getItem() == ItemsCommonProxy.evilBook) {
-                    MysteriumPatchesFixesMagicka.playerModelMap.put(player, "maid" + Minecraft.getMinecraft().theWorld.rand.nextInt(8));
+                    AMHooks.playerModelMap.put(player, "maid" + Minecraft.getMinecraft().theWorld.rand.nextInt(8));
                     return;
                 }
             }
         }
         cooldown = 80;
         AMDataWriter writer = new AMDataWriter();
-        writer.add(MysteriumPatchesFixesMagicka.playerModelMap.size());
-        for (Map.Entry<String, String> entry : MysteriumPatchesFixesMagicka.playerModelMap.entrySet()) {
+        writer.add(AMHooks.playerModelMap.size());
+        for (Map.Entry<String, String> entry : AMHooks.playerModelMap.entrySet()) {
             writer.add(entry.getKey());
             writer.add(entry.getValue());
         }

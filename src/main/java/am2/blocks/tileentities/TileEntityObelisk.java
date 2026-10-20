@@ -1,5 +1,6 @@
 package am2.blocks.tileentities;
 
+import it.unimi.dsi.fastutil.objects.Reference2FloatOpenHashMap;
 import am2.ObeliskFuelHelper;
 import am2.api.blocks.MultiblockStructureDefinition;
 import am2.api.blocks.MultiblockStructureDefinition.StructureGroup;
@@ -50,7 +51,7 @@ public class TileEntityObelisk extends TileEntityAMPower implements IMultiblockS
 	protected MultiblockStructureDefinition structure;
 	protected StructureGroup wizardChalkCircle;
 	protected StructureGroup pillars;
-	protected HashMap<StructureGroup, Float> caps;
+	protected Reference2FloatOpenHashMap<StructureGroup> caps;
 
 	private static final int GROUP_CHISELED_STONE = 0;
 
@@ -72,12 +73,8 @@ public class TileEntityObelisk extends TileEntityAMPower implements IMultiblockS
 			else if (group == wizardChalkCircle)
 				wizChalkFound = true;
 
-			for (StructureGroup cap : caps.keySet()){
-				if (group == cap){
-					capsLevel = caps.get(cap);
-					break;
-				}
-			}
+			if (caps.containsKey(group))
+				capsLevel = caps.getFloat(group);
 		}
 
 		powerMultiplier = 1;
@@ -97,7 +94,7 @@ public class TileEntityObelisk extends TileEntityAMPower implements IMultiblockS
 		structure = new MultiblockStructureDefinition("obelisk_structure");
 
 		pillars = structure.createGroup("pillars", 2);
-		caps = new HashMap<>();
+		caps = new Reference2FloatOpenHashMap<StructureGroup>();
 		StructureGroup chiseled = structure.createGroup("caps_chiseled_stone", 4);
 		caps.put(chiseled, 1.35f);
 

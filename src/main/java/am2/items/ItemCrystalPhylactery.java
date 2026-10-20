@@ -1,5 +1,6 @@
 package am2.items;
 
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import am2.AMCore;
 import am2.texture.ResourceManager;
 import am2.utility.EntityUtilities;
@@ -20,16 +21,20 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ItemCrystalPhylactery extends ArsMagicaItem{
 
 	@SideOnly(Side.CLIENT)
 	private IIcon[] icons;
 
-	private final HashMap<String, Integer> spawnableEntities;
-	static final boolean enabled_summon = AMCore.skillConfig.isSkillEnabled("Summon");;
+	private List<String> spawnableEntities;
+	private Object2IntOpenHashMap<String> eggColors;
+	static final boolean enabled_summon = AMCore.skillConfig.isSkillEnabled("Summon");
 
 	public static final int META_EMPTY = 0;
 	public static final int META_QUARTER = 1;
@@ -39,7 +44,6 @@ public class ItemCrystalPhylactery extends ArsMagicaItem{
 
 	public ItemCrystalPhylactery(){
 		super();
-		spawnableEntities = new HashMap<>();
 		setMaxDamage(0);
 		setMaxStackSize(1);
 	}
@@ -171,58 +175,73 @@ public class ItemCrystalPhylactery extends ArsMagicaItem{
 	@SideOnly(Side.CLIENT)
 	public int getColorFromItemStack(ItemStack stack, int pass){
 		if (enabled_summon && pass == 0){
-			int color = 0x0000FF;
 			if (stack.hasTagCompound()){
 				String className = stack.stackTagCompound.getString("SpawnClassName");
-				if (className != null){
-					Integer storedColor = spawnableEntities.get(className);
-					if (storedColor != null){
-						color = storedColor.intValue();
-					}
-				}
+				if (!className.isEmpty())
+					return getEntityColor(className);
 			}
-			return color;
+			return 0x0000FF;
 		}
 		return 0xFFFFFF;
 	}
 
-	public void getSpawnableEntities(World world){
-		if (!enabled_summon) return;
-		for (Object clazz : EntityList.classToStringMapping.keySet()){
-			if (EntityCreature.class.isAssignableFrom((Class)clazz)){
-				try{
-					EntityCreature temp = (EntityCreature)((Class)clazz).getConstructor(World.class).newInstance(world);
-					if (EntityUtilities.isAIEnabled(temp) && !(temp instanceof IBossDisplayData)){
-						int color = 0;
-						boolean found = false;
-						//look for entity egg
-						for (Object info : EntityList.entityEggs.values()){
-							EntityEggInfo eei = (EntityEggInfo)info;
-							Class spawnClass = EntityList.getClassFromID(eei.spawnedID);
-							if (spawnClass == clazz){
-								color = eei.primaryColor;
-								found = true;
-								break;
-							}
-						}
-						if (!found){
-							//no spawn egg...pick random color?
-							color = world.rand.nextInt();
-						}
-						spawnableEntities.put((String)EntityList.classToStringMapping.get(clazz), color);
-					}
-				}catch (Throwable e){
-					//e.printStackTrace();
-				}
+	/**
+	 * Spawn egg colour for an entity name, or a stable colour derived from the name when the entity has no egg.
+	 * Egg colours only depend on registrations that are fixed after init, so they are indexed once on first use.
+	 */
+	private int getEntityColor(String entityName){
+		if (eggColors == null){
+			Object2IntOpenHashMap<String> colors = new Object2IntOpenHashMap<String>();
+			colors.defaultReturnValue(-1);
+			for (Object info : EntityList.entityEggs.values()){
+				EntityEggInfo eei = (EntityEggInfo)info;
+				String name = EntityList.getStringFromID(eei.spawnedID);
+				if (name != null)
+					colors.put(name, eei.primaryColor);
+			}
+			eggColors = colors;
+		}
+		return eggColors.containsKey(entityName) ? eggColors.getInt(entityName) : entityName.hashCode() & 0xFFFFFF;
+	}
+
+	/**
+	 * Builds the list of storable creatures shown in the creative tab. Deciding whether a class has AI enabled needs an
+	 * instance, so every registered creature class is constructed exactly once, the first time the list is requested
+	 * with a world available, instead of every client tick.
+	 */
+	@SideOnly(Side.CLIENT)
+	private List<String> getSpawnableEntities(){
+		if (spawnableEntities != null || !enabled_summon)
+			return spawnableEntities;
+		World world = net.minecraft.client.Minecraft.getMinecraft().theWorld;
+		if (world == null)
+			return null;
+		ArrayList<String> names = new ArrayList<String>();
+		for (Object entry : EntityList.classToStringMapping.entrySet()){
+			Map.Entry mapping = (Map.Entry)entry;
+			Class clazz = (Class)mapping.getKey();
+			if (!EntityCreature.class.isAssignableFrom(clazz) || IBossDisplayData.class.isAssignableFrom(clazz))
+				continue;
+			try{
+				EntityCreature temp = (EntityCreature)clazz.getConstructor(World.class).newInstance(world);
+				if (EntityUtilities.isAIEnabled(temp))
+					names.add((String)mapping.getValue());
+			}catch (Throwable e){
+				// third-party entity constructors may reject a bare world; such entities are simply not listed
 			}
 		}
+		Collections.sort(names);
+		spawnableEntities = names;
+		return names;
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubItems(Item par1, CreativeTabs par2CreativeTabs, List par3List){
 		par3List.add(new ItemStack(this));
-		for (String s : spawnableEntities.keySet()){
+		List<String> spawnable = getSpawnableEntities();
+		if (spawnable == null) return;
+		for (String s : spawnable){
 			ItemStack stack = new ItemStack(this, 1, META_FULL);
 			stack.stackTagCompound = new NBTTagCompound();
 			stack.stackTagCompound.setString("SpawnClassName", s);

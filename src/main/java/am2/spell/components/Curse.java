@@ -65,7 +65,6 @@ public class Curse implements ISpellComponent, IRitualInteraction{
         // EFFECT REMOVING AND AMPLIFYING
         if (target instanceof EntityLivingBase && !(target instanceof IBossDisplayData)) {
             List<Integer> effectsToRemove = new ArrayList<Integer>();
-            HashMap<Integer, String> effectsToMagnify = new HashMap<Integer, String>();
 
             Iterator iter = ((EntityLivingBase) target).getActivePotionEffects().iterator();
 

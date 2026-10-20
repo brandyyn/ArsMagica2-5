@@ -1,5 +1,6 @@
 package am2.power;
 
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -108,7 +109,7 @@ public abstract class AStar<T>{
 
 
 	private PriorityQueue<Path> paths;
-	private HashMap<T, Double> mindists;
+	private Object2DoubleOpenHashMap<T> mindists;
 	private Double lastCost;
 	private int expandedCounter;
 
@@ -126,7 +127,8 @@ public abstract class AStar<T>{
 	 */
 	public AStar(){
 		paths = new PriorityQueue<Path>();
-		mindists = new HashMap<T, Double>();
+		mindists = new Object2DoubleOpenHashMap<T>();
+		mindists.defaultReturnValue(Double.POSITIVE_INFINITY);
 		expandedCounter = 0;
 		lastCost = 0.0;
 	}
@@ -159,14 +161,14 @@ public abstract class AStar<T>{
 	 */
 	private void expand(Path path){
 		T p = path.getPoint();
-		Double min = mindists.get(path.getPoint());
+		double min = mindists.getDouble(path.getPoint());
 
 		/*
 		 * If a better path passing for this point already exists then
 		 * don't expand it.
 		 */
-		if (min == null || min.doubleValue() > path.f.doubleValue())
-			mindists.put(path.getPoint(), path.f);
+		if (min > path.f.doubleValue())
+			mindists.put(path.getPoint(), path.f.doubleValue());
 		else
 			return;
 

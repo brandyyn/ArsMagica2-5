@@ -19,6 +19,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.BlockTNT;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureAttribute;
 import net.minecraft.entity.effect.EntityLightningBolt;
@@ -152,7 +153,7 @@ public class AffinityHelper{
 				if (!ent.worldObj.isRemote && (!ent.isPotionActive(BuffList.waterBreathing) || ent.getActivePotionEffect(BuffList.waterBreathing).getDuration() <= 200))
 					ent.addPotionEffect(new BuffEffectWaterBreathing(400, 2));
 			} else if (ent instanceof EntityPlayer && ((EntityPlayer)ent).inventory.armorInventory[1] != null && ((EntityPlayer)ent).inventory.armorInventory[1].getItem() == ItemsCommonProxy.archmageLeggings) {
-				isNotInWaterActually.add((EntityPlayer)ent);
+				ExtendedProperties.For(ent).ignoresWater = true;
 				if (!ent.worldObj.isRemote && (!ent.isPotionActive(BuffList.waterBreathing) || ent.getActivePotionEffect(BuffList.waterBreathing).getDuration() <= 200))
 					ent.addPotionEffect(new BuffEffectWaterBreathing(400, 2));
 			}
@@ -164,7 +165,7 @@ public class AffinityHelper{
 		}
 
 		if (!(ent instanceof EntityPlayer && ((EntityPlayer)ent).inventory.armorInventory[1] != null && ((EntityPlayer)ent).inventory.armorInventory[1].getItem() == ItemsCommonProxy.archmageLeggings)) {
-			isNotInWaterActually.remove((EntityPlayer)ent);
+			ExtendedProperties.For(ent).ignoresWater = false;
 		}
 
 		if (ent.worldObj.isRaining() && !ent.worldObj.isRemote && ent.worldObj.getBiomeGenForCoords((int)Math.floor(ent.posX), (int)Math.floor(ent.posZ)).canSpawnLightningBolt()){
@@ -187,7 +188,17 @@ public class AffinityHelper{
 		}
 	}
 
-	public static List<EntityPlayer> isNotInWaterActually = new ArrayList<EntityPlayer>();
+	/**
+	 * Archmage leggings let a player move through water as if it were air. Kept as a flag on the player's own data:
+	 * the water checks that read it run constantly, and the shared list used before was only ever appended to while
+	 * swimming (one entry per tick) and was touched by both the client and the server thread.
+	 */
+	public static boolean isNotInWaterActually(Entity entity){
+		if (!(entity instanceof EntityPlayer))
+			return false;
+		ExtendedProperties props = ExtendedProperties.For((EntityPlayer)entity);
+		return props != null && props.ignoresWater;
+	}
 
 	private Block getBlockInFrontOf(EntityLivingBase ent){
 		double dx = Math.cos(ent.rotationYaw);

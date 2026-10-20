@@ -1,5 +1,9 @@
 package am2.entities;
 
+import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2IntMaps;
+import it.unimi.dsi.fastutil.objects.Reference2IntMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import am2.api.math.AMVector3;
 import am2.damage.DamageSources;
 import am2.navigation.PathNavigator;
@@ -15,21 +19,20 @@ import java.util.HashMap;
 
 public class EntityWhirlwind extends EntityFlying{
 
-	private final HashMap<EntityPlayer, Integer> cooldownList;
+	private final Reference2IntOpenHashMap<EntityPlayer> cooldownList;
 	private AMVector3 currentTarget;
 	private final PathNavigator nav;
 
 	public EntityWhirlwind(World par1World){
 		super(par1World);
-		cooldownList = new HashMap<EntityPlayer, Integer>();
+		cooldownList = new Reference2IntOpenHashMap<EntityPlayer>();
 		nav = new PathNavigator(this);
 	}
 
 	@Override
 	public void onCollideWithPlayer(EntityPlayer player){
 		if (!worldObj.isRemote){
-			Integer cd = cooldownList.get(player);
-			if (cd == null || cd <= 0){
+			if (cooldownList.getInt(player) <= 0){
 				if (!worldObj.isRemote && rand.nextInt(100) < 10){
 					int slot = player.inventory.mainInventory.length + rand.nextInt(4);
 					if (player.inventory.getStackInSlot(slot) != null){
@@ -95,10 +98,13 @@ public class EntityWhirlwind extends EntityFlying{
 	}
 
 	private void tickCooldowns(){
-		for (EntityPlayer player : cooldownList.keySet()){
-			Integer current = cooldownList.get(player);
-			if (current <= 0) continue;
-			cooldownList.put(player, --current);
+		// expired players are dropped so the whirlwind does not keep them referenced
+		for (ObjectIterator<Reference2IntMap.Entry<EntityPlayer>> it = Reference2IntMaps.fastIterator(cooldownList); it.hasNext(); ){
+			Reference2IntMap.Entry<EntityPlayer> entry = it.next();
+			if (entry.getIntValue() <= 1)
+				it.remove();
+			else
+				entry.setValue(entry.getIntValue() - 1);
 		}
 	}
 

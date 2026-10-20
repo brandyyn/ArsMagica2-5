@@ -9,8 +9,8 @@ import am2.playerextensions.ExtendedProperties;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.effect.EntityLightningBolt;
-import thehippomaster.AnimationAPI.AIAnimation;
-import thehippomaster.AnimationAPI.IAnimatedEntity;
+import am2.animation.AIAnimation;
+import am2.animation.IAnimatedEntity;
 
 public class EntityAILightningRod extends AIAnimation{
 

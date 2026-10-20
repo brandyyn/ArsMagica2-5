@@ -1,5 +1,7 @@
 package am2.items;
 
+import it.unimi.dsi.fastutil.objects.Reference2FloatOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2FloatMap;
 import am2.AMCore;
 import am2.api.events.ManaCostEvent;
 import am2.api.math.AMVector3;
@@ -119,9 +121,10 @@ public class SpellBase extends ItemSpellBase{
 		list.add(I18n.format("Mana Cost: %s", (int)manaCost));
 
 		if (!par4 && Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)){
-			HashMap<Affinity, Float> affinityData = SpellUtils.instance.AffinityFor(legacySpell);
-			for (Affinity aff : affinityData.keySet()){
-				list.add(String.format("  %s (%.2f%%)",aff.getColor() + aff.toString(), affinityData.get(aff) * 100));
+			Reference2FloatOpenHashMap<Affinity> affinityData = SpellUtils.instance.AffinityFor(legacySpell);
+			for (Reference2FloatMap.Entry<Affinity> entry : affinityData.reference2FloatEntrySet()){
+				Affinity aff = entry.getKey();
+				list.add(String.format("  %s (%.2f%%)",aff.getColor() + aff.toString(), entry.getFloatValue() * 100));
 			}
 
 			if (stack.stackTagCompound.hasKey("Lore")){

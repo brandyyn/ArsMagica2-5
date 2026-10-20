@@ -1,5 +1,6 @@
 package am2.guis;
 
+import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
 import am2.api.blocks.BlockDec;
 import am2.api.blocks.MultiblockStructureDefinition;
 import am2.api.blocks.BlockCoord;
@@ -72,7 +73,7 @@ public class GuiArcaneCompendium extends GuiScreen{
 	Minecraft mc;
 	String entryName;
 
-	private final HashMap<Item, Integer> forcedMetas;
+	private final Reference2IntOpenHashMap<Item> forcedMetas;
 
 	private static final ResourceLocation background = new ResourceLocation("arsmagica2", "textures/guis/ArcaneCompendiumGui.png");
 	private static final ResourceLocation extras = new ResourceLocation("arsmagica2", "textures/guis/ArcaneCompendiumGuiExtras.png");
@@ -359,7 +360,7 @@ public class GuiArcaneCompendium extends GuiScreen{
 
 		this.entryName = entryName;
 
-		forcedMetas = new HashMap<>();
+		forcedMetas = new Reference2IntOpenHashMap<Item>();
 
 		if (entry != null){
 			lines = splitStringToLines(Minecraft.getMinecraft().fontRenderer, entry.getDescription(entryName), lineWidth, maxLines);
@@ -1249,7 +1250,7 @@ public class GuiArcaneCompendium extends GuiScreen{
 		}
 
 		if (forcedMetas.containsKey(stack.getItem()))
-			stack = new ItemStack(stack.getItem(), stack.stackSize, forcedMetas.get(stack.getItem()));
+			stack = new ItemStack(stack.getItem(), stack.stackSize, forcedMetas.getInt(stack.getItem()));
 
 		try{
 			AMGuiHelper.DrawItemAtXY(stack, sx, sy, this.zLevel);

@@ -1,11 +1,13 @@
 package am2;
 
-import net.tclproject.mysteriumlib.asm.common.CustomLoadingPlugin;
+import net.minecraft.launchwrapper.Launch;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class LogHelper{
+	private static final boolean DEV_ENVIRONMENT = Boolean.TRUE.equals(Launch.blackboard.get("fml.deobfuscatedEnvironment"));
+
 	private static Logger logger = LogManager.getLogger("ArsMagica2");
 
 	public static void log(Level level, String format, Object... data){
@@ -35,7 +37,7 @@ public class LogHelper{
 	      // or call some kind of horrible arcane function chain (which is not documented)
 	      // this is a rather hacky way of turning on debug output if we're in a dev environment, but with the redeeming feature that it actually works
 	      // (the default logging level seems to be INFO and I can't change it easily through code)
-		if(CustomLoadingPlugin.isDevEnvironment){
+		if(DEV_ENVIRONMENT){
 			log(Level.INFO, "AM2 Debug: " + format, data);
 		}
 		else{

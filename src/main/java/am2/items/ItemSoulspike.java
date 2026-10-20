@@ -102,6 +102,13 @@ public class ItemSoulspike extends ItemSword implements IManaContainerItem{
         nbttagcompound.setBoolean("ethereal", false);
     }
 
+    /** The soulspike only changes damage through its own states (0 and 66); everything else is ignored. */
+    @Override
+    public void setDamage(ItemStack stack, int damage) {
+        if (damage == 66 || damage == 0)
+            super.setDamage(stack, damage);
+    }
+
     public static boolean bootsHaveEtherealTag(ItemStack boots) {
         if (boots == null) return false;
         if (boots.stackTagCompound == null)

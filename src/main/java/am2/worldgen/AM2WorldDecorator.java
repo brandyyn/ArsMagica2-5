@@ -201,9 +201,11 @@ public class AM2WorldDecorator implements IWorldGenerator{
 		}
 	}
 
+	// +8 like vanilla decoration: features centred in the populated 2x2 chunk area do not force neighbouring chunks to
+	// generate (huge witchwood trees and pools used to spill into ungenerated chunks and cascade generation)
 	private void generateTree(WorldGenerator trees, World world, Random random, int chunkX, int chunkZ){
-		int x = (chunkX * 16) + random.nextInt(16);
-		int z = (chunkZ * 16) + random.nextInt(16);
+		int x = (chunkX * 16) + random.nextInt(16) + 8;
+		int z = (chunkZ * 16) + random.nextInt(16) + 8;
 		int y = world.getHeightValue(x, z);
 
 		if (trees.generate(world, random, x, y, z)){
@@ -212,8 +214,8 @@ public class AM2WorldDecorator implements IWorldGenerator{
 	}
 
 	private void generatePools(World world, Random random, int chunkX, int chunkZ){
-		int x = (chunkX * 16) + random.nextInt(16);
-		int z = (chunkZ * 16) + random.nextInt(16);
+		int x = (chunkX * 16) + random.nextInt(16) + 8;
+		int z = (chunkZ * 16) + random.nextInt(16) + 8;
 		int y = world.getHeightValue(x, z);
 
 		pools.generate(world, random, x, y, z);

@@ -1,6 +1,8 @@
 package am2.playerextensions;
 
+import am2.utility.IExtendedPropertiesHolder;
 import am2.AMCore;
+import am2.TimeManipulation;
 import am2.PlayerTracker;
 import am2.api.ArsMagicaApi;
 import am2.api.IExtendedProperties;
@@ -66,7 +68,18 @@ public class ExtendedProperties implements IExtendedProperties, IExtendedEntityP
 
 	private final ArrayList<Integer> summon_ent_ids = new ArrayList<Integer>();
 
-	private Map<String, String> extra_properties = new HashMap<String, String>();
+	private final Map<String, String> extra_properties = new HashMap<String, String>();
+	private final Map<String, String> extraVariablesView = Collections.unmodifiableMap(extra_properties);
+	/** Number of extra variables owned by {@link TimeManipulation}, so casters without any skip its countdown. */
+	private int timeEffectVariables;
+	/** False only once no AM2 buff attribute modifier can be applied; see BuffStatModifiers. */
+	public boolean mayHaveBuffModifiers = true;
+	/** Archmage leggings water walking, see AffinityHelper.isNotInWaterActually. */
+	public boolean ignoresWater;
+	/** Tick (entity ticksExisted) at which a temporary flip from archmage armour ends; 0 when none. */
+	public int tempFlipUntil;
+	/** Slots of soulbound stacks between LivingDeathEvent and PlayerDropsEvent (see am2.utility.Soulbound); not saved. */
+	public it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap<ItemStack> soulboundSlots;
 
 	private final Map<String, String> compendium_entries = new HashMap<String, String>();
 
@@ -107,10 +120,11 @@ public class ExtendedProperties implements IExtendedProperties, IExtendedEntityP
 	private int fallProtection = 0;
 	private int previousBreath = 300;
 
-	private final ContingencyTypes[] contingencyTypes = {ContingencyTypes.DAMAGE_TAKEN, ContingencyTypes.DEATH,
+	private static final ContingencyTypes[] contingencyTypes = {ContingencyTypes.DAMAGE_TAKEN, ContingencyTypes.DEATH,
 			ContingencyTypes.FALL, ContingencyTypes.ON_FIRE, ContingencyTypes.HEALTH_LOW};
-	private final ItemStack[] contingencyStacks = {new ItemStack(Items.snowball), new ItemStack(Items.snowball),
-			new ItemStack(Items.snowball), new ItemStack(Items.snowball), new ItemStack(Items.snowball)};
+	/** "No contingency" placeholder shared by every entity (it is only read, copied or replaced, never modified). */
+	private static final ItemStack NO_CONTINGENCY = new ItemStack(Items.snowball);
+	private final ItemStack[] contingencyStacks = {NO_CONTINGENCY, NO_CONTINGENCY, NO_CONTINGENCY, NO_CONTINGENCY, NO_CONTINGENCY};
 
 	public float TK_Distance = 8;
 
@@ -156,7 +170,6 @@ public class ExtendedProperties implements IExtendedProperties, IExtendedEntityP
 	public boolean guardian8 = false;
 	public boolean guardian9 = false;
 	public boolean guardian10 = false;
-	public Map<String, Boolean> guardians = new HashMap<String, Boolean>();
 	public boolean hasRitual = false;
 
 	public static final int UPD_CURRENT_MANA_FATIGUE = 0x1;
@@ -170,6 +183,7 @@ public class ExtendedProperties implements IExtendedProperties, IExtendedEntityP
 	public static final int UPD_BETA_PARTICLES = 0x100;
 	//public static final int UPD_TK_DISTANCE = 0x200;
 	public static final int UPD_MANALINK = 0x400;
+	public static final int UPD_EXTRA_VARIABLES = 0x800;
 	public static final int BIT_MARK_SET = 0x2;
 	public static final int BIT_FLIPPED = 0x4;
 	public static final int BIT_SHRUNK = 0x8;
@@ -188,12 +202,20 @@ public class ExtendedProperties implements IExtendedProperties, IExtendedEntityP
 	}
 
 	public static ExtendedProperties For(EntityLivingBase living){
-		return (ExtendedProperties)living.getExtendedProperties(identifier);
+		// a field on the entity (see am2.mixin.early.MixinEntityLivingBase); For is called many times per entity per tick
+		ExtendedProperties properties = ((IExtendedPropertiesHolder)living).am2$getExtendedProperties();
+		return properties != null ? properties : (ExtendedProperties)living.getExtendedProperties(identifier);
 	}
 
 	//=======================================================================================
 	// Getters
 	//=======================================================================================
+	/** True while a non-player entity still has the state its client copy is created with, so there is nothing to sync. */
+	public boolean isDefaultState(){
+		return bitFlag == 0 && magicLevel <= 1 && numSummons == 0 && manaLinks.isEmpty() && !disableGravity
+				&& currentFatigue == 0 && shrinkPct == 0 && flipRotation == 0;
+	}
+
 	public boolean getHasDoneFullSync(){
 		return this.hasDoneFullSync;
 	}
@@ -215,15 +237,6 @@ public class ExtendedProperties implements IExtendedProperties, IExtendedEntityP
 		return this.numSummons;
 	}
 
-	public int getGuardianAmountUnlocked(){
-		int count = 0;
-		for(String s : guardians.keySet()){
-			if(guardians.get(s)){
-				count++;
-			}
-		}
-		return count;
-	}
 
 
 	@Override
@@ -330,7 +343,6 @@ public class ExtendedProperties implements IExtendedProperties, IExtendedEntityP
 				max += 2000;
 			}
 		}
-		max *= 1 + (getGuardianAmountUnlocked() * 2000);
 		if (hasRitual) {
 			max += 23000; // changed from 25000
 		}
@@ -429,16 +441,9 @@ public class ExtendedProperties implements IExtendedProperties, IExtendedEntityP
 			writer.add(this.disableGravity);
 		}
 
-		NBTTagCompound extra_data = new NBTTagCompound();
-		int c = 0;
-		for (String o : extra_properties.keySet()) {
-			String iValue = extra_properties.get(o);
-			extra_data.setString("persistentobj" + c, iValue);
-			extra_data.setString("persistentobjname" + c, o);
-			c++;
+		if ((this.updateFlags & UPD_EXTRA_VARIABLES) == UPD_EXTRA_VARIABLES){
+			writer.add(writeExtraVariables(new NBTTagCompound()));
 		}
-		extra_data.setInteger("persistentobjsize", extra_properties.size());
-		writer.add(extra_data);
 
 		this.updateFlags = 0;
 		this.forcingSync = false;
@@ -743,6 +748,7 @@ public class ExtendedProperties implements IExtendedProperties, IExtendedEntityP
 		this.setUpdateFlag(UPD_MAX_MANA_FATIGUE);
 		this.setUpdateFlag(UPD_NUM_SUMMONS);
 		this.setUpdateFlag(UPD_BETA_PARTICLES);
+		this.setUpdateFlag(UPD_EXTRA_VARIABLES);
 		this.hasDoneFullSync = true;
 		this.forcingSync = true;
 	}
@@ -1042,10 +1048,8 @@ public class ExtendedProperties implements IExtendedProperties, IExtendedEntityP
 			this.disableGravity = rdr.getBoolean();
 		}
 
-		extra_properties.clear();
-		NBTTagCompound nbt = rdr.getNBTTagCompound();
-		for (int j = 0; j < nbt.getInteger("persistentobjsize"); j++) {
-			extra_properties.put(nbt.getString("persistentobjname" + j), nbt.getString("persistentobj" + j));
+		if ((flags & UPD_EXTRA_VARIABLES) == UPD_EXTRA_VARIABLES){
+			readExtraVariables(rdr.getNBTTagCompound());
 		}
 
 		return true;
@@ -1158,15 +1162,9 @@ public class ExtendedProperties implements IExtendedProperties, IExtendedEntityP
 			compound.setDouble("marklocationz", this.getMarkZ());
 			compound.setInteger("markdimension", this.getMarkDimension());
 		}
-		int c = 0;
-		for (String o : extra_properties.keySet()) {
-			String iValue = extra_properties.get(o);
-			compound.setString("persistentobj" + c, iValue);
-			compound.setString("persistentobjname" + c, o);
-			c++;
-		}
-		compound.setInteger("persistentobjsize", extra_properties.size());
+		writeExtraVariables(compound);
 
+		int c = 0;
 		for (String o : compendium_entries.keySet()) {
 			String iValue = compendium_entries.get(o);
 			compound.setString("compentry" + c, iValue);
@@ -1235,18 +1233,62 @@ public class ExtendedProperties implements IExtendedProperties, IExtendedEntityP
 			}
 		}
 
-		for (int j = 0; j < compound.getInteger("persistentobjsize"); j++) {
-			extra_properties.put(compound.getString("persistentobjname" + j), compound.getString("persistentobj" + j));
-		}
+		readExtraVariables(compound);
 
-		for (int j = 0; j < compound.getInteger("compendiumsize"); j++) {
-			compendium_entries.put(compound.getString("compentryname" + j), compound.getString("compentry" + j));
+		// older saves numbered the compendium entries after the extra variables
+		int compendiumSize = compound.getInteger("compendiumsize");
+		int offset = compendiumSize > 0 && !compound.hasKey("compentryname0") ? compound.getInteger("persistentobjsize") : 0;
+		for (int j = 0; j < compendiumSize; j++) {
+			compendium_entries.put(compound.getString("compentryname" + (j + offset)), compound.getString("compentry" + (j + offset)));
 		}
 	}
 
+	private NBTTagCompound writeExtraVariables(NBTTagCompound compound){
+		int c = 0;
+		for (Map.Entry<String, String> entry : extra_properties.entrySet()) {
+			compound.setString("persistentobj" + c, entry.getValue());
+			compound.setString("persistentobjname" + c, entry.getKey());
+			c++;
+		}
+		compound.setInteger("persistentobjsize", extra_properties.size());
+		return compound;
+	}
+
+	private void readExtraVariables(NBTTagCompound compound){
+		extra_properties.clear();
+		timeEffectVariables = 0;
+		for (int j = 0; j < compound.getInteger("persistentobjsize"); j++) {
+			String name = compound.getString("persistentobjname" + j);
+			extra_properties.put(name, compound.getString("persistentobj" + j));
+			if (TimeManipulation.isTimeEffectKey(name))
+				timeEffectVariables++;
+		}
+	}
+
+	/**
+	 * Extra variables only reach clients for display and the ethereal countdown, so a changed value rides along with
+	 * the next regular sync; only a new key forces one. Countdowns update their values every tick and used to send a
+	 * full player sync each time.
+	 */
 	public void addToExtraVariables(String name, String value) {
-		extra_properties.put(name, value);
-		setFullSync();
+		String previous = extra_properties.put(name, value);
+		if (previous == null){
+			if (TimeManipulation.isTimeEffectKey(name))
+				timeEffectVariables++;
+			setUpdateFlag(UPD_EXTRA_VARIABLES);
+			forceSync();
+		}else if (!previous.equals(value)){
+			setUpdateFlag(UPD_EXTRA_VARIABLES);
+		}
+	}
+
+	public boolean hasTimeEffectVariables(){
+		return timeEffectVariables > 0;
+	}
+
+	/** Read-only view for iteration; mutate through {@link #addToExtraVariables} and {@link #removeFromExtraVariables}. */
+	public Map<String, String> getExtraVariables(){
+		return extraVariablesView;
 	}
 
 	public void setCompendiumEntry(String name, String value) {
@@ -1321,13 +1363,19 @@ public class ExtendedProperties implements IExtendedProperties, IExtendedEntityP
 	}
 
 	public void removeFromExtraVariables(String name) {
-		extra_properties.remove(name);
-		setFullSync();
+		if (extra_properties.remove(name) != null){
+			if (TimeManipulation.isTimeEffectKey(name))
+				timeEffectVariables--;
+			setUpdateFlag(UPD_EXTRA_VARIABLES);
+			forceSync();
+		}
 	}
 
 	public void clearExtraVariables() {
 		extra_properties.clear();
-		setFullSync();
+		timeEffectVariables = 0;
+		setUpdateFlag(UPD_EXTRA_VARIABLES);
+		forceSync();
 	}
 
 	public Map<String, String> getExtraVariablesContains(String contains) {
@@ -1482,7 +1530,12 @@ public class ExtendedProperties implements IExtendedProperties, IExtendedEntityP
 		public void handleExtendedPropertySync(){
 			if (entity != null && entity.worldObj != null) {
 				if (!entity.worldObj.isRemote && !this.getHasDoneFullSync()) {
-					this.setFullSync();
+					// clients create the same defaults, so ordinary mobs need no initial packet (every mob used to send one
+					// on its first tick); mobs with AM2 state also reach players that start tracking them later
+					if (entity instanceof EntityPlayer || !isDefaultState())
+						this.setFullSync();
+					else
+						this.hasDoneFullSync = true;
 				}
 				if (!entity.worldObj.isRemote && this.getHasUpdate()){
 					byte[] data = this.getUpdateData();

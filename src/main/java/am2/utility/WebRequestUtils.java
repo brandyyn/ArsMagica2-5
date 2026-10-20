@@ -17,6 +17,8 @@ public class WebRequestUtils{
 		HttpURLConnection con = (HttpURLConnection)obj.openConnection();
 
 		//add reuqest header
+		con.setConnectTimeout(5000);
+		con.setReadTimeout(5000);
 		con.setRequestMethod("POST");
 		con.setRequestProperty("User-Agent", USER_AGENT);
 		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");

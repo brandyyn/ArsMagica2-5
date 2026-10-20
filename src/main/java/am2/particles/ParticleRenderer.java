@@ -104,50 +104,32 @@ public class ParticleRenderer{
 		blocks.addAll(deferredBlocks);
 		deferredBlocks.clear();
 
-		for (Iterator<EntityFX> it = particles.iterator(); it.hasNext(); ){
-			EntityFX particle = it.next();
-
-			particle.onUpdate();
-
-			if (particle.isDead){
-				it.remove();
-			}
-		}
-
-		for (Iterator<EntityFX> it = radiants.iterator(); it.hasNext(); ){
-			EntityFX particle = it.next();
-
-			particle.onUpdate();
-
-			if (particle.isDead){
-				it.remove();
-			}
-		}
-
-		for (Iterator<AMLineArc> it = arcs.iterator(); it.hasNext(); ){
-			AMLineArc particle = it.next();
-
-			particle.onUpdate();
-
-			if (particle.isDead){
-				it.remove();
-			}
-		}
-
-		for (Iterator<EntityFX> it = blocks.iterator(); it.hasNext(); ){
-			EntityFX particle = it.next();
-
-			particle.onUpdate();
-
-			if (particle.isDead){
-				it.remove();
-			}
-		}
+		tickAndCompact(particles);
+		tickAndCompact(radiants);
+		tickAndCompact(arcs);
+		tickAndCompact(blocks);
 
 		Minecraft.getMinecraft().mcProfiler.endSection();
 	}
 
+	/** Updates every particle and drops the dead ones in one pass (Iterator.remove on an ArrayList is O(n) each). */
+	private static <T extends EntityFX> void tickAndCompact(ArrayList<T> list){
+		int alive = 0;
+		int size = list.size();
+		for (int i = 0; i < size; i++){
+			T particle = list.get(i);
+			particle.onUpdate();
+			if (!particle.isDead)
+				list.set(alive++, particle);
+		}
+		for (int i = size - 1; i >= alive; i--)
+			list.remove(i);
+	}
+
 	private void render(float partialTicks){
+		// no GL work at all while AM2 has nothing to draw (this runs every frame)
+		if (particles.isEmpty() && blocks.isEmpty() && radiants.isEmpty() && arcs.isEmpty())
+			return;
 		Minecraft.getMinecraft().mcProfiler.startSection(name + "-render");
 
 		EntityLivingBase player = Minecraft.getMinecraft().renderViewEntity;
@@ -161,7 +143,8 @@ public class ParticleRenderer{
 		//============================================================================================
 		// Standard Particles Using the Block Atlas
 		//============================================================================================
-		renderBlockParticles(partialTicks);
+		if (!blocks.isEmpty())
+			renderBlockParticles(partialTicks);
 
 		// bind the texture
 		Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationItemsTexture);
@@ -169,15 +152,18 @@ public class ParticleRenderer{
 		//============================================================================================
 		// Standard Particles
 		//============================================================================================
-		renderStandardParticles(partialTicks);
+		if (!particles.isEmpty())
+			renderStandardParticles(partialTicks);
 		//============================================================================================
 		// Radiant Particles
 		//============================================================================================
-		renderRadiants(partialTicks);
+		if (!radiants.isEmpty())
+			renderRadiants(partialTicks);
 		//============================================================================================
 		// Arc Particles
 		//============================================================================================
-		renderArcs(partialTicks);
+		if (!arcs.isEmpty())
+			renderArcs(partialTicks);
 		//============================================================================================
 		// End
 		//============================================================================================

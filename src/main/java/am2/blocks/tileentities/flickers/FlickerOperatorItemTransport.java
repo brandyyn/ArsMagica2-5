@@ -1,5 +1,7 @@
 package am2.blocks.tileentities.flickers;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import am2.api.flickers.IFlickerController;
 import am2.api.flickers.IFlickerFunctionality;
 import am2.api.math.AMVector3;
@@ -200,7 +202,7 @@ public class FlickerOperatorItemTransport implements IFlickerFunctionality{
 	 * @return Returns true if the item can be moved, returns false otherwise
 	 */
 	private boolean FindOutput(World worldObj, TileEntityFlickerHabitat attuner, ItemStack stack, IInventory source){
-		HashMap<Integer, ArrayList<AMVector3>> removeFromOutList = new HashMap<Integer, ArrayList<AMVector3>>();
+		Int2ObjectOpenHashMap<ArrayList<AMVector3>> removeFromOutList = new Int2ObjectOpenHashMap<ArrayList<AMVector3>>();
 		boolean itemMoved = false;
 
 		for (int priority = 0; priority <= TileEntityFlickerHabitat.PRIORITY_FINAL; ++priority){
@@ -263,9 +265,9 @@ public class FlickerOperatorItemTransport implements IFlickerFunctionality{
 					fullLoop = true;
 			}
 
-			for (int i : removeFromOutList.keySet()){
-				for (AMVector3 vector : removeFromOutList.get(i)){
-					attuner.removeOutListAt(i, vector);
+			for (Int2ObjectMap.Entry<ArrayList<AMVector3>> entry : removeFromOutList.int2ObjectEntrySet()){
+				for (AMVector3 vector : entry.getValue()){
+					attuner.removeOutListAt(entry.getIntKey(), vector);
 				}
 			}
 

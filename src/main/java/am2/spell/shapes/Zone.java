@@ -16,7 +16,6 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-import static am2.spell.SpellHelper.lingeringSpellList;
 import static am2.spell.SpellHelper.lingeringSpellZoneList;
 
 public class Zone implements ISpellShape{
@@ -43,7 +42,7 @@ public class Zone implements ISpellShape{
 		int persistenceModifiers = SpellUtils.instance.getModifiedInt_Add(0, stack, caster, target, world, 0, SpellModifiers.LINGERING);
 		if (persistenceModifiers > 0){
 			int zoneLingerDuration = SpellUtils.instance.getModifiedInt_Mul(90, stack, caster, target, world, 0, SpellModifiers.DURATION);
-			lingeringSpellList.add(new SpellHelper.LingeringSpell(persistenceModifiers, stack, world, caster, target, zoneLingerDuration, zone));
+			SpellHelper.addLingeringSpell(new SpellHelper.LingeringSpell(persistenceModifiers, stack, world, caster, target, zoneLingerDuration, zone));
 			lingeringSpellZoneList.add(stack);
 		}
 		return SpellCastResult.SUCCESS;

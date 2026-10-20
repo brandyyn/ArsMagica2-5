@@ -1,6 +1,7 @@
 package am2.proxy.tick;
 
 import am2.AMCore;
+import am2.TimeManipulation;
 import am2.EntityItemWatcher;
 import am2.MeteorSpawnHelper;
 import am2.bosses.BossSpawnHelper;
@@ -19,7 +20,10 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
-import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesMagicka;
+
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import it.unimi.dsi.fastutil.objects.Reference2IntMap;
+import it.unimi.dsi.fastutil.objects.Reference2IntMaps;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,22 +36,15 @@ import static am2.spell.SpellHelper.lingeringSpellList;
 
 public class ServerTickHandler{
 
-	private boolean firstTick = true;
 	public static HashMap<EntityLiving, EntityLivingBase> targetsToSet = new HashMap<EntityLiving, EntityLivingBase>();
 
 	public static String lastWorldName;
 
 	private void gameTick_Start(){
-
-		if (MinecraftServer.getServer().getFolderName().equals(lastWorldName)){
-			lastWorldName = MinecraftServer.getServer().getFolderName();
-			firstTick = true;
-		}
-
-		if (firstTick){
-			ItemsCommonProxy.crystalPhylactery.getSpawnableEntities(MinecraftServer.getServer().worldServers[0]);
-			firstTick = false;
-		}
+		// synced to joining players for per-save compendium data
+		String folder = MinecraftServer.getServer().getFolderName();
+		if (!folder.equals(lastWorldName))
+			lastWorldName = folder;
 		AMCore.proxy.itemFrameWatcher.checkWatchedFrames();
 	}
 
@@ -55,6 +52,9 @@ public class ServerTickHandler{
 		BossSpawnHelper.instance.tick();
 		MeteorSpawnHelper.instance.tick();
 		EntityItemWatcher.instance.tick();
+		TimeManipulation.onServerTickEnd();
+		tickTemporaryCurses();
+		AMCore.proxy.applyDeferredPotionEffects();
 	}
 
 	@SubscribeEvent
@@ -68,64 +68,35 @@ public class ServerTickHandler{
 
 	@SubscribeEvent
 	public void onWorldTick(TickEvent.WorldTickEvent event){
+		// world tick events fire twice per tick for every dimension; per-tick work runs once, at END
+		if (event.phase != TickEvent.Phase.END)
+			return;
 		if (AMCore.config.retroactiveWorldgen())
 			RetroactiveWorldgenerator.instance.continueRetrogen(event.world);
 
-		applyDeferredPotionEffects();
-		if (event.phase == TickEvent.Phase.END){
-			applyDeferredDimensionTransfers();
-		}
+		AMCore.proxy.applyDeferredDimensionTransfers();
 
-		//update lingering spells
-		if (!lingeringSpellList.isEmpty()){
-			SpellHelper.LingeringSpell[] toRemove = new SpellHelper.LingeringSpell[lingeringSpellList.size()];
-			for (int i = 0; i < lingeringSpellList.size(); i++){
-				boolean toRemoveThis = lingeringSpellList.get(i).doUpdate();
-				if (toRemoveThis) toRemove[i] = lingeringSpellList.get(i);
-				else toRemove[i] = null;
+		if (!lingeringSpellList.isEmpty())
+			SpellHelper.tickLingeringSpells(lingeringSpellList, event.world);
+	}
+
+	/** Summoned temporary curse creatures; each entry counts down once per server tick. */
+	private void tickTemporaryCurses(){
+		if (tempCurseMap.isEmpty())
+			return;
+		for (ObjectIterator<Reference2IntMap.Entry<EntityCreature>> it = Reference2IntMaps.fastIterator(tempCurseMap); it.hasNext(); ){
+			Reference2IntMap.Entry<EntityCreature> entry = it.next();
+			int left = entry.getIntValue();
+			if (left <= 3 || entry.getKey().isDead){
+				EntityCreature creature = entry.getKey();
+				it.remove();
+				creature.setDead();
+			}else{
+				entry.setValue(left - 1);
 			}
-
-			for (SpellHelper.LingeringSpell lingeringSpell : toRemove){
-				if (lingeringSpell != null){
-					lingeringSpellList.remove(lingeringSpell);
-				}
-			}
-		}
-
-		// handle temporary curses
-		ArrayList<EntityCreature> toRemove = new ArrayList<EntityCreature>();
-		HashMap<EntityCreature, Integer> toChange = new HashMap<EntityCreature, Integer>();
-		for (Map.Entry<EntityCreature, Integer> entry : tempCurseMap.entrySet()) {
-			EntityCreature key = entry.getKey();
-			Integer value = entry.getValue();
-			if (value <= 3) toRemove.add(key);
-			else toChange.put(key, value-1);
-		}
-		// overwrite with new value
-		tempCurseMap.putAll(toChange);
-		for (EntityCreature ec : toRemove) {
-			tempCurseMap.remove(ec);
-			ec.setDead();
 		}
 	}
 
-	private void applyDeferredPotionEffects(){
-		for (EntityLivingBase ent : AMCore.proxy.getDeferredPotionEffects().keySet()){
-			ArrayList<PotionEffect> potions = AMCore.proxy.getDeferredPotionEffects().get(ent);
-			for (PotionEffect effect : potions)
-				ent.addPotionEffect(effect);
-		}
-
-		AMCore.proxy.clearDeferredPotionEffects();
-	}
-
-	private void applyDeferredDimensionTransfers(){
-		for (EntityLivingBase ent : AMCore.proxy.getDeferredDimensionTransfers().keySet()){
-			DimensionUtilities.doDimensionTransfer(ent, AMCore.proxy.getDeferredDimensionTransfers().get(ent));
-		}
-
-		AMCore.proxy.clearDeferredDimensionTransfers();
-	}
 
 	private void applyDeferredTargetSets(){
 		Iterator<Entry<EntityLiving, EntityLivingBase>> it = targetsToSet.entrySet().iterator();

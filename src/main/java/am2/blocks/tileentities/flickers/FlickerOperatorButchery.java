@@ -1,5 +1,6 @@
 package am2.blocks.tileentities.flickers;
 
+import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
 import am2.AMCore;
 import am2.api.flickers.IFlickerController;
 import am2.api.flickers.IFlickerFunctionality;
@@ -33,16 +34,14 @@ public class FlickerOperatorButchery implements IFlickerFunctionality{
 
 	@Override
 	public boolean DoOperation(World worldObj, IFlickerController habitat, boolean powered){
-		HashMap<Class, Integer> entityCount = new HashMap<>();
+		Reference2IntOpenHashMap<Class> entityCount = new Reference2IntOpenHashMap<Class>();
 		int radius = 6;
 		List<EntityAnimal> creatures = worldObj.getEntitiesWithinAABB(EntityAnimal.class, AxisAlignedBB.getBoundingBox(((TileEntity)habitat).xCoord - radius, ((TileEntity)habitat).yCoord - radius, ((TileEntity)habitat).zCoord - radius, ((TileEntity)habitat).xCoord + radius + 1, ((TileEntity)habitat).yCoord + radius + 1, ((TileEntity)habitat).zCoord + radius + 1));
 		for (EntityAnimal creature : creatures){
 			Class<? extends EntityAnimal> clazz = creature.getClass();
 			if (!SpawnBlacklists.canButcheryAffect(clazz))
 				continue;
-			Integer count = entityCount.get(clazz);
-			if (count == null)
-				count = 0;
+			int count = entityCount.getInt(clazz);
 			if (!creature.isChild())
 				count++;
 			entityCount.put(clazz, count);

@@ -1,5 +1,9 @@
 package am2.spell;
 
+import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2IntMap;
+import it.unimi.dsi.fastutil.objects.Reference2FloatOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2FloatMap;
 import am2.AMCore;
 import am2.api.ArsMagicaApi;
 import am2.api.events.AffinityChangingEvent;
@@ -346,7 +350,7 @@ public class SpellUtils implements ISpellUtils{
 	}
 
 	public SpellRequirements modifySpellRequirementsByAffinity(ItemStack stack, EntityLivingBase caster, SpellRequirements reqs){
-		HashMap<Affinity, Float> affinities = this.AffinityFor(stack);
+		Reference2FloatOpenHashMap<Affinity> affinities = this.AffinityFor(stack);
 		AffinityData affData = AffinityData.For(caster);
 
 		if (affData == null)
@@ -354,10 +358,10 @@ public class SpellUtils implements ISpellUtils{
 
 		float manaCost = reqs.manaCost;
 
-		for (Affinity aff : affinities.keySet()){
-			float depth = affData.getAffinityDepth(aff);
+		for (Reference2FloatMap.Entry<Affinity> entry : affinities.reference2FloatEntrySet()){
+			float depth = affData.getAffinityDepth(entry.getKey());
 			//calculate the modifier based on the player's affinity depth as well as how much of the spell is that affinity
-			float effectiveness = affinities.get(aff); //how much does this affinity affect the overall mana cost?
+			float effectiveness = entry.getFloatValue(); //how much does this affinity affect the overall mana cost?
 			float multiplier = 0.5f * depth; //how much will the player's affinity reduce the mana cost? (max 50%)
 
 			float manaMod = manaCost * effectiveness;
@@ -380,24 +384,17 @@ public class SpellUtils implements ISpellUtils{
 			ISpellShape shape = getShapeForStage(stack, i);
 			ISpellComponent[] components = getComponentsForStage(stack, i);
 			ISpellModifier[] modifiers = getModifiersForStage(stack, i);
-			HashMap<ISpellModifier, Integer> modifierWithQuantity = new HashMap<ISpellModifier, Integer>();
+			Reference2IntOpenHashMap<ISpellModifier> modifierWithQuantity = new Reference2IntOpenHashMap<ISpellModifier>();
 			for (ISpellComponent component : components){
 				stageManaCost += component.manaCost(caster);
 				stageBurnout += component.burnout(caster);
 			}
 			for (ISpellModifier modifier : modifiers){
-				if (modifierWithQuantity.containsKey(modifier)){
-					Integer qty = modifierWithQuantity.get(modifier);
-					if (qty == null) qty = 1;
-					qty++;
-					modifierWithQuantity.put(modifier, qty);
-				}else{
-					modifierWithQuantity.put(modifier, 1);
-				}
+				modifierWithQuantity.addTo(modifier, 1);
 			}
 
-			for (ISpellModifier modifier : modifierWithQuantity.keySet()){
-				stageManaCost *= modifier.getManaCostMultiplier(stack, i, modifierWithQuantity.get(modifier), caster);
+			for (Reference2IntMap.Entry<ISpellModifier> entry : modifierWithQuantity.reference2IntEntrySet()){
+				stageManaCost *= entry.getKey().getManaCostMultiplier(stack, i, entry.getIntValue(), caster);
 			}
 
 			manaCost += (stageManaCost * shape.manaCostMultiplier(stack));
@@ -565,7 +562,9 @@ public class SpellUtils implements ISpellUtils{
 				for (int i : components)
 					last.definition.addComponent(i);
 
-				HashMap<Integer, Integer> ordinals = new HashMap<Integer, Integer>();
+				// Kept as AM2's original boxed HashMap: AM2 Playground (am2pg) rewrites this method's bytecode at load time and
+				// injects a java/util/HashMap.put on this local, so any other map type fails class verification.
+				@SuppressWarnings("boxed-collection") HashMap<Integer, Integer> ordinals = new HashMap<Integer, Integer>();
 				for (ISpellModifier modifier : modifiers){
 					int ordinal = 0;
 					if (ordinals.containsKey(modifier.getID()))
@@ -594,7 +593,8 @@ public class SpellUtils implements ISpellUtils{
 			for (int c : components)
 				def.definition.addComponent(c);
 			ISpellModifier[] modifiers = getModifiersForStage(stack, i);
-			HashMap<Integer, Integer> ordinals = new HashMap<Integer, Integer>();
+			// original boxed form like the loop above, so the method's bytecode stays the shape am2pg patches
+			@SuppressWarnings("boxed-collection") HashMap<Integer, Integer> ordinals = new HashMap<Integer, Integer>();
 			for (ISpellModifier modifier : modifiers){
 				int ordinal = 0;
 				if (ordinals.containsKey(modifier.getID()))
@@ -762,34 +762,27 @@ public class SpellUtils implements ISpellUtils{
 			return Affinity.values()[aff];
 		}
 
-		HashMap<Integer, Integer> affinityFrequency = new HashMap<Integer, Integer>();
+		// called for particles and projectile ticks: counted in an array instead of a boxed map
+		int[] affinityFrequency = new int[AFFINITIES.length];
 
 		for (int i = 0; i < numStages(stack); ++i){
 			for (ISpellComponent comp : getComponentsForStage(stack, i)){
-				EnumSet<Affinity> affList = comp.getAffinity();
-				for (Affinity affinity : affList){
-					if (!affinityFrequency.containsKey(affinity.ordinal())){
-						affinityFrequency.put(affinity.ordinal(), 1);
-					}else{
-						int old = affinityFrequency.get(affinity.ordinal());
-						affinityFrequency.put(affinity.ordinal(), old + 1);
-					}
-				}
+				for (Affinity affinity : comp.getAffinity())
+					affinityFrequency[affinity.ordinal()]++;
 			}
 		}
 
+		// ties keep the lowest ordinal, as the old map iteration did for small integer keys
 		int highestCount = 0;
 		int highestID = 0;
-
-		for (Integer key : affinityFrequency.keySet()){
-			int count = affinityFrequency.get(key);
-			if (count > highestCount){
-				highestID = key;
-				highestCount = count;
+		for (int id = 0; id < affinityFrequency.length; id++){
+			if (affinityFrequency[id] > highestCount){
+				highestID = id;
+				highestCount = affinityFrequency[id];
 			}
 		}
 
-		return Affinity.values()[highestID];
+		return AFFINITIES[highestID];
 	}
 
 	public void doAffinityShift(EntityLivingBase caster, ISpellComponent component, ISpellShape governingShape, float mana){
@@ -831,9 +824,12 @@ public class SpellUtils implements ISpellUtils{
 		}
 		aff.addDiminishingReturns(governingShape.isChanneled());
 	}
-	public HashMap<Affinity, Float> AffinityFor(ItemStack stack){
-		HashMap<Affinity, Integer> affinityFrequency = new HashMap<Affinity, Integer>();
-		HashMap<Affinity, Float> affinities = new HashMap<Affinity, Float>();
+	private static final Affinity[] AFFINITIES = Affinity.values();
+
+	/** Share of each affinity among the spell's components (0..1). */
+	public Reference2FloatOpenHashMap<Affinity> AffinityFor(ItemStack stack){
+		Reference2IntOpenHashMap<Affinity> affinityFrequency = new Reference2IntOpenHashMap<Affinity>();
+		Reference2FloatOpenHashMap<Affinity> affinities = new Reference2FloatOpenHashMap<Affinity>();
 		float totalAffinityEntries = 0;
 
 		if (stack.stackTagCompound.hasKey(ForcedAffinity)){
@@ -849,20 +845,14 @@ public class SpellUtils implements ISpellUtils{
 				EnumSet<Affinity> affList = comp.getAffinity();
 				for (Affinity affinity : affList){
 					totalAffinityEntries++;
-					if (!affinityFrequency.containsKey(affinity)){
-						affinityFrequency.put(affinity, 1);
-					}else{
-						int old = affinityFrequency.get(affinity);
-						affinityFrequency.put(affinity, old + 1);
-					}
+					affinityFrequency.addTo(affinity, 1);
 				}
 			}
 		}
 
-		for (Affinity key : affinityFrequency.keySet()){
-			int count = affinityFrequency.get(key);
-			float percent = (totalAffinityEntries > 0) ? count / totalAffinityEntries : 0;
-			affinities.put(key, percent);
+		for (Reference2IntMap.Entry<Affinity> entry : affinityFrequency.reference2IntEntrySet()){
+			float percent = (totalAffinityEntries > 0) ? entry.getIntValue() / totalAffinityEntries : 0;
+			affinities.put(entry.getKey(), percent);
 		}
 
 		return affinities;

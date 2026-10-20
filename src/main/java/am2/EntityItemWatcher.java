@@ -39,7 +39,10 @@ public class EntityItemWatcher{
 		registerWatchableItem(Items.ender_eye);
 	}
 
+	/** Server thread only: the watched items are server entities (issue #41: this used to also run on the client thread). */
 	public void tick(){
+		if (watchedItems.isEmpty())
+			return;
 		watchedItems.removeAll(toRemove);
 		toRemove.clear();
 
@@ -85,6 +88,8 @@ public class EntityItemWatcher{
 	}
 
 	public void addWatchedItem(EntityItem item){
+		if (item.worldObj.isRemote)
+			return;
 		if (this.itemsToWatch.contains(item.getEntityItem().getItem()))
 			watchedItems.add(item);
 	}

@@ -1,5 +1,7 @@
 package am2.illeffect;
 
+import it.unimi.dsi.fastutil.objects.Reference2IntMap;
+import it.unimi.dsi.fastutil.objects.Reference2IntLinkedOpenHashMap;
 import am2.api.illeffect.BadThingTypes;
 import am2.api.illeffect.IIllEffect;
 import am2.api.illeffect.IllEffectSeverity;
@@ -18,7 +20,7 @@ public class IllEffectsManager{
 	}
 
 	public void ApplyRandomBadThing(TileEntity te, IllEffectSeverity maxSev, BadThingTypes type){
-		HashMap<IIllEffect, Integer> possibleBadThings = new HashMap<IIllEffect, Integer>();
+		Reference2IntLinkedOpenHashMap<IIllEffect> possibleBadThings = new Reference2IntLinkedOpenHashMap<IIllEffect>();
 
 		switch (type){
 		case ALL:
@@ -47,20 +49,20 @@ public class IllEffectsManager{
 		Map<EntityPlayer, Object> affected = chosenBadThing.ApplyIllEffect(te.getWorldObj(), te.xCoord, te.yCoord, te.zCoord);
 	}
 
-	private IIllEffect getWeightedBadthing(HashMap<IIllEffect, Integer> possibilities){
+	private IIllEffect getWeightedBadthing(Reference2IntLinkedOpenHashMap<IIllEffect> possibilities){
 
 		int totalWeight = 0;
 
-		for (IIllEffect effect : possibilities.keySet()){
-			totalWeight += possibilities.get(effect);
+		for (Reference2IntMap.Entry<IIllEffect> entry : possibilities.reference2IntEntrySet()){
+			totalWeight += entry.getIntValue();
 		}
 
 		int tWeight = rand.nextInt(totalWeight);
 
-		for (IIllEffect effect : possibilities.keySet()){
-			tWeight -= possibilities.get(effect);
+		for (Reference2IntMap.Entry<IIllEffect> entry : possibilities.reference2IntEntrySet()){
+			tWeight -= entry.getIntValue();
 			if (tWeight <= 0){
-				return effect;
+				return entry.getKey();
 			}
 		}
 

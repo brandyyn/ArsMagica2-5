@@ -1,5 +1,6 @@
 package am2.guis;
 
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import am2.api.SkillTreeEntry;
 import am2.api.spell.component.interfaces.ISkillTreeEntry;
 import am2.api.spell.enums.LearnStates;
@@ -32,7 +33,7 @@ public class GuiCompendiumIndex extends GuiScreen implements GuiYesNoCallback{
 	private String activeCategory;
 	private String activeCategoryID;
 	private final LinkedHashSet<CompendiumEntryType> categories;
-	private HashMap<String, Integer> pagingData;
+	private Object2IntOpenHashMap<String> pagingData;
 
 	int xSize = 360;
 	int ySize = 256;
@@ -59,7 +60,7 @@ public class GuiCompendiumIndex extends GuiScreen implements GuiYesNoCallback{
 		categories = ArcaneCompendium.instance.getCategories();
 		activeCategory = categories.iterator().next().getCategoryLabel();
 		activeCategoryID = categories.iterator().next().getCategoryName();
-		pagingData = new HashMap<>();
+		pagingData = new Object2IntOpenHashMap<String>();
 		lines = new ArrayList<>();
 
 		sk = SkillData.For(Minecraft.getMinecraft().thePlayer);
@@ -71,7 +72,7 @@ public class GuiCompendiumIndex extends GuiScreen implements GuiYesNoCallback{
 		this.activeCategory = (String)breadcrumb.refData[0];
 		this.activeCategoryID = (String)breadcrumb.refData[1];
 		this.currentParentEntryName = (String)breadcrumb.refData[2];
-		this.pagingData = (HashMap<String, Integer>)breadcrumb.refData[3];
+		this.pagingData = (Object2IntOpenHashMap<String>)breadcrumb.refData[3];
 		if (currentParentEntryName != null){
 			this.currentParentEntry = ArcaneCompendium.instance.getEntry(currentParentEntryName);
 		}
@@ -121,8 +122,7 @@ public class GuiCompendiumIndex extends GuiScreen implements GuiYesNoCallback{
 	}
 
 	protected int getNumPages(){
-		Integer pages = this.pagingData.get(activeCategoryID);
-		return pages != null ? pages : 0;
+		return this.pagingData.getInt(activeCategoryID);
 	}
 
 	@Override
@@ -257,8 +257,7 @@ public class GuiCompendiumIndex extends GuiScreen implements GuiYesNoCallback{
 			lines = GuiArcaneCompendium.splitStringToLines(fontRendererObj, currentParentEntry.getDescription(), lineWidth, maxLines);
 			int numPages = currentParentEntry.hasSubItems() ? lines.size() : lines.size() - 1;
 
-			Integer existingPages = pagingData.get(activeCategoryID);
-			if (existingPages == null || existingPages < numPages){
+			if (!pagingData.containsKey(activeCategoryID) || pagingData.getInt(activeCategoryID) < numPages){
 				pagingData.put(activeCategoryID, numPages);
 				page = 0;
 				prevPage.visible = false;

@@ -7,8 +7,8 @@ import am2.bosses.IArsMagicaBoss;
 import am2.spell.SpellHelper;
 import am2.utility.NPCSpells;
 import net.minecraft.entity.EntityLiving;
-import thehippomaster.AnimationAPI.AIAnimation;
-import thehippomaster.AnimationAPI.IAnimatedEntity;
+import am2.animation.AIAnimation;
+import am2.animation.IAnimatedEntity;
 
 public class EntityAIEnderwave extends AIAnimation{
 

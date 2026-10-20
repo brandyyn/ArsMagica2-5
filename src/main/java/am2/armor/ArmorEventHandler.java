@@ -1,5 +1,7 @@
 package am2.armor;
 
+import am2.utility.AMHooks;
+
 import am2.AMCore;
 import am2.LogHelper;
 import am2.api.items.armor.ArmorTextureEvent;
@@ -53,12 +55,36 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
-import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesMagicka;
 import org.lwjgl.opengl.GL11;
 
 import java.util.*;
 
 public class ArmorEventHandler{
+
+	/** EntityPlayer.speedInAir is private; resolved once instead of on every archmage boots tick. */
+	private static java.lang.reflect.Field speedInAirField;
+
+	private static java.lang.reflect.Field speedInAirField(){
+		if (speedInAirField == null)
+			speedInAirField = ReflectionHelper.findField(EntityPlayer.class, "speedInAir", "field_71102_ce");
+		return speedInAirField;
+	}
+
+	private static float getSpeedInAir(EntityPlayer player){
+		try{
+			return speedInAirField().getFloat(player);
+		}catch (IllegalAccessException e){
+			throw new IllegalStateException(e);
+		}
+	}
+
+	private static void setSpeedInAir(EntityPlayer player, float value){
+		try{
+			speedInAirField().setFloat(player, value);
+		}catch (IllegalAccessException e){
+			throw new IllegalStateException(e);
+		}
+	}
 
 	@SubscribeEvent
 	public void onEntityLiving(LivingUpdateEvent event){
@@ -88,9 +114,9 @@ public class ArmorEventHandler{
 				instance.removeModifier(modifier);
 			}
 
-			float speedInAirLast = ReflectionHelper.getPrivateValue(EntityPlayer.class, player, "speedInAir", "field_71102_ce");
+			float speedInAirLast = getSpeedInAir(player);
 			if (speedInAirLast < 0.1F){
-				ReflectionHelper.setPrivateValue(EntityPlayer.class, player, 0.1F, "speedInAir", "field_71102_ce");
+				setSpeedInAir(player, 0.1F);
 				setSpeedInAir.put(player, speedInAirLast);
 			}
 
@@ -100,13 +126,15 @@ public class ArmorEventHandler{
 				}
 			}
 		} else {
-			if (setSpeedInAir.get(player) != null) {
-				ReflectionHelper.setPrivateValue(EntityPlayer.class, player, setSpeedInAir.get(player), "speedInAir", "field_71102_ce");
+			Float original = setSpeedInAir.remove(player);
+			if (original != null) {
+				setSpeedInAir(player, original);
 			}
 		}
 	}
 
-	private Map<EntityPlayer, Float> setSpeedInAir = new HashMap<EntityPlayer, Float>();
+	// weak: players are dropped with their world; entries are consumed when the boots come off
+	private final Map<EntityPlayer, Float> setSpeedInAir = new java.util.WeakHashMap<EntityPlayer, Float>();
 
 	@SubscribeEvent
 	public void onEntityHurt(LivingHurtEvent event){
@@ -216,69 +244,87 @@ public class ArmorEventHandler{
 	arcane,
 	enderman,
 	}
+	/** Disguise entity per player, reused across frames (two entities used to be constructed per disguised player per frame). */
+	private final java.util.WeakHashMap<EntityPlayer, EntityLivingBase> disguises = new java.util.WeakHashMap<EntityPlayer, EntityLivingBase>();
+	private final java.util.WeakHashMap<EntityPlayer, String> disguiseModels = new java.util.WeakHashMap<EntityPlayer, String>();
+
+	private EntityLivingBase getDisguise(EntityPlayer disguised, String toMob){
+		EntityLivingBase cached = disguises.get(disguised);
+		if (cached != null && cached.worldObj == disguised.worldObj && toMob.equals(disguiseModels.get(disguised)))
+			return cached;
+		EntityLivingBase created = createDisguise(disguised.worldObj, toMob);
+		disguises.put(disguised, created);
+		disguiseModels.put(disguised, toMob);
+		return created;
+	}
+
+	private static EntityLivingBase createDisguise(World player, String toMob){
+		EntityLivingBase elb = new EntityZombie(player);
+
+		if (toMob.equalsIgnoreCase("spider")){
+			elb = new EntitySpider(player);
+		}else if (toMob.equalsIgnoreCase("witch")){
+			elb = new EntityWitch(player);
+		}else if (toMob.equalsIgnoreCase("snowman")){
+			elb = new EntitySnowman(player);
+		}else if (toMob.equalsIgnoreCase("creeper")){
+			elb = new EntityCreeper(player);
+		}else if (toMob.equalsIgnoreCase("chicken")){
+			elb = new EntityChicken(player);
+		}else if (toMob.equalsIgnoreCase("cow")){
+			elb = new EntityCow(player);
+		}else if (toMob.equalsIgnoreCase("enderman")){
+			elb = new EntityEnderman(player);
+		}else if (toMob.equalsIgnoreCase("skeleton")){
+			elb = new EntitySkeleton(player);
+		}else if (toMob.equalsIgnoreCase("blaze")){
+			elb = new EntityBlaze(player);
+		}else if (toMob.equalsIgnoreCase("magma")){
+			elb = new EntityMagmaCube(player);
+		}else if (toMob.equalsIgnoreCase("pigman")){
+			elb = new EntityPigZombie(player);
+		}else if (toMob.equalsIgnoreCase("horse")){
+			elb = new EntityHorse(player);
+		}else if (toMob.equalsIgnoreCase("arcane")){
+			elb = new EntityArcaneGuardian(player);
+		}else if (toMob.equalsIgnoreCase("earth")){
+			elb = new EntityEarthGuardian(player);
+		}
+		else if (toMob.equalsIgnoreCase("fire")){
+			elb = new EntityFireGuardian(player);
+		}
+		else if (toMob.equalsIgnoreCase("air")){
+			elb = new EntityAirGuardian(player);
+		}
+		else if (toMob.equalsIgnoreCase("water")){
+			elb = new EntityWaterGuardian(player);
+		}
+		else if (toMob.equalsIgnoreCase("ice")){
+			elb = new EntityWinterGuardian(player);
+		}
+		else if (toMob.equalsIgnoreCase("lightning")){
+			elb = new EntityLightningGuardian(player);
+		}
+		else if (toMob.equalsIgnoreCase("life")){
+			elb = new EntityLifeGuardian(player);
+		}
+		else if (toMob.equalsIgnoreCase("nature")){
+			elb = new EntityNatureGuardian(player);
+		}else if (toMob.equalsIgnoreCase("end")){
+			elb = new EntityEnderGuardian(player);
+		}
+
+		return elb;
+	}
+
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onPlayerRenderPre(RenderPlayerEvent.Pre event) { // true invis
-		if (MysteriumPatchesFixesMagicka.isPlayerEthereal(event.entityPlayer)) {event.setCanceled(true); return;}
-		if (MysteriumPatchesFixesMagicka.playerModelMap.get(event.entityPlayer.getCommandSenderName()) != null && !MysteriumPatchesFixesMagicka.playerModelMap.get(event.entityPlayer.getCommandSenderName()).startsWith("maid")){
+		if (AMHooks.isPlayerEthereal(event.entityPlayer)) {event.setCanceled(true); return;}
+		if (AMHooks.playerModelMap.get(event.entityPlayer.getCommandSenderName()) != null && !AMHooks.playerModelMap.get(event.entityPlayer.getCommandSenderName()).startsWith("maid")){
 			// custom mobs
-			String toMob = MysteriumPatchesFixesMagicka.playerModelMap.get(event.entityPlayer.getCommandSenderName());
-			World player = event.entityPlayer.worldObj;
-			EntityLivingBase elb = new EntityZombie(event.entityPlayer.worldObj);
-
-			if (toMob.equalsIgnoreCase("spider")){
-				elb = new EntitySpider(player);
-			}else if (toMob.equalsIgnoreCase("witch")){
-				elb = new EntityWitch(player);
-			}else if (toMob.equalsIgnoreCase("snowman")){
-				elb = new EntitySnowman(player);
-			}else if (toMob.equalsIgnoreCase("creeper")){
-				elb = new EntityCreeper(player);
-			}else if (toMob.equalsIgnoreCase("chicken")){
-				elb = new EntityChicken(player);
-			}else if (toMob.equalsIgnoreCase("cow")){
-				elb = new EntityCow(player);
-			}else if (toMob.equalsIgnoreCase("enderman")){
-				elb = new EntityEnderman(player);
-			}else if (toMob.equalsIgnoreCase("skeleton")){
-				elb = new EntitySkeleton(player);
-			}else if (toMob.equalsIgnoreCase("blaze")){
-				elb = new EntityBlaze(player);
-			}else if (toMob.equalsIgnoreCase("magma")){
-				elb = new EntityMagmaCube(player);
-			}else if (toMob.equalsIgnoreCase("pigman")){
-				elb = new EntityPigZombie(player);
-			}else if (toMob.equalsIgnoreCase("horse")){
-				elb = new EntityHorse(player);
-			}else if (toMob.equalsIgnoreCase("arcane")){
-				elb = new EntityArcaneGuardian(player);
-			}else if (toMob.equalsIgnoreCase("earth")){
-				elb = new EntityEarthGuardian(player);
-			}
-			else if (toMob.equalsIgnoreCase("fire")){
-				elb = new EntityFireGuardian(player);
-			}
-			else if (toMob.equalsIgnoreCase("air")){
-				elb = new EntityAirGuardian(player);
-			}
-			else if (toMob.equalsIgnoreCase("water")){
-				elb = new EntityWaterGuardian(player);
-			}
-			else if (toMob.equalsIgnoreCase("ice")){
-				elb = new EntityWinterGuardian(player);
-			}
-			else if (toMob.equalsIgnoreCase("lightning")){
-				elb = new EntityLightningGuardian(player);
-			}
-			else if (toMob.equalsIgnoreCase("life")){
-				elb = new EntityLifeGuardian(player);
-			}
-			else if (toMob.equalsIgnoreCase("nature")){
-				elb = new EntityNatureGuardian(player);
-			}else if (toMob.equalsIgnoreCase("end")){
-				elb = new EntityEnderGuardian(player);
-			}
-
+			String toMob = AMHooks.playerModelMap.get(event.entityPlayer.getCommandSenderName());
+			EntityLivingBase elb = getDisguise(event.entityPlayer, toMob);
 			ItemBoxOfIllusions.Copy(event.entityPlayer, elb);
 			Render rle = RenderManager.instance.getEntityRenderObject(elb);
 			if (rle instanceof RendererLivingEntity) {
@@ -316,8 +362,8 @@ public class ArmorEventHandler{
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onPlayerRenderPreSpecial(RenderPlayerEvent.Specials.Pre event) { // true invis
-		if (MysteriumPatchesFixesMagicka.isPlayerEthereal(event.entityPlayer)) {event.setCanceled(true); return;}
-		if (MysteriumPatchesFixesMagicka.playerModelMap.get(event.entityPlayer.getCommandSenderName()) != null && !MysteriumPatchesFixesMagicka.playerModelMap.get(event.entityPlayer.getCommandSenderName()).startsWith("maid")) {event.setCanceled(true); return;}
+		if (AMHooks.isPlayerEthereal(event.entityPlayer)) {event.setCanceled(true); return;}
+		if (AMHooks.playerModelMap.get(event.entityPlayer.getCommandSenderName()) != null && !AMHooks.playerModelMap.get(event.entityPlayer.getCommandSenderName()).startsWith("maid")) {event.setCanceled(true); return;}
 	}
 
 	// Sorry Roadhog for borrowing some of your code starting here :D
@@ -327,7 +373,7 @@ public class ArmorEventHandler{
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	@SideOnly(Side.CLIENT)
 	public void onOverlayRenderPre(RenderGameOverlayEvent.Pre event) {
-		if(MysteriumPatchesFixesMagicka.isPlayerEthereal(Minecraft.getMinecraft().thePlayer)) {
+		if(AMHooks.isPlayerEthereal(Minecraft.getMinecraft().thePlayer)) {
 			if(event.type == RenderGameOverlayEvent.ElementType.HOTBAR ||
 					event.type == RenderGameOverlayEvent.ElementType.CROSSHAIRS) {
 				event.setCanceled(true);
@@ -342,7 +388,7 @@ public class ArmorEventHandler{
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	@SideOnly(Side.CLIENT)
 	public void onOverlayRenderPost(RenderGameOverlayEvent.Post event) {
-		if(MysteriumPatchesFixesMagicka.isPlayerEthereal(Minecraft.getMinecraft().thePlayer)) {
+		if(AMHooks.isPlayerEthereal(Minecraft.getMinecraft().thePlayer)) {
 			if(event.type == RenderGameOverlayEvent.ElementType.ALL) {
 				Minecraft.getMinecraft().gameSettings.heldItemTooltips = hadHeldItemTooltips;
 			}
@@ -352,14 +398,14 @@ public class ArmorEventHandler{
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onHandRender(RenderHandEvent event) {
-		if(MysteriumPatchesFixesMagicka.isPlayerEthereal(Minecraft.getMinecraft().thePlayer))
+		if(AMHooks.isPlayerEthereal(Minecraft.getMinecraft().thePlayer))
 			event.setCanceled(true);
 	}
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onFireRender(RenderBlockOverlayEvent event) {
-		if(MysteriumPatchesFixesMagicka.isPlayerEthereal(Minecraft.getMinecraft().thePlayer))
+		if(AMHooks.isPlayerEthereal(Minecraft.getMinecraft().thePlayer))
 			event.setCanceled(true);
 	}
 
@@ -367,7 +413,7 @@ public class ArmorEventHandler{
 	@SideOnly(Side.CLIENT)
 	public void onRenderFogDensity(EntityViewRenderEvent.FogDensity event) {
 		if(event.entity instanceof EntityPlayer) {
-			if(MysteriumPatchesFixesMagicka.isPlayerEthereal((EntityPlayer)event.entity)) {
+			if(AMHooks.isPlayerEthereal((EntityPlayer)event.entity)) {
 				if(event.block.getMaterial() == Material.water || event.block.getMaterial() == Material.lava) {
 					event.setCanceled(true);
 					event.density = 0;
@@ -379,7 +425,7 @@ public class ArmorEventHandler{
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onBlockHighlight(DrawBlockHighlightEvent event) {
-		if(MysteriumPatchesFixesMagicka.isPlayerEthereal(event.player)) {
+		if(AMHooks.isPlayerEthereal(event.player)) {
 			Block block = Minecraft.getMinecraft().theWorld.getBlock(event.target.blockX, event.target.blockY, event.target.blockZ);
 			int meta = Minecraft.getMinecraft().theWorld.getBlockMetadata(event.target.blockX, event.target.blockY, event.target.blockZ);
 			if(!block.hasTileEntity(meta) || !(Minecraft.getMinecraft().theWorld.getTileEntity(event.target.blockX, event.target.blockY, event.target.blockZ) instanceof IInventory)) {
@@ -393,7 +439,7 @@ public class ArmorEventHandler{
 	public void onClientTick(TickEvent.ClientTickEvent event) {
 		EntityPlayer player = FMLClientHandler.instance().getClientPlayerEntity();
 		if(player != null && !(player instanceof FakePlayer) && Minecraft.getMinecraft().playerController != null && event.phase == TickEvent.Phase.START) {
-			if(MysteriumPatchesFixesMagicka.isPlayerEthereal(Minecraft.getMinecraft().thePlayer)) {
+			if(AMHooks.isPlayerEthereal(Minecraft.getMinecraft().thePlayer)) {
 				if(!player.capabilities.isFlying) {
 					player.capabilities.isFlying = true;
 					player.sendPlayerAbilities();
@@ -404,7 +450,7 @@ public class ArmorEventHandler{
 
 	@SubscribeEvent
 	public void onInteract(PlayerInteractEvent event) {
-		if(MysteriumPatchesFixesMagicka.isPlayerEthereal(event.entityPlayer)) {
+		if(AMHooks.isPlayerEthereal(event.entityPlayer)) {
 			if(event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK)
 				event.setCanceled(true);
 			else {
@@ -422,21 +468,21 @@ public class ArmorEventHandler{
 
 	@SubscribeEvent
 	public void onInteract(BlockEvent.PlaceEvent event) {
-		if(MysteriumPatchesFixesMagicka.isPlayerEthereal(event.player)) {
+		if(AMHooks.isPlayerEthereal(event.player)) {
 			event.setCanceled(true);
 		}
 	}
 
 	@SubscribeEvent
 	public void onItemPickup(EntityItemPickupEvent event) {
-		if(MysteriumPatchesFixesMagicka.isPlayerEthereal(event.entityPlayer)) {
+		if(AMHooks.isPlayerEthereal(event.entityPlayer)) {
 			event.setCanceled(true);
 		}
 	}
 
 	@SubscribeEvent
 	public void onInteract(AttackEntityEvent event) {
-		if(MysteriumPatchesFixesMagicka.isPlayerEthereal(event.entityPlayer)) {
+		if(AMHooks.isPlayerEthereal(event.entityPlayer)) {
 			event.setCanceled(true);
 		}
 	}
@@ -444,7 +490,7 @@ public class ArmorEventHandler{
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onPlayerTick(TickEvent.PlayerTickEvent event) {
 		if(event.phase == TickEvent.Phase.START) {
-			if(MysteriumPatchesFixesMagicka.isPlayerEthereal(event.player)) {
+			if(AMHooks.isPlayerEthereal(event.player)) {
 				event.player.noClip = true;
 				event.player.onGround = false;
 				event.player.setInvisible(true);
@@ -454,13 +500,13 @@ public class ArmorEventHandler{
 
 	@SubscribeEvent
 	public void breakSpeed(PlayerEvent.BreakSpeed event) {
-		if(MysteriumPatchesFixesMagicka.isPlayerEthereal(event.entityPlayer))
+		if(AMHooks.isPlayerEthereal(event.entityPlayer))
 			event.newSpeed = 0;
 	}
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void itemToss(ItemTossEvent event) {
-		if(MysteriumPatchesFixesMagicka.isPlayerEthereal(event.player)) {
+		if(AMHooks.isPlayerEthereal(event.player)) {
 			event.setCanceled(true);
 			ItemStack item = event.entityItem.getEntityItem();
 			event.player.inventory.addItemStackToInventory(item);

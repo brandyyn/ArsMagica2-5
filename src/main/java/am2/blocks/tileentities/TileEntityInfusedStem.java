@@ -19,6 +19,8 @@ public class TileEntityInfusedStem extends TileEntity {
 
     public void updateEntity() {
         tick++;
+        // animals stay in love for 600 ticks, so scanning once a second instead of every tick misses nothing
+        if (tick % 20 == 0) {
         List<EntityAnimal> breedablesInRange = this.worldObj.getEntitiesWithinAABB(EntityAnimal.class, AxisAlignedBB.getBoundingBox(this.xCoord - 6, this.yCoord - 6, this.zCoord - 6, this.xCoord + 6, this.yCoord + 6, this.zCoord + 6));
 
         int current = 0;
@@ -33,6 +35,8 @@ public class TileEntityInfusedStem extends TileEntity {
                 current++;
                 j--; // we want to try again with the same one since occupied
             }
+        }
+
         }
 
         if (this.worldObj != null && tick >= 200) {

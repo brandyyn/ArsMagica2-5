@@ -1,5 +1,7 @@
 package am2.network;
 
+import am2.utility.AMHooks;
+
 import am2.AMCore;
 import am2.LogHelper;
 import am2.PlayerTracker;
@@ -49,7 +51,6 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
-import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesMagicka;
 
 import java.io.File;
 import java.io.IOException;
@@ -119,6 +120,9 @@ public class AMPacketProcessorClient extends AMPacketProcessorServer{
 				break;
 			case AMPacketIDs.ENERVATOR_BLOCK_UPDATE:
 				handleEnervatorUpdate(remaining);
+				break;
+			case AMPacketIDs.ANIMATION:
+				am2.animation.AnimationSync.handlePacket(remaining);
 				break;
 			case AMPacketIDs.SYNC_AIR_CHANGE:
 				handleSyncAir(remaining);
@@ -211,7 +215,7 @@ public class AMPacketProcessorClient extends AMPacketProcessorServer{
 		for (int i = 0; i < size; i++) {
 			String key = rdr.getString();
 			String value = rdr.getString();
-			MysteriumPatchesFixesMagicka.playerModelMap.put(key, value);
+			AMHooks.playerModelMap.put(key, value);
 		}
 	}
 

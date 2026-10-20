@@ -1,5 +1,7 @@
 package am2.customdata;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import am2.network.AMDataWriter;
 import am2.network.AMNetHandler;
 import am2.network.AMPacketIDs;
@@ -23,19 +25,18 @@ import java.util.Map;
 // per-world and per-dimension data. Syncing individual variables sucks.
 public class CustomWorldData {
 
-    private static Map<Integer, HashMap<String, String>> worldDataArray = new HashMap<Integer, HashMap<String, String>>();
+    private static final Int2ObjectOpenHashMap<HashMap<String, String>> worldDataArray = new Int2ObjectOpenHashMap<HashMap<String, String>>();
 
     private static final HashMap<String, String> WorldVarsFor(World world){
         if (world == null)
             return new HashMap<String, String>();
 
-        if (worldDataArray.containsKey(world.provider.dimensionId)){
-            return worldDataArray.get(world.provider.dimensionId);
-        }else{
-            HashMap<String, String> reg = new HashMap<String, String>();
+        HashMap<String, String> reg = worldDataArray.get(world.provider.dimensionId);
+        if (reg == null){
+            reg = new HashMap<String, String>();
             worldDataArray.put(world.provider.dimensionId, reg);
-            return reg;
         }
+        return reg;
     }
 
     public static boolean worldHasVar(World world, String varName) {
@@ -100,9 +101,9 @@ public class CustomWorldData {
                     File saveFile = new File(((SaveHandler) handler).getWorldDirectory(), "AM2WorldData.txt");
                     saveFile.createNewFile();
                     ArrayList<String> lines = new ArrayList<String>();
-                    for (Map.Entry<Integer, HashMap<String, String>> perDimension : worldDataArray.entrySet()) {
+                    for (Int2ObjectMap.Entry<HashMap<String, String>> perDimension : worldDataArray.int2ObjectEntrySet()) {
                         for (Map.Entry<String, String> perDimensionEntries : perDimension.getValue().entrySet()) {
-                            lines.add(perDimension.getKey() + ":::" + perDimensionEntries.getKey() + ":::" + perDimensionEntries.getValue());
+                            lines.add(perDimension.getIntKey() + ":::" + perDimensionEntries.getKey() + ":::" + perDimensionEntries.getValue());
                         }
                     }
                     PrintWriter pw = new PrintWriter(saveFile);

@@ -1,5 +1,8 @@
 package am2.blocks.tileentities;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import am2.LogHelper;
 import am2.api.math.AMVector3;
 import am2.api.spell.enums.Affinity;
@@ -40,10 +43,10 @@ public class TileEntityFlickerHabitat extends TileEntityFlickerControllerBase im
 	private int fadeCounter = 0;
 
 	private ArrayList<AMVector3> inList;
-	private HashMap<Integer, ArrayList<AMVector3>> outList;
+	private Int2ObjectOpenHashMap<ArrayList<AMVector3>> outList;
 	private int timer;
 	private int inListPosition = 0;
-	private HashMap<Integer, Integer> outListPositions = new HashMap<Integer, Integer>();
+	private final Int2IntOpenHashMap outListPositions = new Int2IntOpenHashMap();
 	private int defoutListPosition = 0;
 	private ItemStack flickerJar;
 	private float rotateOffset = 0;
@@ -77,7 +80,7 @@ public class TileEntityFlickerHabitat extends TileEntityFlickerControllerBase im
 
 	private void initLocationLists(){
 		inList = new ArrayList<AMVector3>();
-		outList = new HashMap<Integer, ArrayList<AMVector3>>();
+		outList = new Int2ObjectOpenHashMap<ArrayList<AMVector3>>();
 
 		for (int i = 0; i < PRIORITY_LEVELS; ++i)
 			outList.put(i, new ArrayList<AMVector3>());
@@ -114,9 +117,6 @@ public class TileEntityFlickerHabitat extends TileEntityFlickerControllerBase im
 	 * @return the outListPosition
 	 */
 	public int getOutListPosition(int priority){
-		if (!outListPositions.containsKey(priority))
-			outListPositions.put(priority, 0);
-
 		return outListPositions.get(priority);
 	}
 
@@ -237,7 +237,10 @@ public class TileEntityFlickerHabitat extends TileEntityFlickerControllerBase im
 	}
 
 	public void removeOutMarkerLocation(int x, int y, int z){
-		outList.remove(new AMVector3(x, y, z));
+		// the markers live in the per-priority lists; removing the vector as a map key never removed anything
+		AMVector3 marker = new AMVector3(x, y, z);
+		for (ArrayList<AMVector3> priorityList : outList.values())
+			priorityList.remove(marker);
 	}
 
 	@Override
@@ -274,14 +277,15 @@ public class TileEntityFlickerHabitat extends TileEntityFlickerControllerBase im
 	private void writeOutList(NBTTagCompound compound){
 		NBTTagList outputList = new NBTTagList();
 
-		for (int priority : outList.keySet()){
+		for (Int2ObjectMap.Entry<ArrayList<AMVector3>> entry : outList.int2ObjectEntrySet()){
+			int priority = entry.getIntKey();
 			//create a compound for the priority
 			NBTTagCompound priorityCompound = new NBTTagCompound();
 			//attach the priority to the compound
 			priorityCompound.setInteger("priority", priority);
 
 			//get the list of locations for this priority
-			ArrayList<AMVector3> priorityList = outList.get(priority);
+			ArrayList<AMVector3> priorityList = entry.getValue();
 			if (priorityList == null)
 				continue;
 

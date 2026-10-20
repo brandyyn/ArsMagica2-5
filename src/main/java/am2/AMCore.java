@@ -62,7 +62,7 @@ import java.util.Set;
 @Mod(modid = "arsmagica2",
 		name = "Ars Magica 2",
 		version = "1.8.5",
-		dependencies = "required-after:AnimationAPI;after:CoFHCore")
+		dependencies = "required-after:gtnhlib;after:CoFHCore")
 public class AMCore{
 
 	@Instance(value = "arsmagica2")
@@ -73,7 +73,6 @@ public class AMCore{
 	public static AMConfig config;
 	public static SkillConfiguration skillConfig;
 	public static final int ANY_META = 32767;
-	public static SimpleNetworkWrapper NETWORK;
 	public static SimpleNetworkWrapper ITEMFRAMENETWORK;
 
 	private String compendiumBase;
@@ -100,8 +99,6 @@ public class AMCore{
 
 		skillConfig = new SkillConfiguration(new File(configBase + "SkillConf.cfg"));
 
-		NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("AM2TickrateChanger");
-		NETWORK.registerMessage(TickrateMessageHandler.class, TickrateMessage.class, 0, Side.CLIENT);
 
 		ITEMFRAMENETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("AM2ItemFrameWatcher");
 		ITEMFRAMENETWORK.registerMessage(CompendiumProgressMessageHandler.class, CompendiumProgressMessage.class, 0, Side.CLIENT);
@@ -175,12 +172,8 @@ public class AMCore{
 			LogHelper.info("A compatible MagicBees version was not found, compat not loading.");
 		}
 
-		// Reduce onEntityLiving() lag by skipping unnecessary tasks if disabled.
-		AMEventHandler.enabled_accelerate = AMCore.skillConfig.isSkillEnabled("Accelerate");
-		AMEventHandler.enabled_slow = AMCore.skillConfig.isSkillEnabled("Slow");
-		AMEventHandler.enabled_timeFortified = AMCore.skillConfig.isSkillEnabled("FortifyTime");
-		AMEventHandler.enabled_shield = AMCore.skillConfig.isSkillEnabled("Shield");
-		AMEventHandler.enable_spatialVortex = AMCore.config.enableSpatialVortex();
+		// time spells are only processed for the skills that are enabled
+		TimeManipulation.configure();
 	}
 
 	private void registerFlickerOperators(){

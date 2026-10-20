@@ -1,5 +1,6 @@
 package am2.spell.components;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import am2.AMCore;
 import am2.api.ArsMagicaApi;
 import am2.api.spell.component.interfaces.ISpellComponent;
@@ -29,10 +30,10 @@ public class Plant implements ISpellComponent{
 	public boolean applyEffectBlock(ItemStack stack, World world, int blockx, int blocky, int blockz, int blockFace, double impactX, double impactY, double impactZ, EntityLivingBase caster){
 		Block soil = world.getBlock(blockx, blocky, blockz);
 		IInventory inventory = DummyEntityPlayer.fromEntityLiving(caster).inventory;
-		HashMap<Integer, ItemStack> seeds = GetAllSeedsInInventory(inventory);
+		Int2ObjectLinkedOpenHashMap<ItemStack> seeds = GetAllSeedsInInventory(inventory);
 		int currentSlot = 0;
 		if (soil != Blocks.air && seeds.size() > 0){
-			currentSlot = seeds.keySet().iterator().next();
+			currentSlot = seeds.firstIntKey();
 			ItemStack seedStack = seeds.get(currentSlot);
 
 			IPlantable seed = (IPlantable)seedStack.getItem();
@@ -90,8 +91,8 @@ public class Plant implements ISpellComponent{
 		return EnumSet.of(Affinity.NATURE);
 	}
 
-	private HashMap<Integer, ItemStack> GetAllSeedsInInventory(IInventory inventory){
-		HashMap<Integer, ItemStack> seeds = new HashMap<Integer, ItemStack>();
+	private Int2ObjectLinkedOpenHashMap<ItemStack> GetAllSeedsInInventory(IInventory inventory){
+		Int2ObjectLinkedOpenHashMap<ItemStack> seeds = new Int2ObjectLinkedOpenHashMap<ItemStack>();
 		for (int i = 0; i < inventory.getSizeInventory(); ++i){
 			ItemStack slotStack = inventory.getStackInSlot(i);
 			if (slotStack == null) continue;

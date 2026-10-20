@@ -1,84 +1,77 @@
 package am2.buffs;
 
-import am2.utility.KeyValuePair;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 
 import java.util.UUID;
 
 public class BuffStatModifiers{
 	public static final BuffStatModifiers instance = new BuffStatModifiers();
 
+	/**
+	 * Keeps the AM2 attribute modifiers in step with the entity's buffs. This runs for every living entity every tick,
+	 * so an entity with no active potion and no modifier left to clean up returns before any attribute lookup
+	 * (server attribute maps lower-case the attribute name on every lookup).
+	 *
+	 * @param mayHaveModifiers false only when the previous call returned false, i.e. no AM2 buff modifier can be applied
+	 * @return whether an AM2 buff modifier is still applied
+	 */
+	public boolean applyStatModifiersBasedOnBuffs(EntityLivingBase entity, boolean mayHaveModifiers){
+		if (!mayHaveModifiers && entity.getActivePotionEffects().isEmpty())
+			return false;
+		boolean applied = applyOrRemoveModifier(entity, BuffList.entangled.id, SharedMonsterAttributes.movementSpeed, entangled);
+		applied |= applyOrRemoveScalingModifier(entity, BuffList.frostSlowed.id, SharedMonsterAttributes.movementSpeed, frostSlow);
+		applied |= applyOrRemoveModifier(entity, BuffList.fury.id, SharedMonsterAttributes.movementSpeed, furyMoveMod);
+		applied |= applyOrRemoveModifier(entity, BuffList.fury.id, SharedMonsterAttributes.attackDamage, furyDmgMod);
+		applied |= applyOrRemoveScalingModifier(entity, BuffList.haste.id, SharedMonsterAttributes.movementSpeed, hasteSpeedBoost);
+		return applied;
+	}
+
 	public void applyStatModifiersBasedOnBuffs(EntityLivingBase entity){
-		//entangled
-		applyOrRemoveModifiersForBuff(entity, BuffList.entangled.id, new KeyValuePair<>(SharedMonsterAttributes.movementSpeed, entangled));
-		//frost slow
-		applyOrRemoveScalingModifiersForBuff(entity, BuffList.frostSlowed.id, SharedMonsterAttributes.movementSpeed, frostSlow_Diminished, frostSlow_Normal, frostSlow_Augmented);
-		//fury
-		applyOrRemoveModifiersForBuff(entity, BuffList.fury.id, new KeyValuePair<>(SharedMonsterAttributes.movementSpeed, furyMoveMod), new KeyValuePair<>(SharedMonsterAttributes.attackDamage, furyDmgMod));
-		//haste
-		applyOrRemoveScalingModifiersForBuff(entity, BuffList.haste.id, SharedMonsterAttributes.movementSpeed, hasteSpeedBoost_Diminished, hasteSpeedBoost_Normal, hasteSpeedBoost_Augmented);
+		applyStatModifiersBasedOnBuffs(entity, true);
 	}
 
-	private void applyOrRemoveModifiersForBuff(EntityLivingBase entity, int buffID, KeyValuePair<IAttribute, AttributeModifier>... modifiers){
-		if (entity.isPotionActive(buffID)){
-			applyAllModifiers(entity, modifiers);
-		}else{
-			clearAllModifiers(entity, modifiers);
-		}
-	}
-
-	private void applyOrRemoveScalingModifiersForBuff(EntityLivingBase entity, int potionID, IAttribute attribute, AttributeModifier... modifiers){
+	private boolean applyOrRemoveModifier(EntityLivingBase entity, int buffID, IAttribute attribute, AttributeModifier modifier){
 		IAttributeInstance inst = entity.getEntityAttribute(attribute);
-		if (inst == null) {
-			return;
-		}
-		AttributeModifier currentModifier = inst.getModifier(modifiers[0].getID());
-		if (entity.isPotionActive(potionID)){
-			int magnitude = entity.getActivePotionEffect(Potion.potionTypes[potionID]).getAmplifier();
-			AttributeModifier modifier = modifiers[Math.min(magnitude, modifiers.length - 1)];
-			if (currentModifier != modifier) {
-				if (currentModifier != null) {
+		if (inst == null)
+			return false;
+		AttributeModifier currentModifier = inst.getModifier(modifier.getID());
+		if (entity.isPotionActive(buffID)){
+			if (currentModifier != modifier){
+				if (currentModifier != null)
 					inst.removeModifier(currentModifier);
-				}
 				inst.applyModifier(modifier);
 			}
-		}else{
-			if (currentModifier != null) {
-				inst.removeModifier(currentModifier);
-			}
+			return true;
 		}
+		if (currentModifier == modifier)
+			inst.removeModifier(currentModifier);
+		return false;
 	}
 
-	private void applyAllModifiers(EntityLivingBase entity, KeyValuePair<IAttribute, AttributeModifier>... modifiers){
-		for (KeyValuePair<IAttribute, AttributeModifier> entry : modifiers){
-			IAttributeInstance inst = entity.getEntityAttribute(entry.getKey());
-			if (inst == null)
-				continue;
-			AttributeModifier currentModifier = inst.getModifier(entry.getValue().getID());
-			if (currentModifier != entry.getValue()){
-				if (currentModifier != null) {
+	private boolean applyOrRemoveScalingModifier(EntityLivingBase entity, int potionID, IAttribute attribute, AttributeModifier[] modifiers){
+		IAttributeInstance inst = entity.getEntityAttribute(attribute);
+		if (inst == null)
+			return false;
+		AttributeModifier currentModifier = inst.getModifier(modifiers[0].getID());
+		PotionEffect effect = entity.getActivePotionEffect(Potion.potionTypes[potionID]);
+		if (effect != null){
+			AttributeModifier modifier = modifiers[Math.min(effect.getAmplifier(), modifiers.length - 1)];
+			if (currentModifier != modifier){
+				if (currentModifier != null)
 					inst.removeModifier(currentModifier);
-				}
-				inst.applyModifier(entry.getValue());
+				inst.applyModifier(modifier);
 			}
+			return true;
 		}
-	}
-
-	private void clearAllModifiers(EntityLivingBase entity, KeyValuePair<IAttribute, AttributeModifier>... modifiers){
-		for (KeyValuePair<IAttribute, AttributeModifier> entry : modifiers){
-			IAttributeInstance inst = entity.getEntityAttribute(entry.getKey());
-			if (inst == null)
-				continue;
-			AttributeModifier currentModifier = inst.getModifier(entry.getValue().getID());
-			if (currentModifier == entry.getValue()) {
-				inst.removeModifier(currentModifier);
-			}
-		}
+		if (currentModifier != null)
+			inst.removeModifier(currentModifier);
+		return false;
 	}
 
 	//*  Fury  *//
@@ -94,13 +87,15 @@ public class BuffStatModifiers{
 
 	//*  Haste *//
 	private static final UUID hasteID = UUID.fromString("CA4D2B5D-D509-49C0-9B2C-C0A338883AB1");
-	private static final AttributeModifier hasteSpeedBoost_Diminished = (new AttributeModifier(hasteID, "Haste Speed Boost (Diminished)", 0.3D, 2));
-	private static final AttributeModifier hasteSpeedBoost_Normal = (new AttributeModifier(hasteID, "Haste Speed Boost (Normal)", 0.6D, 2));
-	private static final AttributeModifier hasteSpeedBoost_Augmented = (new AttributeModifier(hasteID, "Haste Speed Boost (Augmented)", 1.2D, 2));
+	private static final AttributeModifier[] hasteSpeedBoost = {
+			new AttributeModifier(hasteID, "Haste Speed Boost (Diminished)", 0.3D, 2),
+			new AttributeModifier(hasteID, "Haste Speed Boost (Normal)", 0.6D, 2),
+			new AttributeModifier(hasteID, "Haste Speed Boost (Augmented)", 1.2D, 2)};
 
 	//*  Frost Slow *//
 	private static final UUID frostSlowID = UUID.fromString("03B0A79B-9569-43AE-BFE3-820D993D4A64");
-	private static final AttributeModifier frostSlow_Diminished = (new AttributeModifier(frostSlowID, "Frost Slow (Diminished)", -0.2, 2));
-	private static final AttributeModifier frostSlow_Normal = (new AttributeModifier(frostSlowID, "Frost Slow (Normal)", -0.5, 2));
-	private static final AttributeModifier frostSlow_Augmented = (new AttributeModifier(frostSlowID, "Frost Slow (Augmented)", -0.8, 2));
+	private static final AttributeModifier[] frostSlow = {
+			new AttributeModifier(frostSlowID, "Frost Slow (Diminished)", -0.2, 2),
+			new AttributeModifier(frostSlowID, "Frost Slow (Normal)", -0.5, 2),
+			new AttributeModifier(frostSlowID, "Frost Slow (Augmented)", -0.8, 2)};
 }

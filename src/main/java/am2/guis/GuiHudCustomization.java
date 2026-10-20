@@ -1,5 +1,6 @@
 package am2.guis;
 
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import am2.AMCore;
 import am2.api.math.AMVector2;
 import am2.guis.controls.GuiButtonVariableDims;
@@ -52,13 +53,13 @@ public class GuiHudCustomization extends GuiScreen{
 	private GuiButtonVariableDims dragTarget;
 	private AMVector2 dragOffset;
 
-	private final HashMap<Integer, Integer> snapData;
+	private final Int2IntOpenHashMap snapData;
 
 	int screenWidth = 1;
 	int screenHeight = 1;
 
 	public GuiHudCustomization(){
-		snapData = new HashMap<Integer, Integer>();
+		snapData = new Int2IntOpenHashMap();
 		ScaledResolution scaledresolution = new ScaledResolution(Minecraft.getMinecraft(), Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight);
 		screenWidth = scaledresolution.getScaledWidth();
 		screenHeight = scaledresolution.getScaledHeight();
@@ -179,13 +180,10 @@ public class GuiHudCustomization extends GuiScreen{
 	}
 
 	private int getSnapData(GuiButtonVariableDims button){
-		Integer i = snapData.get(button.id);
-		return i != null ? i : 0;
+		return snapData.get(button.id);
 	}
 
 	private AMVector2 getSnapVector(GuiButtonVariableDims button){
-		Integer snap = snapData.get(button.id);
-		if (snap == null) snap = 0;
 		float xPos = (float)((button.getPosition().x) / width);
 		float yPos = (float)((button.getPosition().y) / height);
 

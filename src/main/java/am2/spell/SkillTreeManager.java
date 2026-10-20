@@ -1,5 +1,6 @@
 package am2.spell;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import am2.AMCore;
 import am2.LogHelper;
 import am2.api.SkillTreeEntry;
@@ -12,6 +13,7 @@ import cpw.mods.fml.common.Loader;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 
 public class SkillTreeManager implements ISkillTreeManager{
 
@@ -19,14 +21,16 @@ public class SkillTreeManager implements ISkillTreeManager{
 	private final ArrayList<SkillTreeEntry> defenseTree = new ArrayList<SkillTreeEntry>();
 	private final ArrayList<SkillTreeEntry> utilityTree = new ArrayList<SkillTreeEntry>();
 	private final ArrayList<SkillTreeEntry> talentTree = new ArrayList<SkillTreeEntry>();
-	private final HashMap<Integer, SkillPointTypes> skillPointTypeList;
+	private final Int2ObjectOpenHashMap<SkillPointTypes> skillPointTypeList;
 
 	private int highestSkillDepth = 0;
+	/** Part -> tree entry, built lazily in the original lookup order (offense, defense, utility, talents). */
+	private IdentityHashMap<ISkillTreeEntry, SkillTreeEntry> entryIndex;
 
 	public static final SkillTreeManager instance = new SkillTreeManager();
 
 	private SkillTreeManager(){
-		skillPointTypeList = new HashMap<Integer, SkillPointTypes>();
+		skillPointTypeList = new Int2ObjectOpenHashMap<SkillPointTypes>();
 	}
 
 	//return the skill point (green,blue,red) of a part.
@@ -70,6 +74,7 @@ public class SkillTreeManager implements ISkillTreeManager{
 
 		SkillTreeEntry newEntry = new SkillTreeEntry(x, y, tree, locatedPrerequisites.toArray(new SkillTreeEntry[locatedPrerequisites.size()]), item, enabled);
 		treeListing.add(newEntry);
+		entryIndex = null;
 
 		skillPointTypeList.put(SkillManager.instance.getShiftedPartID(item), requiredPoint);
 	}
@@ -95,36 +100,24 @@ public class SkillTreeManager implements ISkillTreeManager{
 	}
 
 	public SkillTreeEntry getSkillTreeEntry(ISkillTreeEntry part){
-		ArrayList<SkillTreeEntry> treeEntries = SkillTreeManager.instance.getTree(SkillTrees.Offense);
-		for (SkillTreeEntry st_entry : treeEntries){
-			ISkillTreeEntry item = st_entry.registeredItem;
-			if (item != null && item == part){
-				return st_entry;
-			}
+		// called from per-entity tick paths, so the trees are indexed once instead of copied and scanned per call
+		IdentityHashMap<ISkillTreeEntry, SkillTreeEntry> index = entryIndex;
+		if (index == null){
+			index = new IdentityHashMap<ISkillTreeEntry, SkillTreeEntry>();
+			indexTree(index, offenseTree);
+			indexTree(index, defenseTree);
+			indexTree(index, utilityTree);
+			indexTree(index, talentTree);
+			entryIndex = index;
 		}
-		treeEntries = SkillTreeManager.instance.getTree(SkillTrees.Defense);
-		for (SkillTreeEntry st_entry : treeEntries){
-			ISkillTreeEntry item = st_entry.registeredItem;
-			if (item != null && item == part){
-				return st_entry;
-			}
-		}
-		treeEntries = SkillTreeManager.instance.getTree(SkillTrees.Utility);
-		for (SkillTreeEntry st_entry : treeEntries){
-			ISkillTreeEntry item = st_entry.registeredItem;
-			if (item != null && item == part){
-				return st_entry;
-			}
-		}
-		treeEntries = SkillTreeManager.instance.getTree(SkillTrees.Talents);
-		for (SkillTreeEntry st_entry : treeEntries){
-			ISkillTreeEntry item = st_entry.registeredItem;
-			if (item != null && item == part){
-				return st_entry;
-			}
-		}
+		return part == null ? null : index.get(part);
+	}
 
-		return null;
+	private static void indexTree(IdentityHashMap<ISkillTreeEntry, SkillTreeEntry> index, ArrayList<SkillTreeEntry> tree){
+		for (SkillTreeEntry st_entry : tree){
+			if (st_entry.registeredItem != null && !index.containsKey(st_entry.registeredItem))
+				index.put(st_entry.registeredItem, st_entry);
+		}
 	}
 
 	public void init(){

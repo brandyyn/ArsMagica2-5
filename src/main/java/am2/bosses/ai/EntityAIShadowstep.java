@@ -5,8 +5,8 @@ import am2.bosses.EntityEnderGuardian;
 import am2.bosses.IArsMagicaBoss;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.util.Vec3;
-import thehippomaster.AnimationAPI.AIAnimation;
-import thehippomaster.AnimationAPI.IAnimatedEntity;
+import am2.animation.AIAnimation;
+import am2.animation.IAnimatedEntity;
 
 public class EntityAIShadowstep extends AIAnimation{
 

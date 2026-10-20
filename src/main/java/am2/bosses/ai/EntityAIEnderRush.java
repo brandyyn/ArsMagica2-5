@@ -7,8 +7,8 @@ import am2.bosses.IArsMagicaBoss;
 import am2.utility.MathUtilities;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.util.DamageSource;
-import thehippomaster.AnimationAPI.AIAnimation;
-import thehippomaster.AnimationAPI.IAnimatedEntity;
+import am2.animation.AIAnimation;
+import am2.animation.IAnimatedEntity;
 
 public class EntityAIEnderRush extends AIAnimation{
 	private int cooldownTicks = 0;

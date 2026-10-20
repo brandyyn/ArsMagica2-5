@@ -1,5 +1,6 @@
 package am2.blocks.tileentities;
 
+import it.unimi.dsi.fastutil.objects.Reference2FloatOpenHashMap;
 import am2.AMCore;
 import am2.api.blocks.MultiblockStructureDefinition;
 import am2.api.blocks.MultiblockStructureDefinition.StructureGroup;
@@ -51,7 +52,7 @@ public class TileEntityBlackAurem extends TileEntityObelisk implements IMultiblo
 
 		pillars = structure.createGroup("pillars", 4);
 
-		caps = new HashMap<StructureGroup, Float>();
+		caps = new Reference2FloatOpenHashMap<StructureGroup>();
 		StructureGroup chimerite = structure.createGroup("caps_chimerite", 2);
 		StructureGroup obsidian = structure.createGroup("caps_obsidian", 2);
 		StructureGroup sunstone = structure.createGroup("caps_sunstone", 2);
@@ -102,12 +103,8 @@ public class TileEntityBlackAurem extends TileEntityObelisk implements IMultiblo
 			else if (group == wizardChalkCircle)
 				wizChalkFound = true;
 
-			for (StructureGroup cap : caps.keySet()) {
-				if (group == cap) {
-					capsLevel = caps.get(cap);
-					break;
-				}
-			}
+			if (caps.containsKey(group))
+				capsLevel = caps.getFloat(group);
 		}
 
 		powerMultiplier = 1;

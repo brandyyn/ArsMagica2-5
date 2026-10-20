@@ -23,7 +23,9 @@ import java.util.Map.Entry;
 public class AffinityData implements IExtendedEntityProperties, IAffinityData{
 	public static final String identifier = "AffinityData";
 
-	private HashMap<Integer, Float> affinityDepths;
+	private static final Affinity[] AFFINITIES = Affinity.values();
+	/** Depth per affinity ordinal; the NONE slot stays 0 and is never reported. */
+	private float[] affinityDepths;
 	public static final float MAX_DEPTH = 100;
 	private static final float ADJACENT_FACTOR = 0.25f;
 	private static final float MINOR_OPPOSING_FACTOR = 0.5f;
@@ -64,7 +66,7 @@ public class AffinityData implements IExtendedEntityProperties, IAffinityData{
 	public float getAffinityDepth(Affinity affinity){
 		if (affinity == Affinity.NONE) return 0;
 
-		return affinityDepths.get(affinity.ordinal()) / MAX_DEPTH;
+		return affinityDepths[affinity.ordinal()] / MAX_DEPTH;
 	}
 
 	@Override
@@ -96,7 +98,7 @@ public class AffinityData implements IExtendedEntityProperties, IAffinityData{
 
 		if (depth > MAX_DEPTH) depth = MAX_DEPTH;
 		if (depth < 0) depth = 0;
-		affinityDepths.put(affinity.ordinal(), depth);
+		affinityDepths[affinity.ordinal()] = depth;
 		this.hasUpdate = true;
 		updateHighestAffinities();
 	}
@@ -144,27 +146,28 @@ public class AffinityData implements IExtendedEntityProperties, IAffinityData{
 
 	private void addToAffinity(Affinity affinity, float amt){
 		if (affinity == Affinity.NONE || isLocked) return;
-		float existingAmt = affinityDepths.get(affinity.ordinal());
+		float existingAmt = affinityDepths[affinity.ordinal()];
 		existingAmt += amt;
 		if (existingAmt > MAX_DEPTH) existingAmt = MAX_DEPTH;
 		else if (existingAmt < 0) existingAmt = 0;
-		affinityDepths.put(affinity.ordinal(), existingAmt);
+		affinityDepths[affinity.ordinal()] = existingAmt;
 	}
 
 	private void subtractFromAffinity(Affinity affinity, float amt){
 		if (affinity == Affinity.NONE || isLocked) return;
-		float existingAmt = affinityDepths.get(affinity.ordinal());
+		float existingAmt = affinityDepths[affinity.ordinal()];
 		existingAmt -= amt;
 		if (existingAmt > MAX_DEPTH) existingAmt = MAX_DEPTH;
 		else if (existingAmt < 0) existingAmt = 0;
-		affinityDepths.put(affinity.ordinal(), existingAmt);
+		affinityDepths[affinity.ordinal()] = existingAmt;
 	}
 
 	@Override
 	public void saveNBTData(NBTTagCompound compound){
 		NBTTagCompound tags = new NBTTagCompound();
-		for (Integer affinity : affinityDepths.keySet()){
-			tags.setDouble(Affinity.values()[affinity].name(), affinityDepths.get(affinity));
+		for (Affinity affinity : AFFINITIES){
+			if (affinity != Affinity.NONE)
+				tags.setDouble(affinity.name(), affinityDepths[affinity.ordinal()]);
 		}
 		compound.setTag("AffinityDepthData", tags);
 		compound.setBoolean("AffinityLocked", isLocked);
@@ -189,11 +192,7 @@ public class AffinityData implements IExtendedEntityProperties, IAffinityData{
 	}
 
 	private void setupAffinityDefaults(){
-		affinityDepths = new HashMap<Integer, Float>();
-		for (Affinity affinity : Affinity.values()){
-			if (affinity == Affinity.NONE) continue;
-			affinityDepths.put(affinity.ordinal(), 0f);
-		}
+		affinityDepths = new float[AFFINITIES.length];
 		updateHighestAffinities();
 	}
 
@@ -231,16 +230,16 @@ public class AffinityData implements IExtendedEntityProperties, IAffinityData{
 		AMDataWriter writer = new AMDataWriter();
 		writer.add(this.entity.getEntityId());
 
-		writer.add(affinityDepths.get(Affinity.AIR.ordinal()));
-		writer.add(affinityDepths.get(Affinity.LIGHTNING.ordinal()));
-		writer.add(affinityDepths.get(Affinity.ARCANE.ordinal()));
-		writer.add(affinityDepths.get(Affinity.FIRE.ordinal()));
-		writer.add(affinityDepths.get(Affinity.ENDER.ordinal()));
-		writer.add(affinityDepths.get(Affinity.EARTH.ordinal()));
-		writer.add(affinityDepths.get(Affinity.ICE.ordinal()));
-		writer.add(affinityDepths.get(Affinity.NATURE.ordinal()));
-		writer.add(affinityDepths.get(Affinity.WATER.ordinal()));
-		writer.add(affinityDepths.get(Affinity.LIFE.ordinal()));
+		writer.add(affinityDepths[Affinity.AIR.ordinal()]);
+		writer.add(affinityDepths[Affinity.LIGHTNING.ordinal()]);
+		writer.add(affinityDepths[Affinity.ARCANE.ordinal()]);
+		writer.add(affinityDepths[Affinity.FIRE.ordinal()]);
+		writer.add(affinityDepths[Affinity.ENDER.ordinal()]);
+		writer.add(affinityDepths[Affinity.EARTH.ordinal()]);
+		writer.add(affinityDepths[Affinity.ICE.ordinal()]);
+		writer.add(affinityDepths[Affinity.NATURE.ordinal()]);
+		writer.add(affinityDepths[Affinity.WATER.ordinal()]);
+		writer.add(affinityDepths[Affinity.LIFE.ordinal()]);
 		writer.add(diminishingReturns);
 		writer.add(isLocked);
 
@@ -258,16 +257,16 @@ public class AffinityData implements IExtendedEntityProperties, IAffinityData{
 			return false;
 		}
 
-		affinityDepths.put(Affinity.AIR.ordinal(), rdr.getFloat());
-		affinityDepths.put(Affinity.LIGHTNING.ordinal(), rdr.getFloat());
-		affinityDepths.put(Affinity.ARCANE.ordinal(), rdr.getFloat());
-		affinityDepths.put(Affinity.FIRE.ordinal(), rdr.getFloat());
-		affinityDepths.put(Affinity.ENDER.ordinal(), rdr.getFloat());
-		affinityDepths.put(Affinity.EARTH.ordinal(), rdr.getFloat());
-		affinityDepths.put(Affinity.ICE.ordinal(), rdr.getFloat());
-		affinityDepths.put(Affinity.NATURE.ordinal(), rdr.getFloat());
-		affinityDepths.put(Affinity.WATER.ordinal(), rdr.getFloat());
-		affinityDepths.put(Affinity.LIFE.ordinal(), rdr.getFloat());
+		affinityDepths[Affinity.AIR.ordinal()] = rdr.getFloat();
+		affinityDepths[Affinity.LIGHTNING.ordinal()] = rdr.getFloat();
+		affinityDepths[Affinity.ARCANE.ordinal()] = rdr.getFloat();
+		affinityDepths[Affinity.FIRE.ordinal()] = rdr.getFloat();
+		affinityDepths[Affinity.ENDER.ordinal()] = rdr.getFloat();
+		affinityDepths[Affinity.EARTH.ordinal()] = rdr.getFloat();
+		affinityDepths[Affinity.ICE.ordinal()] = rdr.getFloat();
+		affinityDepths[Affinity.NATURE.ordinal()] = rdr.getFloat();
+		affinityDepths[Affinity.WATER.ordinal()] = rdr.getFloat();
+		affinityDepths[Affinity.LIFE.ordinal()] = rdr.getFloat();
 		diminishingReturns = rdr.getFloat();
 		isLocked = rdr.getBoolean();
 
@@ -286,29 +285,26 @@ public class AffinityData implements IExtendedEntityProperties, IAffinityData{
 	}
 
 	private void updateHighestAffinities(){
-		List<Float> values = new ArrayList<Float>(affinityDepths.values());
-		Collections.sort(values);
-		values = values.subList(values.size() - 2, values.size());
+		// the two highest depths, ascending, ignoring depths that round to zero
+		float[] sorted = new float[AFFINITIES.length - 1];
+		int n = 0;
+		for (Affinity affinity : AFFINITIES)
+			if (affinity != Affinity.NONE)
+				sorted[n++] = affinityDepths[affinity.ordinal()];
+		Arrays.sort(sorted, 0, n);
 
-		//remove entries that are too low
-		Iterator it = values.iterator();
-		while (it.hasNext()){
-			Float f = (Float)it.next();
+		List<Affinity> resolvedAffinties = new ArrayList<Affinity>(2);
+		boolean[] used = new boolean[AFFINITIES.length];
+		for (int v = Math.max(0, n - 2); v < n; v++){
+			float f = sorted[v];
 			if (Math.floor(f * 100.0f) / 100.0f == 0)
-				it.remove();
-		}
-
-		List<Affinity> resolvedAffinties = new ArrayList<Affinity>();
-
-		HashMap<Integer, Float> clone = (HashMap<Integer, Float>)affinityDepths.clone();
-
-		for (Float f : values){
-			it = clone.entrySet().iterator();
-			while (it.hasNext()){
-				Entry<Integer, Float> e = (Entry<Integer, Float>)it.next();
-				if (compareFloats(e.getValue(), f, 2)){
-					resolvedAffinties.add(Affinity.getByID(e.getKey()));
-					it.remove();
+				continue;
+			// each depth resolves to the lowest unused ordinal with that depth
+			for (Affinity affinity : AFFINITIES){
+				int id = affinity.ordinal();
+				if (affinity != Affinity.NONE && !used[id] && compareFloats(affinityDepths[id], f, 2)){
+					resolvedAffinties.add(Affinity.getByID(id));
+					used[id] = true;
 					break;
 				}
 			}

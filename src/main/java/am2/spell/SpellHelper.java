@@ -108,7 +108,7 @@ public class SpellHelper{
 		int persistenceModifiers = SpellUtils.instance.getModifiedInt_Add(0, stack, caster, caster, world, 0, SpellModifiers.LINGERING);
 		if (persistenceModifiers > 0){
 			int timeToNextCast = SpellUtils.instance.getModifiedInt_Mul(15, stack, caster, caster, world, 0, SpellModifiers.DURATION);
-			lingeringSpellList.add(new LingeringSpell(persistenceModifiers, stack, world, caster, blockX, blockY, blockZ, blockFace, impactX, impactY, impactZ, timeToNextCast));
+			addLingeringSpell(new LingeringSpell(persistenceModifiers, stack, world, caster, blockX, blockY, blockZ, blockFace, impactX, impactY, impactZ, timeToNextCast));
 		}
 		return SpellCastResult.SUCCESS;
 	}
@@ -163,7 +163,7 @@ public class SpellHelper{
 			int persistenceModifiers = SpellUtils.instance.getModifiedInt_Add(0, stack, caster, target, world, 0, SpellModifiers.LINGERING);
 			if (persistenceModifiers > 0){
 				int timeToNextCast = SpellUtils.instance.getModifiedInt_Mul(15, stack, caster, target, world, 0, SpellModifiers.DURATION);
-				lingeringSpellList.add(new LingeringSpell(persistenceModifiers, stack, world, caster, target, timeToNextCast));
+				addLingeringSpell(new LingeringSpell(persistenceModifiers, stack, world, caster, target, timeToNextCast));
 			}
 			return SpellCastResult.SUCCESS;
 		} else{
@@ -503,7 +503,23 @@ public class SpellHelper{
 		world.spawnEntityInWorld(item);
 	}
 
-	public static List<LingeringSpell> lingeringSpellList = new ArrayList<LingeringSpell>();
+	/** Lingering spells per side: the client and the integrated server tick on different threads. */
+	public static final List<LingeringSpell> lingeringSpellList = new ArrayList<LingeringSpell>();
+	public static final List<LingeringSpell> lingeringSpellListClient = new ArrayList<LingeringSpell>();
+
+	public static void addLingeringSpell(LingeringSpell spell){
+		(spell.world.isRemote ? lingeringSpellListClient : lingeringSpellList).add(spell);
+	}
+
+	/** Advances the lingering spells of the given world (or all of them when world is null) by one tick. */
+	public static void tickLingeringSpells(List<LingeringSpell> spells, World world){
+		// index loop: a cast may queue new lingering spells while this runs
+		for (int i = 0; i < spells.size(); i++){
+			LingeringSpell spell = spells.get(i);
+			if ((world == null || spell.world == world) && spell.doUpdate())
+				spells.remove(i--);
+		}
+	}
 	// used to not add zone spells twice
 	public static List<ItemStack> lingeringSpellZoneList = new ArrayList<ItemStack>();
 

@@ -13,13 +13,13 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 public class ShrinkHandler{
 
 	@SubscribeEvent
-	public void onEntityLiving(LivingEvent event){
+	// LivingUpdateEvent only: subscribing to the LivingEvent base class ran this for every living event (hurt, jump,
+	// drops, targeting...) of every entity, and advanced the shrink several times per tick for players
+	public void onEntityLiving(LivingEvent.LivingUpdateEvent event){
 		if (!(event.entityLiving instanceof EntityPlayer)) return;
 
 		EntityPlayer player = (EntityPlayer) event.entityLiving;
 
-		if (SkillTreeManager.instance.isSkillDisabled(SkillManager.instance.getSkill("Shrink")))
-			return;
 
 
 		ExtendedProperties exProps = ExtendedProperties.For(player);

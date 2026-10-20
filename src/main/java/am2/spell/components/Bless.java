@@ -39,7 +39,6 @@ public class Bless implements ISpellComponent{
 		if (!(target instanceof EntityLivingBase) || target instanceof IBossDisplayData) return false;
 
 		List<Integer> effectsToRemove = new ArrayList<Integer>();
-		HashMap<Integer, String> effectsToMagnify = new HashMap<Integer, String>();
 
 		Iterator iter = ((EntityLivingBase)target).getActivePotionEffects().iterator();
 

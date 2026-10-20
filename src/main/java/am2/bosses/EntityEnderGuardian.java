@@ -15,7 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
-import thehippomaster.AnimationAPI.IAnimatedEntity;
+import am2.animation.IAnimatedEntity;
 
 import static am2.playerextensions.ExtendedProperties.UPD_CURRENT_MANA_FATIGUE;
 
