@@ -60,7 +60,7 @@ public class FireDamage implements ISpellComponent, IRitualInteraction{
 		double damage = SpellUtils.instance.getModifiedDouble_Add(baseDamage, stack, caster, target, world, 0, SpellModifiers.DAMAGE);
 		if (isNetherMob(target))
 			return true;
-		return SpellHelper.instance.attackTargetSpecial(stack, target, DamageSources.causeEntityFireDamage(caster), SpellUtils.instance.modifyDamage(caster, (float)damage));
+		return SpellHelper.instance.attackTargetSpecial(stack, target, DamageSources.causeEntityFireDamage(caster), (float)damage);
 	}
 
 	private boolean isNetherMob(Entity target){

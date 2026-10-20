@@ -1,11 +1,11 @@
 package am2.items;
 
+import am2.containers.slots.SlotLock;
 import am2.containers.slots.SlotRuneOnly;
 import am2.items.ItemKeystone.KeystoneCombination;
 import am2.network.AMDataWriter;
 import am2.network.AMNetHandler;
 import am2.network.AMPacketIDs;
-import am2.utility.InventoryUtilities;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -19,26 +19,22 @@ import java.util.HashMap;
 public class ContainerKeystone extends Container{
 	private final ItemStack keystoneStack;
 	private final ItemStack runeBagStack;
-
 	private final InventoryKeyStone keyStoneInventory;
 	private final InventoryRuneBag runeBag;
-	private final int keystoneSlot;
 	public final int runebagSlot;
 	private final EntityPlayer player;
 	public int specialSlotIndex;
-
+	private boolean hasrunebag = false;
 	private int PLAYER_INVENTORY_START = 3;
-	private int PLAYER_ACTION_BAR_START = 30;
-	private int PLAYER_ACTION_BAR_END = 38;
+	private int PLAYER_ACTION_BAR_END = 39;
 
 	public ContainerKeystone(InventoryPlayer inventoryplayer, ItemStack bookStack, ItemStack runeBagStack, InventoryKeyStone inventoryKeystone, InventoryRuneBag runeBag, int runeBagSlot){
-		//addSlot(new Slot(spellBook,0, 21, 36)); //inventory, index, x, y
+		this.runeBagStack = runeBagStack;
 		this.keyStoneInventory = inventoryKeystone;
 		this.keystoneStack = bookStack;
-		this.keystoneSlot = inventoryplayer.currentItem;
 		this.runeBag = runeBag;
+		hasrunebag = !(runeBag == null) ;
 		this.runebagSlot = runeBagSlot;
-		this.runeBagStack = runeBagStack;
 		player = inventoryplayer.player;
 
 		int slotIndex = 0;
@@ -47,85 +43,81 @@ public class ContainerKeystone extends Container{
 
 		addSlotToContainer(new SlotRuneOnly(keyStoneInventory, slotIndex++, 80, 18));
 		addSlotToContainer(new SlotRuneOnly(keyStoneInventory, slotIndex++, 91, 36));
-		addSlotToContainer(new SlotRuneOnly(keyStoneInventory, slotIndex++, 69, 36));
+		addSlotToContainer(new SlotRuneOnly(keyStoneInventory, slotIndex, 69, 36));
 
 		//storage slots
-		if (this.runeBag != null){
+		if (hasrunebag){
 			int runeSlotIndex = 0;
 			for (int i = 0; i < 8; i++){
 				for (int j = 0; j < 2; j++){
 					addSlotToContainer(new SlotRuneOnly(this.runeBag, runeSlotIndex++, 8 + i * 18, 109 + j * 17));
 				}
 			}
-
 			PLAYER_INVENTORY_START += 16;
-			PLAYER_ACTION_BAR_START += 16;
 			PLAYER_ACTION_BAR_END += 16;
 		}
 
-		int playerInventoryCounter = 0;
+		int playerInventoryCounter=9;
 
-		int y = runebagSlot > -1 ? 216 : 179;
-
+		int y = runebagSlot > -1 ? 158 : 121;
+		//display player inventory
+		for (int i = 0; i < 3; i++){
+			for (int k = 0; k < 9; k++){
+				if (playerInventoryCounter++ == runeBagSlot){
+					addSlotToContainer(new SlotLock(inventoryplayer,k + i * 9 + 9, 8 + k * 18, y + i * 18));
+					continue;
+				}
+				addSlotToContainer(new Slot(inventoryplayer, k + i * 9 + 9, 8 + k * 18, y + i * 18));
+			}
+		}
+		playerInventoryCounter =0;
+		y = runebagSlot > -1 ? 216 : 179;
 		//display player action bar
 		for (int j1 = 0; j1 < 9; j1++){
-			if (playerInventoryCounter++ == runeBagSlot)
+			if (playerInventoryCounter++ == runeBagSlot){
+				addSlotToContainer(new SlotLock(inventoryplayer, j1, 8 + j1 * 18, y));
 				continue;
+			}
 			if (inventoryplayer.getStackInSlot(j1) == bookStack){
-				specialSlotIndex = j1 + 32;
+				addSlotToContainer(new SlotLock(inventoryplayer,j1,8 + j1 * 18, y));
 				continue;
 			}
 			addSlotToContainer(new Slot(inventoryplayer, j1, 8 + j1 * 18, y));
 		}
 
-		y = runebagSlot > -1 ? 158 : 121;
-
-		//display player inventory
-		for (int i = 0; i < 3; i++){
-			for (int k = 0; k < 9; k++){
-				if (playerInventoryCounter++ == runeBagSlot)
-					continue;
-				addSlotToContainer(new Slot(inventoryplayer, k + i * 9 + 9, 8 + k * 18, y + i * 18));
-			}
-		}
-
-
 	}
 
-	public ItemStack[] GetFullKeystoneInventory(){
-		ItemStack[] stack = new ItemStack[keyStoneInventory.inventorySize];
-		for (int i = 0; i < keyStoneInventory.inventorySize; ++i){
+	public ItemStack[] getFullInventory(){
+		ItemStack[] stack = new ItemStack[InventoryKeyStone.inventorySize];
+		for (int i = 0; i < InventoryKeyStone.inventorySize; ++i){
 			stack[i] = ((Slot)inventorySlots.get(i)).getStack();
 		}
+
 		return stack;
 	}
-
-	public ItemStack[] GetFullRuneBagInventory(){
-		ItemStack[] stack = new ItemStack[runeBag.inventorySize];
-		for (int i = keyStoneInventory.inventorySize; i < keyStoneInventory.inventorySize + runeBag.inventorySize; ++i){
-			stack[i - keyStoneInventory.inventorySize] = ((Slot)inventorySlots.get(i)).getStack();
-		}
+	public ItemStack[] getRuneBagInventory(){
+		ItemStack[] stack = new ItemStack[InventoryRuneBag.inventorySize];
+			for (int i = InventoryKeyStone.inventorySize; i < InventoryKeyStone.inventorySize + InventoryRuneBag.inventorySize; ++i){
+				stack[i - InventoryKeyStone.inventorySize] = ((Slot)inventorySlots.get(i)).getStack();
+			}
 		return stack;
 	}
 
 
 	@Override
 	public void onContainerClosed(EntityPlayer entityplayer){
-
 		World world = entityplayer.worldObj;
-
 		if (!world.isRemote){
 			ItemStack keyStoneItemStack = keystoneStack;
-			ItemStack[] items = GetFullKeystoneInventory();
+			ItemStack[] items = getFullInventory();
 			ItemsCommonProxy.keystone.UpdateStackTagCompound(keyStoneItemStack, items);
-			entityplayer.inventory.setInventorySlotContents(entityplayer.inventory.currentItem, keyStoneItemStack);
-
-			if (runeBagStack != null){
-				ItemStack runebagItemStack = runeBagStack;
-				items = GetFullRuneBagInventory();
-				ItemsCommonProxy.runeBag.UpdateStackTagCompound(runebagItemStack, items);
-				entityplayer.inventory.setInventorySlotContents(InventoryUtilities.getInventorySlotIndexFor(entityplayer.inventory, ItemsCommonProxy.runeBag), runebagItemStack);
+			if(hasrunebag){
+				ItemStack runeBagInventoryStack = runeBagStack;
+				ItemStack[] runeBagItems = getRuneBagInventory();
+				ItemsCommonProxy.runeBag.UpdateStackTagCompound(runeBagInventoryStack, runeBagItems);
+				entityplayer.inventory.setInventorySlotContents(runebagSlot, runeBagInventoryStack);
 			}
+			entityplayer.setCurrentItemOrArmor(0,keyStoneItemStack);
 		}
 
 		super.onContainerClosed(entityplayer);
@@ -135,102 +127,42 @@ public class ContainerKeystone extends Container{
 	public boolean canInteractWith(EntityPlayer entityplayer){
 		return keyStoneInventory.isUseableByPlayer(entityplayer);
 	}
+	/**
+	 * Override slotClick behavior to correctly handle quick-swap access security
+	 */
+	@Override
+	public ItemStack slotClick(int slotId, int keyOrdinal, int clickType, EntityPlayer player) {
+		if(clickType == 2 && keyOrdinal >= 0 && keyOrdinal < 9) {
+			int hotbarSlotIndex = this.inventorySlots.size() - ( 9 - keyOrdinal);
+			Slot hotbarTargetSlot = getSlot(hotbarSlotIndex);
+			Slot hoverSlot = getSlot(slotId);
+			if(hotbarTargetSlot instanceof SlotLock || hoverSlot instanceof SlotLock) {
+				return null;
+			}
+		}
+		return super.slotClick(slotId, keyOrdinal, clickType, player);
+	}
 
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int i){
 		ItemStack itemstack = null;
 		Slot slot = (Slot)inventorySlots.get(i);
-
 		if (slot != null && slot.getHasStack()){
 			ItemStack itemstack1 = slot.getStack();
 			itemstack = itemstack1.copy();
-			if (i < PLAYER_INVENTORY_START){
-				if (PLAYER_INVENTORY_START > InventoryKeyStone.inventorySize){
-					if (i > InventoryKeyStone.inventorySize){
-						for (int n = 0; n < InventoryKeyStone.inventorySize; n++){
-							Slot runeSlot = (Slot)inventorySlots.get(n);
-							if (runeSlot.getHasStack()) continue;
-
-							runeSlot.putStack(new ItemStack(itemstack1.getItem(), 1, itemstack1.getItemDamage()));
-							runeSlot.onSlotChanged();
-							itemstack1.stackSize--;
-							if (itemstack1.stackSize == 0){
-								slot.putStack(null);
-								slot.onSlotChanged();
-							}
-							return null;
-						}
-					}else{
-						for (int n = InventoryKeyStone.inventorySize; n < PLAYER_INVENTORY_START; n++){
-							Slot runeSlot = (Slot)inventorySlots.get(n);
-							if (runeSlot.getHasStack()) continue;
-
-							runeSlot.putStack(new ItemStack(itemstack1.getItem(), 1, itemstack1.getItemDamage()));
-							runeSlot.onSlotChanged();
-							itemstack1.stackSize--;
-							if (itemstack1.stackSize == 0){
-								slot.putStack(null);
-								slot.onSlotChanged();
-							}
-							return null;
-						}
-					}
-				}
-				if (!mergeItemStack(itemstack1, PLAYER_INVENTORY_START, PLAYER_ACTION_BAR_END - 1, true)){
-					return null;
-				}
-			}else if (i >= PLAYER_INVENTORY_START && i < PLAYER_ACTION_BAR_START) //range 27 - player inventory
+			if (i < PLAYER_INVENTORY_START)
 			{
-				if (itemstack.getItem() instanceof ItemRune){
-					for (int n = 0; n < PLAYER_INVENTORY_START; n++){
-						Slot runeSlot = (Slot)inventorySlots.get(n);
-						if (runeSlot.getHasStack()) continue;
-
-						runeSlot.putStack(new ItemStack(itemstack1.getItem(), 1, itemstack1.getItemDamage()));
-						runeSlot.onSlotChanged();
-						itemstack1.stackSize--;
-						if (itemstack1.stackSize == 0){
-							slot.putStack(null);
-							slot.onSlotChanged();
-						}
-						return null;
-					}
-				}
-				if (!mergeItemStack(itemstack1, PLAYER_ACTION_BAR_START, PLAYER_ACTION_BAR_END - 1, false)){
+				if (!mergeItemStack(itemstack1,PLAYER_INVENTORY_START,PLAYER_ACTION_BAR_END,true)){
 					return null;
 				}
-			}else if (i >= PLAYER_ACTION_BAR_START && i < PLAYER_ACTION_BAR_END) //range 9 - player action bar
-			{
-				if (itemstack.getItem() instanceof ItemRune){
-					for (int n = 0; n < PLAYER_INVENTORY_START; n++){
-						Slot runeSlot = (Slot)inventorySlots.get(n);
-						if (runeSlot.getHasStack()) continue;
-
-						runeSlot.putStack(new ItemStack(itemstack1.getItem(), 1, itemstack1.getItemDamage()));
-						runeSlot.onSlotChanged();
-						itemstack1.stackSize--;
-						if (itemstack1.stackSize == 0){
-							slot.putStack(null);
-							slot.onSlotChanged();
-						}
-						return null;
-					}
-				}
-				if (!mergeItemStack(itemstack1, PLAYER_INVENTORY_START, PLAYER_ACTION_BAR_START, false)){
-					return null;
-				}
-			}else if (!mergeItemStack(itemstack1, PLAYER_INVENTORY_START, PLAYER_ACTION_BAR_END, false)){
+			}
+			else if (!mergeItemStack(itemstack1, 3, PLAYER_INVENTORY_START, false)){
 				return null;
 			}
 			if (itemstack1.stackSize == 0){
 				slot.putStack(null);
 			}else{
 				slot.onSlotChanged();
-			}
-			if (itemstack1.stackSize != itemstack.stackSize){
-				slot.onSlotChange(itemstack1, itemstack);
-			}else{
-				return null;
 			}
 		}
 		return itemstack;
@@ -278,7 +210,7 @@ public class ContainerKeystone extends Container{
 		int matchIndex = 0;
 		int searchIndex = 0;
 
-		while (matchIndex < combo.metas.length && searchIndex < InventoryKeyStone.inventorySize + (runeBag != null ? InventoryRuneBag.inventorySize : 0)){
+		while (matchIndex < combo.metas.length && searchIndex < InventoryKeyStone.inventorySize + (hasrunebag ? InventoryRuneBag.inventorySize : 0)){
 			IInventory searchInventory = searchIndex >= InventoryKeyStone.inventorySize ? runeBag : keyStoneInventory;
 			int inventoryIndex = searchIndex >= InventoryKeyStone.inventorySize ? searchIndex - InventoryKeyStone.inventorySize : searchIndex;
 

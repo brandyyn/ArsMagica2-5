@@ -18,6 +18,7 @@ import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.*;
@@ -39,6 +40,7 @@ public class BlocksCommonProxy{
 	//--------------------------------------------------------------
 	public static Block essenceRefiner;
 	public static IllusionBlock illusionBlock;
+	public static Block cosmicRock;
 	public static Block blockMageTorch;
 	public static Block essenceConduit;
 	public static Block obelisk;
@@ -263,10 +265,11 @@ public class BlocksCommonProxy{
 		spellSealedDoor = (BlockSpellSealedDoor)new BlockSpellSealedDoor().setBlockName("arsmagica2:spell_sealed_door");
 		entropicEnervator = (BlockEntropicEnervator)new BlockEntropicEnervator().setBlockName("arsmagica2:entropic_enervator").setCreativeTab(blockTab);
 		spellReplicator = (BlockSpellReplicator)new BlockSpellReplicator().setBlockName("arsmagica2:spellReplicator").setCreativeTab(blockTab);
+		cosmicRock = new AMCosmicRock(Material.rock).setUnlocalizedNameAndID("arsmagica2:cosmicRock").setHardness(50.0F).setCreativeTab(blockTab);
 
-		rainRockrose = (BlockRainRockrose) new BlockRainRockrose().setUnlocalizedNameAndID("arsmagica2:rainRockrose");
-		stormSawtooth = (BlockStormSawtooth) new BlockStormSawtooth().setUnlocalizedNameAndID("arsmagica2:stormSawtooth");
-		imbuedMoonflower = (BlockImbuedMoonflower) new BlockImbuedMoonflower().setUnlocalizedNameAndID("arsmagica2:imbuedMoonflower");
+		rainRockrose = new BlockRainRockrose().setUnlocalizedNameAndID("arsmagica2:rainRockrose");
+		stormSawtooth = new BlockStormSawtooth().setUnlocalizedNameAndID("arsmagica2:stormSawtooth");
+		imbuedMoonflower = new BlockImbuedMoonflower().setUnlocalizedNameAndID("arsmagica2:imbuedMoonflower");
 
 		blockTab.setIconItemIndex(new ItemBlock(manaBattery));
 	}
@@ -767,6 +770,7 @@ public class BlocksCommonProxy{
 	public void RegisterBlocks(){
 		registerBlock(essenceRefiner, "essenceRefiner");
 		registerBlock(blockMageTorch, "mageTorch");
+		registerBlock(cosmicRock,"cosmicRock");
 		registerBlock(essenceConduit, "essenceConduit");
 		registerBlock(obelisk, "obelisk");
 		registerBlock(calefactor, "calefactor");
@@ -851,6 +855,9 @@ public class BlocksCommonProxy{
 		OreDictionary.registerOre("stairWood", witchwoodStairs);
 		OreDictionary.registerOre("plankWood", witchwoodPlanks);
 		OreDictionary.registerOre("slabWood", witchwoodSingleSlab);
+		OreDictionary.registerOre("plankMagical",witchwoodPlanks);
+		OreDictionary.registerOre("stairMagical",witchwoodStairs);
+		OreDictionary.registerOre("slabMagical",witchwoodSingleSlab);
 		OreDictionary.registerOre("plankWitchwood", witchwoodPlanks);
 		OreDictionary.registerOre("witchwoodLog", witchwoodLog);
 		OreDictionary.registerOre("stairWitchwood", witchwoodStairs);
@@ -879,7 +886,7 @@ public class BlocksCommonProxy{
 		GameRegistry.registerBlock(block, name);
 	}
 
-	private void registerBlock(Block block, Class placerClass, String name){
+	private void registerBlock(Block block, Class<? extends ItemBlock> placerClass, String name){
 		arsMagicaBlocksList.add(block);
 		GameRegistry.registerBlock(block, placerClass, name);
 	}

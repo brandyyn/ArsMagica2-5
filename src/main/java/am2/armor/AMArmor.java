@@ -13,7 +13,7 @@ import net.minecraftforge.common.MinecraftForge;
 
 public class AMArmor extends ItemArmor implements ISpecialArmor{
 
-	private static final int maxDamageArray[] = {
+	private static final int[] maxDamageArray = {
 			11, 16, 15, 13
 	};
 	public final int armorType;
@@ -46,7 +46,6 @@ public class AMArmor extends ItemArmor implements ISpecialArmor{
 		setTextureName(name);
 		return this;
 	}
-
 	@Override
 	public int getItemEnchantability(){
 		return material.getEnchantability();
@@ -84,9 +83,7 @@ public class AMArmor extends ItemArmor implements ISpecialArmor{
 
 	@Override
 	public ArmorProperties getProperties(EntityLivingBase player, ItemStack armor, DamageSource source, double damage, int slot){
-		AMArmor armorItem = (AMArmor)armor.getItem();
-		ArmorProperties ap = new ArmorProperties(1, material.getDamageReduceRatio(slot), 1000);
-		return ap;
+		return new ArmorProperties(1, material.getDamageReduceRatio(slot), 1000);
 	}
 
 	@Override
@@ -119,7 +116,7 @@ public class AMArmor extends ItemArmor implements ISpecialArmor{
 	public boolean hasEffect(ItemStack stack, int pass){
 		if (stack.hasTagCompound() && stack.stackTagCompound.hasKey(NBT_KEY_AMPROPS)){
 			String s = ((NBTTagCompound)stack.stackTagCompound.getTag(NBT_KEY_AMPROPS)).getString(NBT_KEY_EFFECTS);
-			return s != null && s.length() > 0;
+			return s != null && !s.isEmpty();
 		}
 		return false;
 

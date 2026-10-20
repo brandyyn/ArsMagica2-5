@@ -1,8 +1,10 @@
 package am2.blocks;
 
 import am2.AMCore;
+import am2.api.math.AMVector3;
 import am2.api.power.PowerTypes;
 import am2.blocks.tileentities.TileEntityManaBattery;
+import am2.network.AMNetHandler;
 import am2.power.PowerNodeRegistry;
 import am2.texture.ResourceManager;
 import cpw.mods.fml.relauncher.Side;
@@ -60,15 +62,17 @@ public class BlockManaBattery extends PoweredBlock{
 	public boolean onBlockActivated(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer, int par6, float par7, float par8, float par9){
 		if (!super.onBlockActivated(par1World, par2, par3, par4, par5EntityPlayer, par6, par7, par8, par9))
 			return true;
-
-		if (par1World.isRemote){
 			TileEntityManaBattery te = getTileEntity(par1World, par2, par3, par4);
 			if (te != null){
+			float charge = PowerNodeRegistry.For(par1World).getPower(te, te.getPowerType()) / te.getCapacity() * 100;
+			String color = AMCore.config.colourblindMode() ? getColorNameFromPowerType(te.getPowerType()) : te.getPowerType().chatColor();
+			AMNetHandler.INSTANCE.sendPowerRequestToServer(new AMVector3(te));
 				// TODO localize these messages
+			if (par1World.isRemote){
 				if (AMCore.config.colourblindMode()){
-					par5EntityPlayer.addChatMessage(new ChatComponentText(String.format("Charge Level: %.2f %% [%s]", PowerNodeRegistry.For(par1World).getPower(te, te.getPowerType()) / te.getCapacity() * 100, getColorNameFromPowerType(te.getPowerType()))));
+					par5EntityPlayer.addChatMessage(new ChatComponentText(String.format("Charge Level: %.2f %% [%s]", charge, color)));
 				}else{
-					par5EntityPlayer.addChatMessage(new ChatComponentText(String.format("Charge Level: %s%.2f \u00A7f%%", te.getPowerType().chatColor(), PowerNodeRegistry.For(par1World).getPower(te, te.getPowerType()) / te.getCapacity() * 100)));
+					par5EntityPlayer.addChatMessage(new ChatComponentText(String.format("Charge Level: %s%.2f \u00A7f%%", color, charge)));
 				}
 			}
 		}
@@ -83,7 +87,7 @@ public class BlockManaBattery extends PoweredBlock{
 
 	private TileEntityManaBattery getTileEntity(World world, int x, int y, int z){
 		TileEntity te = world.getTileEntity(x, y, z);
-		if (te != null && te instanceof TileEntityManaBattery){
+		if (te instanceof TileEntityManaBattery){
 			return (TileEntityManaBattery)te;
 		}
 		return null;
@@ -93,7 +97,7 @@ public class BlockManaBattery extends PoweredBlock{
 	public void onBlockPlacedBy(World par1World, int par2, int par3, int par4, EntityLivingBase par5EntityLiving, ItemStack stack){
 		if (stack != null){
 			TileEntityManaBattery te = getTileEntity(par1World, par2, par3, par4);
-			if (stack.stackTagCompound != null){
+			if (te != null && stack.stackTagCompound != null){
 				if (stack.stackTagCompound.hasKey("power_charge") && stack.stackTagCompound.hasKey("outputType"))
 					PowerNodeRegistry.For(par1World).setPower(te, PowerTypes.getByID(stack.stackTagCompound.getInteger("outputType")), stack.stackTagCompound.getFloat("power_charge"));
 				else

@@ -11,7 +11,6 @@ import net.minecraft.world.World;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 public class IllEffectSpark extends IllEffectBase{
 

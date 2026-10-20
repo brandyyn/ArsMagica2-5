@@ -324,7 +324,7 @@ public class GuiKeystone extends GuiContainer{
 		for (int i = comboScrollOffset; i < numCombos; ++i){
 			KeystoneCombination combo = ItemsCommonProxy.keystone.getCombinationAt(((ContainerKeystone)this.inventorySlots).getKeystoneStack(), i);
 
-			if (matchedCombo != null && combo.equals(matchedCombo)){
+			if (combo.equals(matchedCombo)){
 				currentCombination = i;
 				for (int n = 0; n < combo.metas.length; ++n){
 					if (combo.metas[n] > -1){
@@ -347,23 +347,23 @@ public class GuiKeystone extends GuiContainer{
 			cx = xSize;
 		}
 
-		mc.renderEngine.bindTexture(extras);
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.5F);
+//		mc.renderEngine.bindTexture(extras);
+//		GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.5F);
 		//special slot(s)
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		int index = ((ContainerKeystone)this.inventorySlots).specialSlotIndex - 32;
-		int x = 8 + 18 * index;
-		int y = (((ContainerKeystone)this.inventorySlots).runebagSlot > -1) ? 216 : 179;
-		drawTexturedModalRect(x, y, 0, 20, 16, 16);
-
-		if (((ContainerKeystone)this.inventorySlots).runebagSlot > -1){
-			index = ((ContainerKeystone)this.inventorySlots).runebagSlot;
-			x = 8 + 18 * (index % 9);
-			y = index < 9 ? 216 : 140 + 18 * (int)Math.floor(index / 9f);
-			drawTexturedModalRect(x, y, 0, 20, 16, 16);
-		}
-		GL11.glDisable(GL11.GL_BLEND);
+//		GL11.glEnable(GL11.GL_BLEND);
+//		GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
+//		int index = ((ContainerKeystone)this.inventorySlots).specialSlotIndex - 32;
+//		int x = 8 + 18 * index;
+//		int y = (((ContainerKeystone)this.inventorySlots).runebagSlot > -1) ? 216 : 179;
+//		drawTexturedModalRect(x, y, 0, 20, 16, 16);
+//
+//		if (((ContainerKeystone)this.inventorySlots).runebagSlot > -1){
+//			index = ((ContainerKeystone)this.inventorySlots).runebagSlot;
+//			x = 8 + 18 * (index % 9);
+//			y = index < 9 ? 216 : 140 + 18 * (int)Math.floor(index / 9f);
+//			drawTexturedModalRect(x, y, 0, 20, 16, 16);
+//		}
+//		GL11.glDisable(GL11.GL_BLEND);
 
 		combinationName.drawTextBox();
 

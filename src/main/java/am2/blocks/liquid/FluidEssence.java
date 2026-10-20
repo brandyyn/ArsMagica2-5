@@ -7,8 +7,8 @@ public class FluidEssence extends Fluid{
 
 	public FluidEssence(){
 		super("liquidEssence");
-		setDensity(500);
-		setViscosity(500);
+		setDensity(2000);
+		setViscosity(700);
 
 		FluidRegistry.registerFluid(this);
 	}

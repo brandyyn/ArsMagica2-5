@@ -10,7 +10,7 @@
     <shape id="Channel">
       <name>Channeled</name>
       <desc>Through intense concentration, a mage can maintain a flow of magic on themselves.  This is useful for things like Telekinesis, Healing, Attract, and Storm.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </shape>
     <shape id="Beam">
       <name>Beam</name>
@@ -20,7 +20,7 @@
     <shape id="Self">
       <name>Self</name>
       <desc>One of the simplest forms of magic application is applying the magic to yourself.  The distance is low, and the target is willing.  You only hope you don't accidentally light yourself on fire.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </shape>
     <shape id="Touch">
       <name>Touch</name>
@@ -50,37 +50,37 @@
     <shape id="Glyph">
       <name>Glyph</name>
       <desc>You can create a magically-infused glyph in the air and activate the spell at that location at a later time.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </shape>
     <shape id="Contingency_Fall">
       <name>Contingency: Fall</name>
       <desc>You have figured out a spell shape that triggers when falling the instant before you hit the ground. !d Oh gravity, thou art a heartless...</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </shape>
     <shape id="Contingency_Damage">
       <name>Contingency: Damage</name>
       <desc>You have managed to create a spell that triggers only when you get hurt. !d Let's play shot for shot.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </shape>
     <shape id="Contingency_Fire">
       <name>Contingency: Fire</name>
       <desc>You've decided you really don't like being on fire anymore.  To that end, you made a spell that will light up when the flames do.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </shape>
     <shape id="Contingency_Health">
       <name>Contingency: Health</name>
       <desc>No matter how subtle the wizard, a knife between the shoulder blades will seriously cramp his style.  You think you have found a way to make them regret trying that.  Or need two knives. !d This contingency procs when your health is less than or equal to 25% of maximum.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </shape>
     <shape id="Contingency_Death">
       <name>Contingency: Death</name>
       <desc>You may get me, but in those few seconds it takes you, I will have all the time I need to ensure you come along for the ride.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </shape>
     <shape id="Binding">
       <name>Binding</name>
       <desc>You can create solid objects out of nothing!  The binding shape allows you to bind tools to yourself, which drain constant mana while bound, and burst mana when used instead of durability.  Dropping the item with the drop hotkey (default 'q') will instead unbind it.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
       <relatedEntries>bindingCatalyst@0,bindingCatalyst@1,bindingCatalyst@2,bindingCatalyst@3,bindingCatalyst@4,bindingCatalyst@5</relatedEntries>
     </shape>
     <shape id="Wall">
@@ -118,7 +118,7 @@
     <component id="LightningStrike">
       <name>Lightning Strike</name>
       <desc>I have at once perfected my mastery of electricity.  No longer do I have to get by with puny discharges - for now I can summon entire lightnings!</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="FireDamage">
       <name>Fire Damage</name>
@@ -138,12 +138,12 @@
     <component id="Forge">
       <name>Forge</name>
       <desc>You have gained fine control over fire and can use it to magically smelt blocks where they stand, without charring them to ash.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="MeltArmor">
       <name>Melt Armor</name>
       <desc>You have achieved the greatest mastery of the fire element, for you are now able to concentrate and direct it to such a degree, as to quickly render most armors useless simply by melting them in a magical flame.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="Blind">
       <name>Blind</name>
@@ -164,12 +164,12 @@
     <component id="Storm">
       <name>Thunderstorm</name>
       <desc>The clouds darkened, and rain began to fall.  The wind howled, and a flash of lightning streaked across the sky, leaving bright flashes in my vision.  The thunder was deafening.  Lightning struck all around me at each enemy.  The strain of maintaining the storm was immense. </desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="Deafen">
       <name>Deafen</name>
       <desc>By producing a concentrated, high frequency, high amplitude burst of sound you are able to temporarily impair the hearing of your enemies. </desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="AstralDistortion">
       <name>Astral Distortion</name>
@@ -259,7 +259,7 @@
     <component id="Repel">
       <name>Repel</name>
       <desc>You can create a singularity in space, which, as long as you maintain it, will radiate waves of force, pushing enemies and deflecting arrows away from you.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="SwiftSwim">
       <name>Swift Swim</name>
@@ -274,7 +274,7 @@
     <component id="ManaDrain">
       <name>Mana Drain</name>
       <desc>You can create a parasitic bond with the target's aura, draining their mana and boosting your own.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="Entangle">
       <name>Entangle</name>
@@ -329,7 +329,7 @@
     <component id="Disarm">
       <name>Disarm</name>
       <desc>Now that you have learned to summon tools to your hand, it was a small step to be able to make others drop what they are holding.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="Rift">
       <name>Rift Storage</name>
@@ -339,37 +339,37 @@
     <component id="Attract">
       <name>Attract</name>
       <desc>You create an area of negative pressure around you, pulling everything living in towards you.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="Telekinesis">
       <name>Telekinesis</name>
       <desc>You can use your magic to amplify your brainwaves, giving them physical form.  These waves can be used to pull items and XP towards a point in front of you.  Rolling the mouse wheel while using the spell can change the distance of the point closer or farther away from you.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="HarvestPlants">
       <name>Harvest</name>
       <desc>You can cause all plants, leaves, and flowers to be harvested.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="Plow">
       <name>Plow</name>
       <desc>You can cause the earth to churn at your command, creating deep furrows ideal for planting.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="CreateWater">
       <name>Create Water</name>
       <desc>You can coalesce moisture from the air around into one location, creating water where there was none.  This will not work in the nether.  It can also be used to fill a cauldron.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="Grow">
       <name>Grow</name>
       <desc>Pouring energy into plants, equal to months of talking to them, will cause them to grow more rapidly.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="BanishRain">
       <name>Banish Rain</name>
       <desc>Rain rain, go away.  Come again another day!  Who would have thought that those were the words to the spell?  If used in the corresponding ritual, this spell can also call rain too.  See the #5Rituals#0 page for details.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="WaterBreathing">
       <name>Water Breathing</name>
@@ -414,28 +414,28 @@
     <component id="Transplace">
       <name>Transplace</name>
       <desc>Your knowledge of teleportation magic has grown.  You can now switch places with your target.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
 	  <relatedEntries>rituals_overview,otherworldly_ritual</relatedEntries>
     </component>
     <component id="Mark">
       <name>Mark</name>
       <desc>You can magically mark a location, which you can recall to from almost anywhere.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="Recall">
       <name>Recall</name>
       <desc>You can tune your teleportation magic to home in on a mark you have left, transporting you or your target back to its location.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="EnderIntervention">
       <name>Ender Intervention</name>
       <desc>You have mastered teleportation magic, to the level at which you can transcend interdimensional barriers, and can enter the nether from almost anywhere.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="DivineIntervention">
       <name>Divine Intervention</name>
       <desc>You have mastered teleportation magic, to the level at which you can transcend interdimensional barriers, and can enter the overworld from almost anywhere.  If cast when you are already in the overworld, you will be returned to your bed, or to spawn if no bed exists.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="Summon">
       <name>Summon</name>
@@ -450,7 +450,7 @@
     <component id="Daylight">
       <name>Daylight</name>
       <desc>You have gained the ability to control time.  This spell will cause the time to move to Dawn.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="FallingStar">
       <name>Starstrike</name>
@@ -465,7 +465,7 @@
     <component id="ManaLink">
       <name>Mana Link</name>
       <desc>You have discovered the secret to linking your mana together with another entity.  When you cast this spell, your target will be able to draw upon your mana pool as if it were their own. !d The target will use their own mana first, then will begin to draw upon yours. !d It has a limited radius, but can have radius modifiers if you so desire.  If the target leaves the radius, the link is not broken, but is rather temporarily disabled.  When they again return into the radius, the link will reactivate and will function again.  To end the link, simply cast the spell on the target again. !d You can link your own mana to multiple entities, and on the other side, you can have multiple links coming in from other sources.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="ConcentrateTime">
       <name>Concentrate Time</name>
@@ -490,12 +490,12 @@
     <component id="Moonrise">
       <name>Moonrise</name>
       <desc>You have gained the ability to control time.  This spell will cause the time to move to Dusk.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="Drought">
       <name>Drought</name>
       <desc>You have taken your knowledge of creating water and have reversed the process.  This spell will draw water out of whatever it hits, removing water blocks and turning dirt, grass, sandstone and mycelium to sand, withering plants it hits, and stone to cobblestone.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="Absorption">
       <name>Absorption</name>
@@ -505,12 +505,12 @@
     <component id="Plant">
       <name>Plant</name>
       <desc>You can cause seeds from your inventory to be planted in the ground, if conditions are right for it to grow.  Best coupled with AoE or some other such shape for rapid planting.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="Accelerate">
       <name>Accelerate</name>
       <desc>This spell causes targeted blocks to tick faster.  Note that it does not make tile entities any quicker.  This spell is best used in a shape like beam, wall, or zone, due to its need to be cast multiple times to have any real effect.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="Drown">
       <name>Drown</name>
@@ -520,7 +520,7 @@
     <component id="Banish">
       <name>Banish</name>
       <desc>You have learned to manipulate the forces of evil, and are now able to cast your enemies into the depths of oblivion.  The forces of evil, however, will not listen to you unless you are perceived as evil by the fractal world itself. </desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="Curse">
       <name>Curse</name>
@@ -550,12 +550,12 @@
     <component id="Appropriation">
       <name>Appropriation</name>
       <desc>You can appropriate one block or entity into your spell.  Casting the spell again will place a picked up entity or block at the targeted location.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="Silence">
       <name>Silence</name>
       <desc>You can silence another entity, preventing all spell casting for a short duration.  THe duration cannot be extended.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
     <component id="Shrink">
       <name>Shrink</name>
@@ -565,7 +565,7 @@
     <component id="PlaceBlock">
       <name>Place Block</name>
       <desc>You can use this spell part to place blocks!  Can be extremely powerful when combined with different shape combinations.  In order to place a block, you need to set the spell to place it, and you need to have at least one of said block in your inventory.  No creating them out of thin air, sorry!  To set the block to be placed, cast the spell on a block while sneaking.  You need to be sneaking when the spell actually applies, so keep that in mind when using something like Projectile.  It's recommended to not use AoE to set the block, as it can sometimes set it to something you don't expect (as it will apply to everything in a radius, setting the block over and over).  To see what block the spell will place, hover your mouse over it in your inventory and press SHIFT.</desc>
-      <modifiedBy></modifiedBy>
+      <modifiedBy/>
     </component>
   </components>
   <modifiers zeroItemText="You don't know any modifiers yet, and aren't eligible to learn any!">
@@ -789,82 +789,82 @@
       <subitem id="itemOre@3">
         <name>Purified Vinteum Dust</name>
         <desc>By adding #5Arcane Ash#0 to strengthen its magical properties, and adding #5Blue Orchids#0 as a catalyst and #5Desert Novas#0 to release instability, Vinteum Dust can be put into a purified state with much higher capacity for Etherium.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="itemOre@4">
         <name>Chimerite</name>
         <desc>Able to shift to all colors and in an ever-changing state, Chimerite is used in spells that require a great deal of alteration or illusion.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="itemOre@5">
         <name>Blue Topaz</name>
         <desc>A relatively common gem, blue topaz is often used by mages as an entry level crystal to focus Etherium.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="itemOre@6">
         <name>Sunstone</name>
         <desc>Sunstone is only found in the most intently hot locations in all of Minecraft and worlds beyond.  Requiring such intense heat to form, but very low pressure, it is commonly found in the lava lakes of the nether, but can exist in the lava pools of the overworld as well, if you are lucky.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="itemOre@7">
         <name>Moonstone</name>
         <desc>If one were to look up at the sky at the right time of night, one may see a meteor descending from the sky.  These meteors contain the rare mineral Moonstone.  Where exactly these meteors came from, nobody knows, but the magical properties of Moonstone far excel anything else found in the world.  Studies have shown that the meteors fall more and more often as the moon waxes full, then decreases again as it wanes back to new.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="itemOre@8">
         <name>Animal Fat</name>
         <desc>A relatively common material, usually obtained from pigs (with a near-30% chance to succeed).  Useful in making candles and the like.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="itemOre@9">
         <name>Celestial Fish</name>
         <desc>A magical fish, found swimming the vast oceans of the End.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="itemOre@10">
         <name>Cosmic Dust</name>
         <desc>The End equivalent of space dust.  Perhaps broken off from the main island somehow, or some comet passing by - who knows now?  More importantly, contrary to what one may think, it has a variety of useful magical properties.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="itemOre@11">
         <name>Moonstone Fragment</name>
         <desc>However useful and powerful moonstone is, some spells are simply not capable of harnessing its full raw potential.  By experimentation, mages discovered that fragmenting it into smaller pieces can help with this, similarly to sunstone.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="itemOre@12">
         <name>Sunstone Fragment</name>
         <desc>However useful and powerful sunstone is, some spells are simply not capable of harnessing its full raw potential.  By experimentation, mages discovered that fragmenting it into smaller pieces can help with this, similarly to moonstone.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="itemOre@13">
         <name>Hellfish</name>
         <desc>However improbable that may sound,  due to their unique heat-controlling properties, these fish have adapted to survive and thrive in the lava oceans of the Nether.  This makes them an object of universal interest and attention from both scientists and mages.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="itemOre@14">
         <name>Pyrogenic Sediment</name>
         <desc>A relatively common rock, formed under pressure and heat of the Nether lava lakes and found floating in the latter.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="itemOre@15">
         <name>Spatial Star</name>
         <desc>An extremely rare and valuable resource, half physical and half magical in nature, spatial stars can occasionally be seen traversing the End's infinite expanses.  Legend has it, this only occurs during full moons, when the link between the two worlds is at its strongest.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="itemOre@16">
         <name>Temporal Cluster</name>
         <desc>An object of almost-mythical reputation, said to grant ones wielding it control of time - it is unknown whether anyone in the history of magic ever succeeded in making one.  How much truth or falsity are there to these rumors, is up to you to judge.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="itemOre@17">
         <name>Storm Sawtooth</name>
         <desc>A potent magical plant, its potential only unlocked through growing and harvesting it during storms, hence its name.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="itemOre@18">
         <name>Rain Rockrose</name>
         <desc>Storm Sawtooth's less capricious cousin.  This magical plant can be harvested during any rain and is not as powerful, making it less useful - but also allowing it to reproduce.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="itemOre@19">
         <name>Imbued Moonflower</name>
@@ -874,191 +874,202 @@
       <subitem id="itemOre@20">
         <name>Cognitive Dust</name>
         <desc>A kind of dust only seen when immersed in psychedelic experiences.  Some propose that it is those experiences, that influence your brain to materialize it.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="itemOre@21">
-        <name>Nightmare Essence</name>
-        <desc>An inverted essence, its nature being not of our world but the fractal one.  One can be obtained by killing the inhabitants of the latter (no easy task), or trading with select ones by offering them any of the overworld essences.  For this purpose it is important to note that some inhabitants of the fractal world are not native to it, and are materialized by your own imagination - these cannot be traded with.</desc>
-        <relatedEntries></relatedEntries>
-      </subitem>
-      <subitem id="itemOre@22">
         <name>Fractal Fragment</name>
         <desc>A fragment of the fractal world itself, only reachable when you are most connected to it.  Can be obtained by killing small, purple manifestations of it, or trading with tall purple elves for Spatial Stars.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
-      <subitem id="itemOre@23">
+      <subitem id="itemOre@22">
         <name>Soul Fragment</name>
-        <desc>A fragment of a soul of a living being.  Can only be acquired by forcefully separating it from one's soul during psychedelic experiences (in other words, attempting to die while in the Higher fractal world).  During such an act, one must possess a significant amount (about a half-dozen should suffice) of rare (for example, enchanted) items - these will be drained and lost during the process.  In return, one will gain a fragment of a soul - something with a will and agency, capable of making its own decisions and even casting spells.</desc>
-        <relatedEntries></relatedEntries>
+        <desc>A fragment of a soul of a living being.  Can only be acquired by forcefully separating it from one's soul, such an act can only be done by killing with the dismembering modifier, this process can only be done on entities known as possessing a soul such as villagers or other players . In return, one will gain a fragment of a soul - something with a will and agency, capable of making its own decisions and even casting spells.</desc>
+        <relatedEntries>DISMEMBERING</relatedEntries>
       </subitem>
       <relatedEntries>calefactor</relatedEntries>
     </item>
     <item id="essence">
-      <name>Essences / Essence Bag</name>
-      <desc>Essences are used both in crafting magical items, as well as reagents for spells.  Elemental essences are dropped by their respective guardians, and all essences can also be crafted using the #5Essence Refiner#0.</desc>
+      <name>Essences</name>
+      <desc>Essences are used both in crafting magical items, and reagents for spells.  Elemental essences are dropped by their respective guardians, and all essences can also be crafted using the #5Essence Refiner#0.</desc>
       <subitem id="essence@0">
         <name>Arcane Essence</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>essence_bag,essence_refiner</relatedEntries>
       </subitem>
       <subitem id="essence@1">
         <name>Earth Essence</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>essence_bag,essence_refiner</relatedEntries>
       </subitem>
       <subitem id="essence@2">
         <name>Air Essence</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>essence_bag,essence_refiner</relatedEntries>
       </subitem>
       <subitem id="essence@3">
         <name>Fire Essence</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>essence_bag,essence_refiner</relatedEntries>
       </subitem>
       <subitem id="essence@4">
         <name>Water Essence</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>essence_bag,essence_refiner</relatedEntries>
       </subitem>
       <subitem id="essence@5">
         <name>Nature Essence</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>essence_bag,essence_refiner</relatedEntries>
       </subitem>
       <subitem id="essence@6">
         <name>Ice Essence</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>essence_bag,essence_refiner</relatedEntries>
       </subitem>
       <subitem id="essence@7">
         <name>Lightning Essence</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>essence_bag,essence_refiner</relatedEntries>
       </subitem>
       <subitem id="essence@8">
         <name>Life Essence</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>essence_bag,essence_refiner</relatedEntries>
       </subitem>
       <subitem id="essence@9">
         <name>Ender Essence</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>essence_bag,essence_refiner</relatedEntries>
       </subitem>
       <subitem id="essence@10">
-        <name>Pure Essence</name>
-        <desc></desc>
-        <relatedEntries>essence_bag,essence_refiner</relatedEntries>
+        <name>Nightmare Essence</name>
+        <desc>An inverted essence, its nature being not of our world but the fractal one.  One can be obtained by killing the inhabitants of the latter (no easy task), or trading with select ones by offering them any of the overworld essences.  For this purpose it is important to note that some inhabitants of the fractal world are not native to it, and are materialized by your own imagination - these cannot be traded with.</desc>
+        <relatedEntries/>
       </subitem>
       <subitem id="essence@11">
-        <name>High Essence Core</name>
-        <desc></desc>
+        <name>Pure Essence</name>
+        <desc/>
         <relatedEntries>essence_bag,essence_refiner</relatedEntries>
       </subitem>
       <subitem id="essence@12">
-        <name>Base Essence Core</name>
-        <desc></desc>
+        <name>High Essence Core</name>
+        <desc/>
         <relatedEntries>essence_bag,essence_refiner</relatedEntries>
       </subitem>
       <subitem id="essence@13">
-        <name>Etherium</name>
+        <name>Base Essence Core</name>
+        <desc/>
+        <relatedEntries>essence_bag,essence_refiner</relatedEntries>
+      </subitem>
+      <subitem id="essence@14">
+        <name>Light Etherium</name>
         <desc>This represents etherium, AM2's power, and will be shown as part of certain spell recipes.  When this appears, ensure your crafting altar is connected to the right kind of Etherium type (check the book on the Lectern, and by color), and flip the lever on the crafting altar.</desc>
         <relatedEntries>altarOfCreation</relatedEntries>
       </subitem>
-      <subitem id="essence_bag">
+      <subitem id="essence@15">
+        <name>Neutral Etherium</name>
+        <desc>This represents etherium, AM2's power, and will be shown as part of certain spell recipes.  When this appears, ensure your crafting altar is connected to the right kind of Etherium type (check the book on the Lectern, and by color), and flip the lever on the crafting altar.</desc>
+        <relatedEntries>altarOfCreation</relatedEntries>
+      </subitem>
+      <subitem id="essence@17">
+        <name>Dark Etherium</name>
+        <desc>This represents etherium, AM2's power, and will be shown as part of certain spell recipes.  When this appears, ensure your crafting altar is connected to the right kind of Etherium type (check the book on the Lectern, and by color), and flip the lever on the crafting altar.</desc>
+        <relatedEntries>altarOfCreation</relatedEntries>
+      </subitem>
+
+      <relatedEntries/>
+    </item>
+    <item id="essence_bag">
         <name>Essence Bag</name>
         <desc>The essence bag can be crafted to allow additional storage when adventuring.</desc>
         <relatedEntries>essence_refiner</relatedEntries>
-      </subitem>
-      <relatedEntries></relatedEntries>
     </item>
     <item id="runes">
       <name>Runes</name>
       <desc>Runes are the building blocks for spells.  When combined with multiple other items in the right combination, a magical spell scroll can be created.</desc>
       <subitem id="runes@0" unlocked="true">
         <name>Black Rune</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>runebag,keystone</relatedEntries>
       </subitem>
       <subitem id="runes@1" unlocked="true">
         <name>Blank Rune</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>runebag,keystone</relatedEntries>
       </subitem>
       <subitem id="runes@2" unlocked="true">
         <name>Blue Rune</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>runebag,keystone</relatedEntries>
       </subitem>
       <subitem id="runes@3" unlocked="true">
         <name>Brown Rune</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>runebag,keystone</relatedEntries>
       </subitem>
       <subitem id="runes@4" unlocked="true">
         <name>Cyan Rune</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>runebag,keystone</relatedEntries>
       </subitem>
       <subitem id="runes@5" unlocked="true">
         <name>Gray Rune</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>runebag,keystone</relatedEntries>
       </subitem>
       <subitem id="runes@6" unlocked="true">
         <name>Green Rune</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>runebag,keystone</relatedEntries>
       </subitem>
       <subitem id="runes@7" unlocked="true">
         <name>Light Blue Rune</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>runebag,keystone</relatedEntries>
       </subitem>
       <subitem id="runes@8" unlocked="true">
         <name>Light Gray Rune</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>runebag,keystone</relatedEntries>
       </subitem>
       <subitem id="runes@9" unlocked="true">
         <name>Lime Rune</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>runebag,keystone</relatedEntries>
       </subitem>
       <subitem id="runes@10" unlocked="true">
         <name>Magenta Rune</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>runebag,keystone</relatedEntries>
       </subitem>
       <subitem id="runes@11" unlocked="true">
         <name>Orange Rune</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>runebag,keystone</relatedEntries>
       </subitem>
       <subitem id="runes@12" unlocked="true">
         <name>Pink Rune</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>runebag,keystone</relatedEntries>
       </subitem>
       <subitem id="runes@13" unlocked="true">
         <name>Purple Rune</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>runebag,keystone</relatedEntries>
       </subitem>
       <subitem id="runes@14" unlocked="true">
         <name>Red Rune</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>runebag,keystone</relatedEntries>
       </subitem>
       <subitem id="runes@15" unlocked="true">
         <name>White Rune</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>runebag,keystone</relatedEntries>
       </subitem>
       <subitem id="runes@16" unlocked="true">
         <name>Yellow Rune</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>runebag,keystone</relatedEntries>
       </subitem>
       <subitem id="runebag" unlocked="true">
@@ -1073,22 +1084,22 @@
       <desc>A more advanced version of simple robes, mage armor allows for slightly more durability, recharge, and protection.  Mage armor, due to the runes inlaid in it, has very high capability to be enchanted.  It also can repair its condition using mana drawn from its wearer.  When wearing a full suit of mage armor, your mana regen speed is increased and all spells are slightly more effective.</desc>
       <subitem id="helmet_mage">
         <name>Mage Hood</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>infusion,armor_xp_infusion</relatedEntries>
       </subitem>
       <subitem id="chest_mage">
         <name>Mage Robes</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>infusion,armor_xp_infusion</relatedEntries>
       </subitem>
       <subitem id="legs_mage">
         <name>Mage Leggings</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>infusion,armor_xp_infusion</relatedEntries>
       </subitem>
       <subitem id="boots_mage">
         <name>Mage Boots</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>infusion,armor_xp_infusion</relatedEntries>
       </subitem>
       <relatedEntries>infusion,armor_xp_infusion</relatedEntries>
@@ -1098,22 +1109,22 @@
       <desc>Granted only to mages who have proven themselves true masters, Battlemage Armor offers a good amount of protection.  It has higher durability than Mage Armor, but has a slower repair rate and less enchantability, as well as giving lesser versions of the magical bonuses that mage armor does.  Battlemage Armor can also be given XP which will unlock protective spells that will come to the aid of its wearer, draining some of the magic within the armor.  The magic will then infuse back over time from your own mana pool.</desc>
       <subitem id="helmet_battlemage">
         <name>Battlemage Circlet</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>infusion,armor_xp_infusion</relatedEntries>
       </subitem>
       <subitem id="chest_battlemage">
         <name>Battlemage Armor</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>infusion,armor_xp_infusion</relatedEntries>
       </subitem>
       <subitem id="legs_battlemage">
         <name>Battlemage Leggings</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>infusion,armor_xp_infusion</relatedEntries>
       </subitem>
       <subitem id="boots_battlemage">
         <name>Battlemage Boots</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>infusion,armor_xp_infusion</relatedEntries>
       </subitem>
       <relatedEntries>infusion</relatedEntries>
@@ -1174,59 +1185,59 @@
       <subitem id="affinity_tome@0">
         <name>Affinity Tome: General</name>
         <desc>The general affinity tome is special in that it can unlock a locked affinity state.  It will reduce all affinity progression by 10% without boosting any of them.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="affinity_tome@1">
         <name>Affinity Tome: Arcane</name>
-        <desc></desc>
-        <relatedEntries></relatedEntries>
+        <desc/>
+        <relatedEntries/>
       </subitem>
       <subitem id="affinity_tome@2">
         <name>Affinity Tome: Water</name>
-        <desc></desc>
-        <relatedEntries></relatedEntries>
+        <desc/>
+        <relatedEntries/>
       </subitem>
       <subitem id="affinity_tome@3">
         <name>Affinity Tome: Fire</name>
-        <desc></desc>
-        <relatedEntries></relatedEntries>
+        <desc/>
+        <relatedEntries/>
       </subitem>
       <subitem id="affinity_tome@4">
         <name>Affinity Tome: Earth</name>
-        <desc></desc>
-        <relatedEntries></relatedEntries>
+        <desc/>
+        <relatedEntries/>
       </subitem>
       <subitem id="affinity_tome@5">
         <name>Affinity Tome: Air</name>
-        <desc></desc>
-        <relatedEntries></relatedEntries>
+        <desc/>
+        <relatedEntries/>
       </subitem>
       <subitem id="affinity_tome@6">
         <name>Affinity Tome: Lightning</name>
-        <desc></desc>
-        <relatedEntries></relatedEntries>
+        <desc/>
+        <relatedEntries/>
       </subitem>
       <subitem id="affinity_tome@7">
         <name>Affinity Tome: Ice</name>
-        <desc></desc>
-        <relatedEntries></relatedEntries>
+        <desc/>
+        <relatedEntries/>
       </subitem>
       <subitem id="affinity_tome@8">
         <name>Affinity Tome: Nature</name>
-        <desc></desc>
-        <relatedEntries></relatedEntries>
+        <desc/>
+        <relatedEntries/>
       </subitem>
       <subitem id="affinity_tome@9">
         <name>Affinity Tome: Life</name>
-        <desc></desc>
-        <relatedEntries></relatedEntries>
+        <desc/>
+        <relatedEntries/>
       </subitem>
       <subitem id="affinity_tome@10">
         <name>Affinity Tome: Ender</name>
-        <desc></desc>
-        <relatedEntries></relatedEntries>
+        <desc/>
+        <relatedEntries/>
       </subitem>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </item>
     <item id="foci">
       <name>Foci</name>
@@ -1337,24 +1348,24 @@
       <subitem id="mana_boost_potion">
         <name>Infused Etherium Potion</name>
         <desc>By taking a #5bucket of Liquid Etherium#0, a mage can combine it with #5chimerite#0 and #5tarma root#0 in order to create a potion to give a temporary boost to maximum mana.  Unfortunately, the process is minimally efficient and much of the Liquid Etherium is lost along the way.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
 	  <subitem id="mana_martini">
         <name>Mana Martini</name>
         <desc>In honour of Mithion's final release of AM2, which happens to be #9version 007#0, you can now make a Mana Martini that, when drank, will give you a 25% reduction in burnout gained from casting spells.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="casparazoid">
         <name>Casparazoid</name>
         <desc>A weak psychedelic substance, magical in nature, enabling hallucinations and tuning oneself to the Lower planes of existence in the Nether.  Warning: Abrupt withdrawals can be dangerous for both your body and soul.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="astrocalis">
         <name>Astrocalis</name>
         <desc>A strong psychedelic substance, enabling attunement to the Higher planes of existence in the End as well as the lower.  Helps to establish a powerful connection to the fractal realm.  Warning: Abrupt withdrawals can be dangerous for both your body and soul.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </item>
     <item id="spell_staff">
       <name>Spell Staffs</name>
@@ -1362,17 +1373,17 @@
       <subitem id="spell_staff_novice">
         <name>Novice's Spell Staff</name>
         <desc>Can cast spells of up to 300 mana total during its lifetime.  Too weak for anything considerable, but a good starting point.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="spell_staff_journeyman">
         <name>Journeyman's Spell Staff</name>
         <desc>Can cast spells of up to 900 mana total during its lifetime.  Still not entirely ideal, but perfect for a utility or a last-ditch resource.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="spell_staff_master">
         <name>Master's Spell Staff</name>
         <desc>Can cast spells of up to 5000 mana total during its lifetime.  The most powerful spell staff available - these can pack a punch and turn the tides of battle in your favor.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
     </item>
     <item id="crystal_wrench">
@@ -1424,7 +1435,7 @@
     <item id="spell_book">
       <name>Spell Book</name>
       <desc>The spell book is a useful item to have, allowing mages to organize their spells and save space at the same time.  The spell book, when equipped, can be scrolled through either by pressing x/z (default), or by sneaking and rolling the mouse wheel.  Spell books can be dyed a variety of different colors.  They can also be #5enchanted#0 with some useful powers.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </item>
     <item id="magic_broom">
       <name>Magic Broom</name>
@@ -1436,37 +1447,37 @@
     <item id="nature_scythe">
       <name>Nature's Scythe</name>
       <desc>Taken from the guardian of nature itself, this scythe wields immense power.  It can clear leaves and plants with astounding efficiency.  It can be thrown like a boomerang by right clicking, though it costs 250 mana to do so.  All plant clearing effects apply while thrown, and damage is increased.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </item>
     <item id="arcane_spellbook">
       <name>Arcane Spellbook</name>
       <desc>Imbued with unknowable enchantments by ancient mages, the arcane spell book #9increases the effectiveness of all spells cast from it#0.  Damage is increased, and mana cost is lowered.  Things like duration and radius are not modified.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </item>
     <item id="winter_arm">
       <name>Winter's Grasp</name>
       <desc>Taken from the guardian of winter, this arm can be used as a blunt weapon.  It retains its unearthly chill, and drastically slows and weakens all struck with it.  For 250 mana, it can be thrown, and will pull back an entity to you if it is hit by the arm, applying a more powerful slow and weaken effect.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </item>
     <item id="air_sled">
       <name>Air Sled</name>
       <desc>The air sled allows you to take to the sky with ease.  It is slightly faster than creative mode flight, but does not afford the same level of control.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </item>
     <item id="earth_armor">
       <name>Earth Armor</name>
       <desc>The earth armor is the chest of the guardian of earth.  It offers significant physical damage resistance for a single piece of armor.  It adds a sizeable amount of damage (+4) and knockback to unarmed strikes (no item equipped).</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </item>
     <item id="water_orbs">
       <name>Water Orbs</name>
       <desc>The water orbs allow you to control water subconsciously.  While wearing them (they are a leg slot item), you will not be pushed by flowing liquids.  You will also have infinite breath while underwater.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </item>
     <item id="fire_ears">
       <name>Fire Antenna</name>
       <desc>The fire antenna, when worn, grant full immunity to fire and lava.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </item>
     <item id="workbenchUpgrade">
       <name>Workbench Grid Upgrade</name>
@@ -1478,35 +1489,35 @@
       <desc>Binding Catalysts are used by the #5Binding#0 shape to determine what type of tool or weapon will be bound.</desc>
       <subitem id="bindingCatalyst@0">
         <name>Binding Catalyst: Pickaxe</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>Binding</relatedEntries>
       </subitem>
       <subitem id="bindingCatalyst@1">
         <name>Binding Catalyst: Axe</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>Binding</relatedEntries>
       </subitem>
       <subitem id="bindingCatalyst@2">
         <name>Binding Catalyst: Sword</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>Binding</relatedEntries>
       </subitem>
       <subitem id="bindingCatalyst@3">
         <name>Binding Catalyst: Shovel</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>Binding</relatedEntries>
       </subitem>
       <subitem id="bindingCatalyst@4">
         <name>Binding Catalyst: Hoe</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>Binding</relatedEntries>
       </subitem>
       <subitem id="bindingCatalyst@5">
         <name>Binding Catalyst: Bow</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>Binding</relatedEntries>
       </subitem>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </item>
     <item id="warding_candle">
       <name>Warding Candle</name>
@@ -1523,17 +1534,17 @@
     <item id="enderBoots">
       <name>Ender Boots</name>
       <desc>The Ender Boots are a rare drop from the #5Ender Guardian#0.  When wearing these boots, #9sneaking and jumping will reverse gravity#0!  This will only apply to you, and you will fall upwards.  Normal falling damage applies.  You cannot reverse gravity while airborne.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </item>
     <item id="lightningcharm">
       <name>Lightning Charm</name>
       <desc>The Lightning Charm is a rare drop from the #5Lightning Guardian#0.  Sneaking and right clicking will toggle the item on and off.  When on, its static electricity draws in nearby items automatically.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </item>
     <item id="lifeward">
       <name>Life Ward</name>
       <desc>The Life Ward is a rare drop from the #5Life Guardian#0.  When in your action bar, you will slowly generate a shield around you that will absorb incoming damage.  It will generate up to 20 additional temporary hit points.  The hit points remain if the Ward is removed from your inventory, but will not replenish themselves without it.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </item>
     <item id="magitechGoggles">
       <name>Magitech's Goggles</name>
@@ -1618,7 +1629,7 @@
     <item id="etheriumExtractor">
       <name>Etherium Extractor</name>
       <desc>The preferred (by many mages) way of gathering liquid Etherium.  Using it on witchwood logs will allow it to drain some of their sap, perform a simple magical transformation on it, and pour the resulting Etherium into a bucket.  This leaves the log itself useless for most purposes, as it loses its core magical properties in the process.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </item>
     <item id="playerjournal">
       <name>Journal</name>
@@ -1650,17 +1661,17 @@
 		<desc>These upgrades improve the functionality of your #9Inscription Table#0, allowing you to make use of more shape groups.</desc>
 		<subitem id="inscription_upgrade@0">
 			<name>Tier 1 Upgrade</name>
-			<desc></desc>
+          <desc/>
 			<relatedEntries>inscriptionTable</relatedEntries>
 		</subitem>
 		<subitem id="inscription_upgrade@1">
 			<name>Tier 2 Upgrade</name>
-			<desc></desc>
+          <desc/>
 			<relatedEntries>inscriptionTable</relatedEntries>
 		</subitem>
 		<subitem id="inscription_upgrade@2">
 			<name>Tier 3 Upgrade</name>
-			<desc></desc>
+          <desc/>
 			<relatedEntries>inscriptionTable</relatedEntries>
 		</subitem>
 		<relatedEntries>inscriptionTable</relatedEntries>
@@ -1711,42 +1722,42 @@
       <desc>
 			Harnessing the forces of creation, the crafting altar allows mages to work miracles of magic.  This is where you will create all of your spells in Ars Magica.  The structure is upgradeable by 2 main groups, the caps and the main material.  Both groups individually increase the available power of the altar and allow it to make more powerful spells.  The main blocks, in order of power, are as follows:
 			!l
-			Wood Planks (+1 Effect)
+			Wood Planks (#9+1 Effect#0)
 			!l
-			Stone Brick (+1 Effect)
+            Sandstone (#9+1 Effect#0)
 			!l
-			Sandstone (+1 Effect)
+            Stone Brick (#9+2 Effect#0)
 			!l
-			Bricks (+2 Effects)
+			Bricks (#9+2 Effect#0)
 			!l
-			Witchwood (not drained) (+2 Effects)
+			Witchwood (#9+2 Effect#0)
 			!l
-			Nether Bricks (+3 Effects)
+			Nether Bricks (#9+3 Effect#0)
 			!l
-			Nether Quartz (+3 Effects)
+			Nether Quartz (#9+3 Effect#0)
 			!l
 			!l
 			For the caps (grand total of 5 in the structure), the progression is as follows:
 			!l
-			Glass (+1 Effect)
+			Glass (#9+1 Effect#0)
 			!l
-			Coal Blocks (+2 Effects)
+			Coal Blocks (#9+2 Effect#0)
 			!l
-			Redstone Blocks (+3 Effects)
+			Redstone Blocks (#9+3 Effect#0)
 			!l
-			Iron Blocks (+4 Effects)
+			Iron Blocks (#9+4 Effect#0)
 			!l
-			Lapis Blocks (+5 Effects)
+			Lapis Blocks (#9+5 Effect#0)
 			!l
-			Gold Blocks (+6 Effects)
+			Gold Blocks (#9+6 Effect#0)
 			!l
-			Diamond Blocks (+7 Effects)
+			Diamond Blocks (#9+7 Effect#0)
 			!l
-			Emerald Blocks (+8 Effects)
+			Emerald Blocks (#9+8 Effect#0)
 			!l
-			Moonstone Blocks (+9 Effects)
+			Moonstone Blocks (#9+9 Effect#0)
 			!l
-			Sunstone Blocks (+10 Effects)
+			Sunstone Blocks (#9+10 Effect#0)
 			!l
 			!l
 			These stack cumulatively, so for example wood planks with glass caps would equal a maximum of 2 effects, whereas stone bricks with redstone caps would have a maximum of 4 effects in a spell.  The maximum number of effects you can currently have on a spell is 13.
@@ -1763,12 +1774,12 @@
         	!l
         	If allowed to venture out of control, instability may cause you to face a multitude of consequences, ranging from being drained of your mana or drawing lightning to yourself, to attracting curious Elementals and only Gods know what else - a reminder that the Arcane arts are not to be taken lightly.
 			</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </structure>
     <structure id="inlays_structure">
       <name>Inlay Rings</name>
       <desc>Inlay Rings are created by putting inlay blocks into a 3x3 ring with an empty center block.  All blocks must be on the same Y level, and must all be of the same type of inlay block.  You will know it is working when runes begin to appear on the blocks.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </structure>
     <ritual id="rituals_overview">
       <name>Rituals</name>
@@ -1991,7 +2002,7 @@
     <mob id="MobHecate">
       <name>Hecate</name>
       <desc>The hecate is a dark spirit from the nether.  Occasionally, the walls between the Nether and the Overworld can weaken, allowing the Hecates to spawn in the overworld.  The hecate is an assassin - it moves extremely fast and can turn invisible briefly when attacking.  They deal a large amount of damage, but thankfully don't have much in terms of resilience  It's rumored that if you move slowly and quietly enough, you can pass by them undetected as long as you don't get too close.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mob>
     <mob id="MobManaElemental">
       <name>Mana Elemental</name>
@@ -2005,7 +2016,7 @@
 				resistant to physical damage. If all the mana is drained
 				from the elemental, it will die.
 			</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mob>
     <mob id="MobManaCreeper">
       <name>Mana Creeper</name>
@@ -2019,7 +2030,7 @@
 				you have, so it is still a threat to even the most
 				powerful of magi.
 			</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mob>
     <mob id="MobLightMage">
       <name>Light Mage</name>
@@ -2031,7 +2042,7 @@
 				plague the world of Minecraft. They have a special
 				distaste for Dark Mages.
 			</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mob>
     <mob id="MobDarkMage">
       <name>Dark Mage</name>
@@ -2044,7 +2055,7 @@
 				"living" anyways) and creepers. They will go out of
 				their way to fight a Light Mage.
 			</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mob>
     <mob id="MobFireElemental">
       <name>Fire Elemental</name>
@@ -2053,7 +2064,7 @@
 				destructive and ignite anything in their path. Fire
 				Elementals are only found in the nether.
 			</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mob>
     <mob id="MobWaterElemental">
       <name>Water Elemental</name>
@@ -2064,7 +2075,7 @@
 				can affect their targets with Watery Grave, which will
 				pull unsuspecting down to the crushing black depths.
 			</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mob>
     <mob id="EarthElemental">
       <name>Earth Elemental</name>
@@ -2077,7 +2088,7 @@
 				focus on them and they will try to bounce from target to
 				target.
 			</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mob>
     <mob id="MobDryad">
       <name>Dryad</name>
@@ -2086,52 +2097,52 @@
 				grasslands. They can be lured with a sapling and will
 				periodically make nearby plants grow faster.
 			</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mob>
     <mob id="MobDarkling">
       <name>Darkling</name>
       <desc>Darklings are small dog-like creatures that are found in the nether.  Their body becomes less visible during night, fading to near invsibility at midnight.  As dawn approaches, the Darklings will begin to gradually appear again until they become fully visible again for the day.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mob>
     <mob id="HallucinationMagmacube">
       <name>Magmacube Hallucination</name>
       <desc>A hallucination native to the Lower planes of fractal existence.  Highly values all Overworld essences.  Like all Hallucinations, cannot be hurt by ordinary, physical sources of damage.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mob>
     <mob id="HallucinationWitherSkeleton">
       <name>Wither Skeleton Hallucination</name>
       <desc>A hallucination of a wither skeleton.  Despite its formidable appearance, it does not seem to be any more deadly than the other hallucinations.  Like all Hallucinations, cannot be hurt by ordinary, physical sources of damage.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mob>
     <mob id="HallucinationCreeper">
       <name>Creeper Hallucination</name>
       <desc>A hallucination of an ordinary creeper, awakened and materialized by you with the aid of psychedelics and perhaps your primal fears.  As you have later observed, they do not seem to behave entirely like creepers, or have all the attributes of one..  Like all Hallucinations, cannot be hurt by ordinary, physical sources of damage.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mob>
     <mob id="HallucinationEnderman">
       <name>Enderman Hallucination</name>
       <desc>A hallucination native to the Higher planes of fractal existence.  Highly values Spatial Stars.  Like all Hallucinations, cannot be hurt by ordinary, physical sources of damage.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mob>
     <mob id="HallucinationEndermite">
       <name>Endermite Hallucination</name>
       <desc>A special hallucination only appearing when a strong link to the fractal realm is established, almost a manifestation of its energy.  This makes them quicker and deadlier than most ordinary hallucinations.  Like all Hallucinations, cannot be hurt by ordinary, physical sources of damage.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mob>
     <mob id="HallucinationSpider">
       <name>Spider Hallucination</name>
       <desc>A hallucination of an ordinary spider, awakened and materialized by you with the aid of psychedelics and perhaps your primal fears.  As you have later observed, they do not seem to behave entirely like spiders, or have all the attributes of one..  Like all Hallucinations, cannot be hurt by ordinary, physical sources of damage.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mob>
     <mob id="HallucinationZombie">
       <name>Zombie Hallucination</name>
       <desc>A hallucination of an ordinary zombie, awakened and materialized by you with the aid of psychedelics and perhaps your primal fears.  Like all Hallucinations, cannot be hurt by ordinary, physical sources of damage.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mob>
     <mob id="HellCow">
       <name>Hell Cow</name>
       <desc>Moo? Moo moo moo, moo moo moo moo.  Moo.  Moo moo moo moo moo, moo moo moo?  Moo!  Moo moo moo moo moo - moo moo moo. !d 1.) Moo moo moo moo !d 2.) Moo, moo moo moo moo. !d 3.) Moo! !d Moo, moo moo moo, moo moo moo.  Moo moo moo moo moo moo.  Moo, moo!</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mob>
     <mob id="Flicker">
       <name>Flickers</name>
@@ -2193,7 +2204,7 @@
     <boss id="BossNatureGuardian">
       <name>Nature Guardian</name>
       <desc>The Nature Guardian is a fearsome opponent.  Boasting a deadly scythe and the skill to use it, only the most powerful or foolish would seek it out. The few who have survived an encounter state that it is just as dangerous at range as in melee, if not more. !l Recommended level: 60 !p Rumor has it that it appears to guard the servants of nature when enough are slain in quick succession.  Nature can be harsh, but it will not tolerate a massacre. !d  Warning: !l This is a very difficult boss that can take down even the most well geared players. </desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </boss>
     <boss id="BossEarthGuardian">
       <name>Earth Guardian</name>
@@ -2212,7 +2223,7 @@
 				area of the surrounding blocks, so it would be wise to
 				summon somewhere other than your basement.
 			</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </boss>
     <boss id="BossWaterGuardian">
       <name>Water Guardian</name>
@@ -2229,7 +2240,7 @@
         		One should note, that as well as leaving behind their unique bodyparts,
         		each guardian defeated grants a mage an additional 2,000 mana.
 			</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </boss>
     <boss id="BossWinterGuardian">
       <name>Winter Guardian</name>
@@ -2246,7 +2257,7 @@
 				Warning: !l This is a very difficult boss that can take
 				down even the most well geared players.
 			</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </boss>
     <boss id="BossArcaneGuardian">
       <name>Arcane Guardian</name>
@@ -2265,7 +2276,7 @@
 				Arcane Essence directly in the middle of the circle to
 				start the ritual.
 			</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </boss>
     <boss id="BossAirGuardian">
       <name>Air Guardian</name>
@@ -2280,7 +2291,7 @@
 				and build a platform (y 150 or higher). Build a gold
 				inlay ring on the platform and throw in an Air Essence.
 			</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </boss>
     <boss id="BossFireGuardian">
       <name>Fire Guardian</name>
@@ -2293,22 +2304,22 @@
 				those that try to bring water to its domain. Be prepared
 				for a fight! !l Recommended level: 90
 			</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </boss>
     <boss id="BossLifeGuardian">
       <name>Life Guardian</name>
       <desc>The life guardian generally prefers to let the natural order of things take their course, not intervening unless a true sacriledge against life is performed.  Luckily (or unluckily, depending on how you look at it) for you, you have come up with a way to commit such an act.  Create a 5x5 ring using wizard's chalk, and place a warding candle in the center part of each side, on the outside of the ring (4 candles in total).  The circle will help to contain and focus the deed.  Then, on the night of a full moon, sacrifice a villager child inside the circle.  That should be enough to anger the life guardian to action. !d You monster you. !p The life guardian doesn't attack much on its own, though it may decide to throw you around a little.  It generally prefers to let others do the fighting for it, infusing them with its tremendous power.  In return, the others will often lay down their lives for the guardian's protection.  The life guardian is a different kind of fight than the other guardians.  !d Recommended level: 50</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </boss>
     <boss id="BossLightningGuardian">
       <name>Lightning Guardian</name>
       <desc>The lightning guardian is as unpredictable as it is powerful.  It can fire bolts of lightning at extreme range, and has been known to mess with the synapses inside the brains of living creatures.  It has also on occasion been able to replicate an effect similar to telekinesis using massive amounts of concentrated static electricity, which leaves the unfortunate victim open to several other effects. !d To summon the lightning guardian, create a #5Gold Inlay Ring#0 and place a mana battery in the middle.  Then, place 2 iron bars on top, creating a lightning rod.  !d  Finally, wait for a storm. !d This guardian is capable of doing extreme damage in a short amount of time.  Make sure you are well protected.  Recommended Level: 70</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </boss>
     <boss id="BossEnderGuardian">
       <name>Ender Guardian</name>
       <desc>Tales are told in hushed whispers of the true guardian of the End.  Of eyes glowing with an abhorrent light, and scaly skin as black as a moonless night.  Alas, the tales of this waking nightmare are vague at best and always shrouded in the veil of speculation.  The truth is, nobody has ever seen the guardian and lived.  The most common tale is that of Magnus Severinus, the Archmage of the Second Era.  At the height of his power, he was rumored to be able to move mountains with a thought, create lush gardens out of the most barren terrain, and create wards that could stop an army cold.  Alas, his most trusted advisor took ill, and her spiteful stepson had taken her place.  Goaded by honeyed words encouraging his power and making him arrogant, he gathered the conclave together and in front of them all, tore open the fabric between worlds, opening a portal to the end that pulsed with a soft purple glow that almost seemed to draw light away from its surroundings.  He stepped in, and summoned the guardian.  He never had time to scream.  A piece of paper, flecked with bits of dark blood, flitted back through the portal and it winked shut.  Upon the paper was the following ritual: !d In the End, around a black aurem atop a platform of blackest coal, create an inlay of gold.  Light a burning fire on each side of the inlay.  Throw in an Ender Essence and an Eye of Ender to destabilize the aurem and summon the guardian. !d The paper was locked away in magical valuts and forgotten for millenia...until now.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </boss>
   </bosses>
   <blocks>
@@ -2337,7 +2348,7 @@
         <desc>Ethereal illusion blocks will look like solid blocks, but anything can pass through them.  They still will emit particles if you have #9True Sight#0 active.  Ethereal Illusion Blocks will not change their appearance due to True Sight though.</desc>
         <relatedEntries>illusionBlock@0,everstone</relatedEntries>
       </subitem>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </block>
     <block id="essence_refiner">
       <name>Essence Refiner</name>
@@ -2368,7 +2379,7 @@
         		breaking down diverse ordinary seed varieties. The Enervator, of course,
         		requires etherium to power this process.
       		</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </block>
     <block id="spellReplicator">
       <name>Spell Replicator</name>
@@ -2379,7 +2390,7 @@
         		about the prospect of losing their spells, or if one wanted to share the
         		creations of their ingenious creativity with a friend or two.
       		</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </block>
     <block id="infusedStem">
       <name>Infused Stem</name>
@@ -2390,7 +2401,7 @@
         		Effervescent Snowdrop assuming an abundance of breeding or a
         		Sanguine Amaryllis assuming an abundance of killing.
       		</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </block>
     <block id="effervescentSnowdrop">
       <name>Effervescent Snowdrop</name>
@@ -2400,7 +2411,7 @@
          		life energies back into the environment; exhibits healing effects.
          		Otherwise, serves as a potent spell ingredient.
        		</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </block>
     <block id="sanguineAmaryllis">
       <name>Sanguine Amaryllis</name>
@@ -2410,7 +2421,7 @@
            		and frustration back into the environment; exhibits effects affecting the mind
            		and possibly the body of passersby. Otherwise, serves as a potent spell ingredient.
        		</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </block>
     <block id="essenceconduit">
       <name>Etherium Conduit</name>
@@ -2423,7 +2434,7 @@
 				range of 10 blocks, and can form chains to move Etherium 
 				up to 100 blocks away from the origin.
 			</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </block>
     <block id="casters">
       <name>Caster Blocks</name>
@@ -2450,7 +2461,7 @@
       </subitem>
       <subitem id="blockcaster">
         <name>Caster</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>foci</relatedEntries>
       </subitem>
       <relatedEntries>foci</relatedEntries>
@@ -2569,7 +2580,7 @@
 				also request Etherium from the network
 				when given a redstone signal.
 			</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </block>
     <block id="cerublossom">
       <name>Cerublossom</name>
@@ -2583,7 +2594,7 @@
 				also noted that the Cerublossom could be used as part of
 				the purification process for Vinteum dust.
 			</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </block>
     <block id="desert_nova">
       <name>Desert Nova</name>
@@ -2595,7 +2606,7 @@
 				the two plants used in the purification process of
 				Vinteum dust.
 			</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </block>
     <block id="keystonechest">
       <name>Keystone Chest</name>
@@ -2608,7 +2619,7 @@
     <block id="magicWall">
       <name>Magic Wall</name>
       <desc>An early attempt at the illusion block, the magic wall wasn't really able to blend with it's surroundings.  Or even prevent people from looking through.  The value, though, was just after having master mage Leonidus criticize us for our efforts, watching him walk face first into one.  That's when we knew it at least had the stopping power part right.  But when the fireball he threw at it BOUNCED back and burnt his beard off, we knew it was a keeper.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </block>
     <block id="arcanereconstructor">
       <name>Arcane Reconstructor</name>
@@ -2618,7 +2629,7 @@
     <block id="lectern">
       <name>Lectern</name>
       <desc>A must have for any organized mage, the Lectern is an ideal place to store books, compendiums, and thaumonomicons for easy access.  The book sits perfectly where it can be read without having to remove it from the lectern.  It is also a critical part of the Crafting Altar, as spell crafting does require organization.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </block>
     <block id="occulus" unlocked="true">
       <name>Occulus</name>
@@ -2638,22 +2649,22 @@
     <block id="particleEmitter" unlocked="true">
       <name>Particle Emitter</name>
       <desc>Purely a decoration block, the particle emitter can be used to create a magical feel in any area.  The emitter can be customized by right clicking it, and it can be hidden.  If hidden, simply holding a crystal wrench while near it will cause it to be visible again.  Right clicking a particle emitter with a crystal wrench in unlink mode will cause its settings to be copied.  Right clicking another particle emitter while also in unlink mode will copy those settings to the second emitter.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </block>
     <block id="aum">
       <name>Aum</name>
       <desc>A flower with healing properties, Aum is a component in many spells.  It can only be found at the base of witchwood trees.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </block>
     <block id="tarmaroot">
       <name>Tarma Root</name>
       <desc>Lighter than it looks, Tarma Root grows in caves and other dark places.  It is an ingredient in spells, and air essences.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </block>
     <block id="wakebloom">
       <name>Wakebloom</name>
       <desc>Growing on the surface of water in warm climates, wakebloom is used in water-based spells frequently as well as being a component in water essence.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </block>
     <block id="summoner">
       <name>Summoner</name>
@@ -2666,29 +2677,29 @@
       <subitem id="redstone_inlay">
         <name>Redstone Inlay</name>
         <desc>Redstone inlays are the most basic of inlay.  They are used to summon bosses, and can also be used as rails.  They will speed up a minecart as it passes over them.  Be wary when cornering too fast, as the cart can leave the tracks entirely.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="iron_inlay">
         <name>Iron Inlay</name>
         <desc>Iron inlays are an intermediate inlay.  They are used to summon bosses, and can also be used as rails.  When a minecart touches an iron inlay, it will reverse direction.  Some of the momentum is preserved, but not all.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="gold_inlay">
         <name>Gold Inlay</name>
         <desc>Gold inlays are the most advanced inlay.  They are used to summon the most powerful of bosses.  They can also be used as rails.  When a minecart touches a gold inlay, it will attempt to warp to the next gold inlay in the direction it is currently traveling within 8 blocks.  This can transport the minecart (and any passengers) through solid obstacles, as it is in fact teleportation.  There is a short delay before the minecart can teleport on a gold rail again after it warps.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </block>
     <block id="stonebricksmooth@3" unlocked="true">
       <name>Chiseled Stone Blocks</name>
       <desc>You can create chiseled stone blocks that you need by crafting 4 stone bricks together in a 2x2 grid.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </block>
     <block id="saplingWitchwood">
       <name>Witchwood Saplings</name>
       <desc>Witchwood saplings can rarely be obtained from the leaves of a witchwood tree.  They can be planted, however they need a source of Liquid Etherium within 1 block and below them (x/z +/- 1, y-1).  The more liquid etherium source pools nearby (max 8), the faster the sapling will grow.  Even with all 8, however, the grow time can be significant.  Once the sapling grows into a full witchwood tree, it can sometimes also cause aum to grow nearby as well.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </block>
     <block id="altarOfCreation">
       <name>Crafting Altar</name>
@@ -2796,12 +2807,12 @@
       <desc>Keystone Doors can be locked using a rune combination.  If locked, they will only open if you have a keystone with the matching key in your inventory.  If not locked, they function simply as a door.  Zombies cannot break them down either way.</desc>
       <subitem id="keystoneDoor">
         <name>Keystone Door</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>keystone, keystoneTrapdoor</relatedEntries>
       </subitem>
       <subitem id="keystoneTrapdoor">
         <name>Keystone Trapdoor</name>
-        <desc></desc>
+        <desc/>
         <relatedEntries>keystone, keystoneDoor</relatedEntries>
       </subitem>
     </block>
@@ -2810,8 +2821,8 @@
       <desc>The Armor Imbuement Table can be used to attach special imbuements to any armor in Minecraft.  In order to do this, you first need to have the armor equipped.  Mousing over any armor will display a prompt of "Press SHIFT for more information".  Doing so will show you how much XP has been absorbed into the armor.  Armor gains XP when you do.  See #5Mechanics -&gt; Armor XP Infusion#0 for more information on how it works. !d Once your armor has reached at least level 30, you can apply a Tier I imbuement to it.  Simply equip the armor and activate the Armor Imbuement Table.  Place the armor from the equip slots at the bottom of the UI into the active slot.  Available imbuements will appear in colour, unavailable ones will be grayscale.  You can only apply one tier of imbuement per armor piece, so choose wisely!  !d The tier costs are: !l Tier 1: 30 levels !l Tier 2: 42 levels !l Tier 3: 54 levls !l Tier 4: 66 levels !d Each time you imbue the armor, XP is deducted from it to apply the imbuement.</desc>
 	  <subitem id="armor_infuser">
 		<name>Block Recipe</name>
-		<desc></desc>
-		<relatedEntries></relatedEntries>
+        <desc/>
+        <relatedEntries/>
 	  </subitem>
       <subitem id="imbuement_burnout_reduction">
         <name>Imbuement:  Burnout Reduction</name>
@@ -2980,7 +2991,7 @@
 					!d
 					With earth affinity, you are heavier, and as such you will sink more quickly in water (though never enough that you cannot surface), and you cannot fall as far without taking fall damage.
 				</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="water_affinity">
         <name>Water Affinity</name>
@@ -2989,7 +3000,7 @@
 					!d
 					Water affinity mages take damage periodically if exposed to fire, making the nether particularly dangerous.  This damage will not take you below 75% health, and will not occur at all if you are lower.
 				</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="air_affinity">
         <name>Air Affinity</name>
@@ -2998,7 +3009,7 @@
 					!d
 					Air affinity mages are hindered by rain and storms; the wind blows you around and you must move slower.  #5Sneaking#0 or casting a spell of #5Gravity Well#0 can negate the effect and allow you to move in the storm, albeit slowly.
 				</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="fire_affinity">
         <name>Fire Affinity</name>
@@ -3007,7 +3018,7 @@
 					!d
 					Once your fire affinity reaches 50%, you will start to take damage periodically when touching water sources.  This damage will not take you down below 75% health and will not occur if lower.
 				</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="nature_affinity">
         <name>Nature Affinity</name>
@@ -3018,7 +3029,7 @@
 					!d
 					At full nature affinity, you gain the aspect of a leaf on the wind, negating all fall damage and falling more slowly.  You can sneak to fall at normal speed.  This will still cause fall damage to be negated.
 				</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="ice_affinity">
         <name>Ice Affinity</name>
@@ -3027,7 +3038,7 @@
 					!d
 					All ice mages move slightly slower due to being cold blooded, unless on ice or water.
 				</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="lightning_affinity">
         <name>Lightning Affinity</name>
@@ -3036,7 +3047,7 @@
 					!d
 					Unfortunately due to your affinity you are also sort of short out in water. You can also light nearby TNT and supercharge nearby creepers!  Don't worry though, as you gain more control over your electric nature, you will be able to reduce the TNT and Creeper effects.
 				</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="life_affinity">
         <name>Life Affinity</name>
@@ -3045,7 +3056,7 @@
 					!d
 					Due to your close ties with life, any time you kill something it makes you sick and nauseated for a while.
 				</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="arcane_affinity">
         <name>Arcane Affinity</name>
@@ -3054,7 +3065,7 @@
 					!d
 					As a disadvantage, all magical damage sources do more damage to you.
 				</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="ender_affinity">
         <name>Ender Affinity</name>
@@ -3063,44 +3074,44 @@
 					!d
 					Due to your dark nature, your maximum health is reduced in light, and at higher ender affinity, it is reduced in water as well.  Masters of the ender are rumored to have evolved beyond this weakness.
 				</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mechanic>
     <mechanic id="spellCreation" unlocked="true">
       <name>Spell Creation</name>
       <desc>Creating spells is somewhat time consuming, but simple.  First, learn some spell parts using an #5Occulus#0.  Next, lay out the spell you want to create at an #5Inscription Table#0.  Place the book from the inscription table on the lectern of your crafting altar structure, and throw in a #5Blank Rune#0.  The book will guide you through the rest of the process, showing you what you need.  When Etherium is required during the spell creation process, use a #5crystal wrench#0 to change the power type if necessary, then flip the switch on the multiblock.  The structure will draw enough power, then turn the switch off automatically.  Once your spell is created, equip it and right click to name it and set the icon.  Once you have done this correctly, the spell will be castable!  Otherwise it will show the customization UI again when you cast.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mechanic>
     <mechanic id="infusion">
       <name>Infusion</name>
       <desc>#5Infusion#0 is a process in which AM armor will drain mana from your mana pool to repair itself.  Due to this mechanic, all AM armor has low durability, and won't last in a prolonged fight.  Taking the armor off will cause it to stop infusing - it must be equipped for the mechanic to function.  If the armor is at full durability, there is no mana cost.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mechanic>
     <mechanic id="mana" unlocked="true">
       <name>Mana</name>
       <desc>Mana is your magical energy level.  You gain more mana by increasing your Magic Level, defeating bosses, acquiring talents and performing certain rituals. !d Mana regenerates over time, but you can gain boosts to regeneration by eating a #9Mana Cake#0 or standing near an Obelisk, Celestial Prism, or Black Aurem with more than 10% charge.  #9Mana Potions#0 and #9Mana Potion Bundles#0 can be used to give an instant boost to mana.  Mana is represented by a blue bar on your HUD.  You can use "#2/amuicfg#0" to toggle an option to show the actual numeric values of your mana.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mechanic>
     <mechanic id="magicLevel" unlocked="true">
       <name>Magic Level</name>
       <desc>Magic Level represents your strength as a mage.  As your Magic Level increases, so will your Mana and Burnout capacities.  Magic level can be increased by casting valid spells.  A valid spell cast is one that does what is intended, meaning casting fire bolt at a wall for an hour won't get you anywhere.  Certain components that have valid targets more rarely award more magical XP towards the next level.  Your Magic Level is represented by a blue number on your HUD.  You can use "#2/amuicfg#0" to toggle an option to show the actual numeric values of your magic XP bar.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mechanic>
     <mechanic id="burnout" unlocked="true">
       <name>Burnout</name>
       <desc>Burnout is your level of strain when casting spells.  The higher your Burnout, the more mana each spell will cost.  Casting more powerful spells will cause more Burnout.  It will decrease over time.  Gaining Magic Levels will give you a higher Burnout cap, allowing you to cast more spells before becoming completely fatigued.  Depending on one's burnout, there might be adverse side effects.  They range from slight inconveniences like short weakness and slowness effects to more serious ones, like lightning discharges or short-distance arbitrary teleportation, to a total destruction of one's self, but this is rare and only occurs when extremely powerful mages fully overflow their burnout.  Your Burnout level is displayed as a red bar on the HUD.  You can use "#2/amuicfg#0" to toggle an option to show the actual numeric values of your burnout.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mechanic>
     <mechanic id="rituals">
       <name>Summoning Rituals</name>
       <desc>Summoning Rituals are what are performed to call upon bosses in Ars Magica.  See the #5bosses section#0 of this compendium for the rituals specific to each boss.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mechanic>
     <mechanic id="moonstone_meteors">
       <name>Moonstone Meteors</name>
       <desc>On occasion, during the night, small meteors may crash down into the overworld.  This is the only way to obtain moonstone ore.  A full moon increases the odds of one spawning.  The meteor always falls within 32 blocks of a player, and they will only ever fall on a biome's cover block.  Meaning unless you have a house made of grass, it won't even hit your home.  If you do have a house made of grass, then what is wrong with you?  Didn't you ever read the three little pigs?</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mechanic>
     <mechanic id="enchantments" unlocked="true">
       <name>Enchantments</name>
@@ -3108,14 +3119,14 @@
       <subitem id="magic_resistance">
         <name>Magic Resistance</name>
         <desc>As the name suggests, this enchant offers protection against magic damage.  There are 4 ranks to the enchantment, and it goes on armor.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
       <subitem id="soulbound">
         <name>Soulbound</name>
         <desc>Ever get tired of losing your gear on death?  You can fix that now.  The soulbound enchant can be applied to just about any item that accepts enchantments, and will cause that item to remain in your inventory on death.  You will respawn with the item in the same slot in your inventory it was when you died.  Soulbound has a max enchantment level of 1.</desc>
-        <relatedEntries></relatedEntries>
+        <relatedEntries/>
       </subitem>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mechanic>
     <mechanic id="armor_xp_infusion">
       <name>Armor XP Infusion</name>
@@ -3125,7 +3136,7 @@
     <mechanic id="silver_skills">
       <name>Silver Skills</name>
       <desc>Silver skills are skills inside the occulus that cannot be obtained in normal ways.  To unlock a silver skill, the correct spell combination must be crafted, and then cast.  There are a few rules to silver skill unlock combinations that will make them somewhat easier to decipher. !d 1.) All parts required to unlock a silver skill will be in the #9same tree as the silver skill itself#0. !d 2.) All silver skills require between #9 2 and 4 components and/or modifiers to unlock#0. !d 3.) Shapes do not matter in unlocking a silver skill.  #9Any shape can be used#0. !d 4.) The combination #9does not have to be in any specific order#0.  As long as the correct components are present, it will work. !d 5.) The components/modifiers #9all have to be in the same stage#0. !d 6.) The components and modifiers #9will logcally make sense with the silver skill#0.  For example, Firestorm won't require drown. !d 7.) The spell to unlocka silver skill may not be the most practical for common use.</desc>
-      <relatedEntries></relatedEntries>
+      <relatedEntries/>
     </mechanic>
   </mechanics>
   <guides>
@@ -3167,7 +3178,10 @@
     </guide>
     <guide id="powerTypes" order="9">
       <name>Types of Etherium</name>
-      <desc>There are three types of Etherium, by default.  Addons to the mod can register new Etherium types, but the defaults are Light, Neutral, and Dark.  See structures for crafting and variations of each of these.  Each type of Etherium affects machines in a different way, and has advantages and disadvantages.  You will also need all three types of Etherium available for spell crafting, as certain shapes, components, and modifiers can require different types of Etherium.  Certain machines can only run on certain types of Etherium, and some machines require multiple types simultaneously.</desc>
+      <desc>
+        There are three types of Etherium, by default.  Addons to the mod can register new Etherium types, but the defaults are Light, Neutral, and Dark.  See structures for crafting and variations of each of these.  Each type of Etherium affects machines in a different way, and has advantages and disadvantages.  You will also need all three types of Etherium available for spell crafting, as certain shapes, components, and modifiers can require different types of Etherium.  Certain machines can only run on certain types of Etherium, and some machines require multiple types simultaneously.
+      </desc>
+
     </guide>
   </guides>
 </compendium>

@@ -1,7 +1,6 @@
 package am2.items;
 
 import am2.utility.EntityUtilities;
-import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -34,11 +33,6 @@ public class ItemJournal extends ArsMagicaItem{
 	}
 
 	@Override
-	public boolean getShareTag(){
-		return true;
-	}
-
-	@Override
 	public void addInformation(ItemStack journal, EntityPlayer player, List list, boolean par4){
 		String owner = getOwner(journal);
 		if (owner == null){
@@ -53,7 +47,7 @@ public class ItemJournal extends ArsMagicaItem{
 		if (owner.equals(player.getCommandSenderName()))
 			list.add(String.format(StatCollector.translateToLocal("am2.tooltip.containedXP"), getXPInJournal(journal)));
 
-		if (owner == null || owner.equals(player.getCommandSenderName()))
+		if (owner.equals(player.getCommandSenderName()))
 			list.add(StatCollector.translateToLocal("am2.tooltip.journalUse"));
 	}
 

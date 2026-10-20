@@ -9,7 +9,7 @@ import net.minecraft.util.DamageSource;
 
 import java.util.List;
 
-public class EntityAISpinAttack<T> extends EntityAIBase{
+public class EntityAISpinAttack extends EntityAIBase{
 
 	private final EntityLiving host;
 	private final float moveSpeed;

@@ -60,7 +60,7 @@ public class BuffList implements IBuffHelper{
 	public static final int default_buff_duration = 600;
 	private static int potionDefaultOffset = 0;
 	public static HashMap<Integer, Integer> particlesForBuffID;
-	private static HashMap<Integer, Class> classesForBuffID;
+	private static HashMap<Integer, Class<? extends BuffEffect>> classesForBuffID;
 
 	//since sync code only applies the PotionEffect class, any inherited bonuses are lost.
 	//These dummy buffs can be used to apply the tick of the potion when the class type
@@ -78,7 +78,7 @@ public class BuffList implements IBuffHelper{
 
 	}
 
-	private static ArsMagicaPotion createAMPotion(int index, String name, int IIconRow, int iconCol, boolean isBadEffect, Class buffEffectClass){
+	private static ArsMagicaPotion createAMPotion(int index, String name, int IIconRow, int iconCol, boolean isBadEffect, Class<? extends BuffEffect> buffEffectClass){
 
 		String configID = name.replace(" ", "").toLowerCase().trim();
 		index = AMCore.config.getConfigurablePotionID(configID, index);
@@ -117,7 +117,7 @@ public class BuffList implements IBuffHelper{
 		return potion;
 	}
 
-	private static void createDummyBuff(Class buffEffectClass, int potionID){
+	private static void createDummyBuff(Class<? extends  BuffEffect> buffEffectClass, int potionID){
 		try{
 			Constructor ctor = buffEffectClass.getConstructor(Integer.TYPE, Integer.TYPE);
 			BuffEffect utilityBuff = (BuffEffect)ctor.newInstance(0, 0);
@@ -130,7 +130,7 @@ public class BuffList implements IBuffHelper{
 	public static void Init(){
 		dispelBlacklist = new ArrayList<Integer>();
 		particlesForBuffID = new HashMap<Integer, Integer>();
-		classesForBuffID = new HashMap<Integer, Class>();
+		classesForBuffID = new HashMap<Integer, Class<? extends BuffEffect>>();
 		ourInitialPotionAllocations = new HashMap<Integer, Potion>();
 
 		try{
@@ -300,7 +300,7 @@ public class BuffList implements IBuffHelper{
 	}
 
 	public static BuffEffect buffEffectFromPotionID(int potionID, int duration, int amplifier){
-		Class _class = classesForBuffID.get(potionID);
+		Class<? extends  BuffEffect> _class = classesForBuffID.get(potionID);
 		if (_class == null) return null;
 
 		Constructor buffMaker = _class.getDeclaredConstructors()[0];
@@ -308,13 +308,7 @@ public class BuffList implements IBuffHelper{
 			buffMaker.setAccessible(true);
 			BuffEffect p = (BuffEffect)buffMaker.newInstance(duration, amplifier);
 			return p;
-		}catch (InstantiationException e){
-			LogHelper.error("Could not create potion: " + e.getMessage());
-		}catch (IllegalAccessException e){
-			LogHelper.error("Could not create potion: " + e.getMessage());
-		}catch (IllegalArgumentException e){
-			LogHelper.error("Could not create potion: " + e.getMessage());
-		}catch (InvocationTargetException e){
+		}catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e){
 			LogHelper.error("Could not create potion: " + e.getMessage());
 		}
 		return null;

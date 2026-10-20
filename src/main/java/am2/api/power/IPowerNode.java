@@ -1,12 +1,10 @@
 package am2.api.power;
 
-import net.minecraft.tileentity.TileEntity;
-
 /**
  * @author Mithion
  *         This will eventually allow you to interface with the AM power network - currently it is not fully working.
  */
-public interface IPowerNode<T extends TileEntity>{
+public interface IPowerNode{
 
 	/**
 	 * Gets the current capacity in the power block

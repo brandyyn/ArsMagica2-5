@@ -1,5 +1,6 @@
 package am2.spell.components;
 
+import am2.items.ItemOre;
 import am2.AMCore;
 import am2.RitualShapeHelper;
 import am2.api.ArsMagicaApi;
@@ -12,6 +13,7 @@ import am2.blocks.BlocksCommonProxy;
 import am2.buffs.BuffEffect;
 import am2.buffs.BuffList;
 import am2.entities.EntitySpecificHallucinations;
+import am2.items.ItemEssence;
 import am2.items.ItemsCommonProxy;
 import am2.particles.AMParticle;
 import am2.particles.ParticleArcToEntity;
@@ -72,7 +74,8 @@ public class Curse implements ISpellComponent, IRitualInteraction{
             int targetDuration = SpellUtils.instance.getModifiedInt_Mul(BuffList.default_buff_duration / 2, stack, caster, target, world, 0, SpellModifiers.DURATION);
 
             while (iter.hasNext()) {
-                Integer potionID = ((PotionEffect) iter.next()).getPotionID();
+                PotionEffect potion = ((PotionEffect)iter.next());
+                int potionID = potion.getPotionID();
                 PotionEffect pe = ((EntityLivingBase) target).getActivePotionEffect(Potion.potionTypes[potionID]);
                 if (!Potion.potionTypes[potionID].isBadEffect) { // method is clientside only; we need the field
                     int magnitudeCost = pe.getAmplifier();
@@ -83,20 +86,25 @@ public class Curse implements ISpellComponent, IRitualInteraction{
                             ((BuffEffect) pe).stopEffect((EntityLivingBase) target);
                         }
                     }
-                } else { // bad effect
-                    effectsToRemove.add(potionID);
-                    if (pe instanceof BuffEffect && !world.isRemote) {
-                        ((BuffEffect) pe).stopEffect((EntityLivingBase) target);
-                    }
-                    effectsToMagnify.put(potionID, pe.getDuration() + ":" + pe.getAmplifier() + ":" + (pe instanceof BuffEffect));
+                } else {// bad effect
+                    targetDuration = Math.max(targetDuration,potion.getDuration());
+                    targetAmplifier = Math.max(targetAmplifier,potion.getAmplifier());
+                    PotionEffect targetpotion = new PotionEffect(potionID,targetDuration,targetAmplifier);
+                    ((EntityLivingBase)target).addPotionEffect(targetpotion);
+
+//                    effectsToRemove.add(potionID);
+//                    if (pe instanceof BuffEffect && !world.isRemote) {
+//                        ((BuffEffect) pe).stopEffect((EntityLivingBase) target);
+//                    }
+//                    effectsToMagnify.put(potionID, pe.getDuration() + ":" + pe.getAmplifier() + ":" + (pe instanceof BuffEffect));
                 }
             }
 
             if (!world.isRemote) {
                 removePotionEffects((EntityLivingBase) target, effectsToRemove);
-                for (Integer potionID : effectsToMagnify.keySet()) {
-                    magnifyPotions(world, (EntityLivingBase) target, magnitudeLeft, targetAmplifier, targetDuration, potionID, Integer.valueOf(effectsToMagnify.get(potionID).split(":")[0]), Integer.valueOf(effectsToMagnify.get(potionID).split(":")[1]), Boolean.valueOf(effectsToMagnify.get(potionID).split(":")[2]));
-                }
+//                for (Integer potionID : effectsToMagnify.keySet()) {
+//                    magnifyPotions(world, (EntityLivingBase) target, magnitudeLeft, targetAmplifier, targetDuration, potionID, Integer.valueOf(effectsToMagnify.get(potionID).split(":")[0]), Integer.valueOf(effectsToMagnify.get(potionID).split(":")[1]), Boolean.valueOf(effectsToMagnify.get(potionID).split(":")[2]));
+//                }
             }
         }
 
@@ -185,7 +193,7 @@ public class Curse implements ISpellComponent, IRitualInteraction{
     public Object[] getRecipeItems(){
         return new Object[]{
                 new ItemStack(ItemsCommonProxy.rune, 1, ItemsCommonProxy.rune.META_RED),
-                new ItemStack(ItemsCommonProxy.itemOre, 1, ItemsCommonProxy.itemOre.META_NIGHTMAREESSENCE),
+                new ItemStack(ItemsCommonProxy.itemOre, 1, ItemOre.META_NIGHTMAREESSENCE),
                 new ItemStack(ItemsCommonProxy.itemOre, 1, ItemsCommonProxy.itemOre.META_SUNSTONE),
                 BlocksCommonProxy.sanguineAmaryllis
         };

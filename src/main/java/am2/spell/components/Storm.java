@@ -4,9 +4,13 @@ import am2.AMCore;
 import am2.api.ArsMagicaApi;
 import am2.api.spell.component.interfaces.ISpellComponent;
 import am2.api.spell.enums.Affinity;
+import am2.api.spell.enums.SpellModifiers;
+import am2.items.ItemOre;
+import am2.items.ItemRune;
 import am2.items.ItemsCommonProxy;
 import am2.particles.AMParticle;
 import am2.particles.ParticleOrbitEntity;
+import am2.spell.SpellUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.effect.EntityLightningBolt;
@@ -26,19 +30,18 @@ public class Storm implements ISpellComponent{
 
 	@Override
 	public boolean applyEffectBlock(ItemStack stack, World world, int blockx, int blocky, int blockz, int blockFace, double impactX, double impactY, double impactZ, EntityLivingBase caster){
-		applyEffect(caster, world);
+		applyEffect(caster, world,stack);
 		return true;
 	}
 
 	@Override
 	public boolean applyEffectEntity(ItemStack stack, World world, EntityLivingBase caster, Entity target){
-		applyEffect(caster, world);
+		applyEffect(caster, world,stack);
 		return true;
 	}
 
-	private void applyEffect(EntityLivingBase caster, World world){
-		float rainStrength = world.getRainStrength(1.0f);
-		if (rainStrength > 0.9D){
+	private void applyEffect(EntityLivingBase caster, World world,ItemStack stack){
+		if(world.getWorldInfo().isThundering()){
 			if (!world.isRemote){
 				int xzradius = 50;
 				int random = world.rand.nextInt(100);
@@ -58,7 +61,7 @@ public class Storm implements ISpellComponent{
 					world.addWeatherEffect(bolt);
 				}else if (random < 80){
 					List<Entity> entities = world.getEntitiesWithinAABB(IMob.class, caster.boundingBox.expand(xzradius, 10D, xzradius));
-					if (entities.size() <= 0){
+					if (entities.isEmpty()){
 						return;
 					}
 					Entity target = entities.get(world.rand.nextInt(entities.size()));
@@ -72,8 +75,12 @@ public class Storm implements ISpellComponent{
 				}
 			}
 		}else{
-			if (!world.isRemote){
+			if (!world.isRemote && !world.getWorldInfo().isRaining()){
+				int duration = SpellUtils.instance.getModifiedInt_Mul(600,stack,caster,null, world,SpellModifiers.DURATION) * 20;
+				world.getWorldInfo().setRainTime(duration);
+				world.getWorldInfo().setThunderTime(duration);
 				world.getWorldInfo().setRaining(true);
+				world.getWorldInfo().setThundering(true);
 			}
 		}
 	}
@@ -114,9 +121,9 @@ public class Storm implements ISpellComponent{
 	@Override
 	public Object[] getRecipeItems(){
 		return new Object[]{
-				new ItemStack(ItemsCommonProxy.rune, 1, ItemsCommonProxy.rune.META_YELLOW),
-				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemsCommonProxy.itemOre.META_BLUETOPAZ),
-				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemsCommonProxy.itemOre.META_RAINROCKROSE),
+				new ItemStack(ItemsCommonProxy.rune, 1, ItemRune.META_YELLOW),
+				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemOre.META_BLUETOPAZ),
+				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemOre.META_RAINROCKROSE),
 				Items.ghast_tear
 		};
 	}

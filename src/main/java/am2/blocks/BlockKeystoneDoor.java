@@ -1,6 +1,5 @@
 package am2.blocks;
 
-import java.util.Random;
 import am2.AMCore;
 import am2.api.blocks.IKeystoneLockable;
 import am2.api.items.KeystoneAccessType;
@@ -24,6 +23,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+
+import java.util.Random;
 
 public class BlockKeystoneDoor extends BlockDoor implements ITileEntityProvider{
 

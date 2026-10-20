@@ -69,7 +69,7 @@ public abstract class CompendiumEntry implements Comparable<CompendiumEntry>{
 	}
 
 	public final String getDescription(){
-		if (this.description == null || this.description.equals("")){
+		if (this.description == null || this.description.isEmpty()){
 			if (this.parent != null){
 				return this.parent.getDescription();
 			}
@@ -108,25 +108,29 @@ public abstract class CompendiumEntry implements Comparable<CompendiumEntry>{
 		this.order = orderNode != null ? Integer.parseInt(orderNode.getNodeValue()) : -1;
 
 		Node lockableNode = node.getAttributes().getNamedItem("unlocked");
-		this.isLocked = lockableNode != null ? !Boolean.parseBoolean(lockableNode.getNodeValue()) : true;
+		this.isLocked = lockableNode == null || !Boolean.parseBoolean(lockableNode.getNodeValue());
 
 		Node newNode = node.getAttributes().getNamedItem("new");
-		this.isNew = newNode != null ? Boolean.parseBoolean(newNode.getNodeValue()) : true;
+		this.isNew = newNode == null || Boolean.parseBoolean(newNode.getNodeValue());
 
 		NodeList childNodes = node.getChildNodes();
 
 		for (int i = 0; i < childNodes.getLength(); ++i){
 			Node childNode = childNodes.item(i);
-			if (childNode.getNodeName() == "name"){
+			switch (childNode.getNodeName()){
+			case "name":
 				this.name = childNode.getTextContent();
-			}else if (childNode.getNodeName() == "desc"){
+				break;
+			case "desc":
 				this.description = childNode.getTextContent();
-			}else if (childNode.getNodeName() == "relatedEntries"){
+				break;
+			case "relatedEntries":
 				String[] relatedItems = childNode.getTextContent().split(",");
 				for (String s : relatedItems)
 					this.relatedItems.add(s.trim());
-			}else if (childNode.getNodeName().equals("subitem")){
-				CompendiumEntry subItem = null;
+				break;
+			case "subitem":
+				CompendiumEntry subItem;
 				try{
 					subItem = this.getClass().getConstructor().newInstance();
 				}catch (Throwable t){
@@ -137,6 +141,7 @@ public abstract class CompendiumEntry implements Comparable<CompendiumEntry>{
 				subItem.setParent(this);
 				this.subItems.add(subItem);
 				ArcaneCompendium.instance.addAlias(subItem.getID(), this.getID());
+				break;
 			}
 		}
 
@@ -145,11 +150,11 @@ public abstract class CompendiumEntry implements Comparable<CompendiumEntry>{
 	}
 
 	public boolean hasSubItems(){
-		return subItems.size() > 0;
+		return !subItems.isEmpty();
 	}
 
 	public CompendiumEntry[] getSubItems(){
-		return subItems.toArray(new CompendiumEntry[subItems.size()]);
+		return subItems.toArray(new CompendiumEntry[0]);
 	}
 
 	public CompendiumEntry[] getRelatedItems(){
@@ -160,7 +165,7 @@ public abstract class CompendiumEntry implements Comparable<CompendiumEntry>{
 				relations.add(e);
 		}
 
-		return relations.toArray(new CompendiumEntry[relations.size()]);
+		return relations.toArray(new CompendiumEntry[0]);
 	}
 
 	public GuiArcaneCompendium getCompendiumGui(String searchID){
@@ -190,7 +195,7 @@ public abstract class CompendiumEntry implements Comparable<CompendiumEntry>{
 		if (arg0 == null) return 1;
 
 		if (this.order > -1 && arg0.order > -1){
-			return this.order > arg0.order ? 1 : this.order < arg0.order ? -1 : 0;
+			return Integer.compare(this.order, arg0.order);
 		}
 
 		if (this.name != null && arg0.name != null)

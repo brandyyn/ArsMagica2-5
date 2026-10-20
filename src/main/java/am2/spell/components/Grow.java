@@ -13,7 +13,9 @@ import am2.particles.ParticleFloatUpward;
 import am2.particles.ParticleOrbitPoint;
 import am2.utility.DummyEntityPlayer;
 import cpw.mods.fml.common.eventhandler.Event.Result;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockMushroom;
+import net.minecraft.block.IGrowable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
@@ -23,11 +25,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.BonemealEvent;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Random;
+import java.util.*;
 
 
 public class Grow implements ISpellComponent{

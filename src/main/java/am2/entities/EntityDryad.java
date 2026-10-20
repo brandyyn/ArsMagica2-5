@@ -15,8 +15,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 
-import java.util.Random;
-
 public class EntityDryad extends EntityCreature{
 
 	public EntityDryad(World par1World){

@@ -10,7 +10,6 @@ import am2.blocks.BlocksCommonProxy;
 import am2.blocks.tileentities.flickers.FlickerOperatorRegistry;
 import am2.enchantments.AMEnchantmentHelper;
 import cpw.mods.fml.common.registry.GameRegistry;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -243,17 +242,18 @@ public class ItemsCommonProxy{
 		BoundLeggings = (new BoundArmor(ArmorMaterial.IRON, ArsMagicaArmorMaterial.BOUND, ArmorHelper.getArmorRenderIndex("bound"), 2)).setUnlocalizedAndTextureName("arsmagica2:bound_legs").setCreativeTab(itemTab);
 		BoundBoots = (new BoundArmor(ArmorMaterial.IRON, ArsMagicaArmorMaterial.BOUND, ArmorHelper.getArmorRenderIndex("bound"), 3)).setUnlocalizedAndTextureName("arsmagica2:bound_boots").setCreativeTab(itemTab);
 		archmageHood = (new AMArmor(ArmorMaterial.DIAMOND, ArsMagicaArmorMaterial.ARCHMAGE, ArmorHelper.getArmorRenderIndex("archmage"), 0)).setUnlocalizedAndTextureName("arsmagica2:helmet_archmage").setCreativeTab(itemTab).setMaxDamage(0);
-		archmageArmor = new AMArmor(ArmorMaterial.DIAMOND, ArsMagicaArmorMaterial.ARCHMAGE, ArmorHelper.getArmorRenderIndex("archmage"), 1) {
+		archmageArmor = (new AMArmor(ArmorMaterial.DIAMOND, ArsMagicaArmorMaterial.ARCHMAGE, ArmorHelper.getArmorRenderIndex("archmage"), 1){
+			@Override
 			public void onArmorTick(World world, EntityPlayer player, ItemStack itemStack){
 				if (player.ticksExisted % 20 == 0){
-					float abs = ((EntityLivingBase)player).getAbsorptionAmount();
+					float abs = player.getAbsorptionAmount();
 					if (abs < 38){ // 2 rows of hearts
 						abs++;
-						if (!world.isRemote) ((EntityLivingBase)player).setAbsorptionAmount(abs);
+						if (!world.isRemote) player.setAbsorptionAmount(abs);
 					}
 				}
 			}
-		}.setUnlocalizedAndTextureName("arsmagica2:chest_archmage").setCreativeTab(itemTab).setMaxDamage(0);
+		}).setUnlocalizedAndTextureName("arsmagica2:chest_archmage").setCreativeTab(itemTab).setMaxDamage(0);
 		stormSawtoothSeeds = (ItemSeeds)(new ItemSeeds(BlocksCommonProxy.stormSawtooth, Blocks.soul_sand) {
 			@Override
 			public EnumPlantType getPlantType(IBlockAccess world, int x, int y, int z)

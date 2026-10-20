@@ -1,6 +1,5 @@
 package am2.guis;
 
-import am2.AMCore;
 import am2.api.SkillTreeEntry;
 import am2.api.spell.component.interfaces.ISkillTreeEntry;
 import am2.api.spell.enums.LearnStates;
@@ -15,7 +14,6 @@ import am2.spell.SkillManager;
 import am2.spell.SkillTreeManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiConfirmOpenLink;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiYesNoCallback;
 import net.minecraft.client.renderer.RenderHelper;
@@ -24,6 +22,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import org.lwjgl.opengl.GL11;
 
+import java.awt.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,8 +59,8 @@ public class GuiCompendiumIndex extends GuiScreen implements GuiYesNoCallback{
 		categories = ArcaneCompendium.instance.getCategories();
 		activeCategory = categories.iterator().next().getCategoryLabel();
 		activeCategoryID = categories.iterator().next().getCategoryName();
-		pagingData = new HashMap<String, Integer>();
-		lines = new ArrayList<String>();
+		pagingData = new HashMap<>();
+		lines = new ArrayList<>();
 
 		sk = SkillData.For(Minecraft.getMinecraft().thePlayer);
 	}
@@ -116,28 +115,20 @@ public class GuiCompendiumIndex extends GuiScreen implements GuiYesNoCallback{
 			backToIndex.visible = true;
 		}
 
-		if (page < getNumPages()){
-			nextPage.visible = true;
-		}else{
-			nextPage.visible = false;
-		}
+		nextPage.visible = page < getNumPages();
 
-		if (this.page > 0){
-			prevPage.visible = true;
-		}else{
-			prevPage.visible = false;
-		}
+		prevPage.visible = this.page > 0;
 	}
 
 	protected int getNumPages(){
 		Integer pages = this.pagingData.get(activeCategoryID);
-		return pages != null ? pages.intValue() : 0;
+		return pages != null ? pages : 0;
 	}
 
 	@Override
 	protected void mouseClicked(int par1, int par2, int par3){
-		for (int l = 0; l < this.buttonList.size(); ++l){
-			GuiButton guibutton = (GuiButton)this.buttonList.get(l);
+		for (Object o : this.buttonList){
+			GuiButton guibutton = (GuiButton)o;
 
 			if (guibutton.mousePressed(Minecraft.getMinecraft(), par1, par2)){
 				if (guibutton.id == updateButton.id){
@@ -158,9 +149,7 @@ public class GuiCompendiumIndex extends GuiScreen implements GuiYesNoCallback{
 
 	private void openLink(URI par1URI){
 		try{
-			Class oclass = Class.forName("java.awt.Desktop");
-			Object object = oclass.getMethod("getDesktop", new Class[0]).invoke((Object)null, new Object[0]);
-			oclass.getMethod("browse", new Class[]{URI.class}).invoke(object, new Object[]{par1URI});
+			Desktop.getDesktop().browse(par1URI);
 		}catch (Throwable throwable){
 			throwable.printStackTrace();
 		}
@@ -182,7 +171,7 @@ public class GuiCompendiumIndex extends GuiScreen implements GuiYesNoCallback{
 		if (buttonClicked instanceof GuiButtonCompendiumTab){
 			this.currentParentEntry = null;
 			this.currentParentEntryName = null;
-			this.activeCategory = ((GuiButtonCompendiumTab)buttonClicked).displayString;
+			this.activeCategory = buttonClicked.displayString;
 			activeCategoryID = ((GuiButtonCompendiumTab)buttonClicked).categoryID;
 			int visibleButtons = 0;
 			for (Object button : this.buttonList){
@@ -209,11 +198,7 @@ public class GuiCompendiumIndex extends GuiScreen implements GuiYesNoCallback{
 
 			page = 0;
 			prevPage.visible = false;
-			if (getNumPages() > 0){
-				nextPage.visible = true;
-			}else{
-				nextPage.visible = false;
-			}
+			nextPage.visible = getNumPages() > 0;
 
 		}else if (buttonClicked instanceof GuiButtonCompendiumLink){
 			this.currentParentEntry = null;
@@ -286,11 +271,7 @@ public class GuiCompendiumIndex extends GuiScreen implements GuiYesNoCallback{
 		for (Object button : this.buttonList){
 			if (button == backToIndex) continue;
 			if (button instanceof GuiButtonCompendiumLink){
-				if (((GuiButtonCompendiumLink)button).getCategory().equals(activeCategoryID) && (((GuiButtonCompendiumLink)button).getPageNum() == this.page || ((GuiButtonCompendiumLink)button).getDisplayOnAllPages())){
-					((GuiButtonCompendiumLink)button).visible = true;
-				}else{
-					((GuiButtonCompendiumLink)button).visible = false;
-				}
+				((GuiButtonCompendiumLink)button).visible = ((GuiButtonCompendiumLink)button).getCategory().equals(activeCategoryID) && (((GuiButtonCompendiumLink)button).getPageNum() == this.page || ((GuiButtonCompendiumLink)button).getDisplayOnAllPages());
 			}
 		}
 	}
@@ -325,9 +306,6 @@ public class GuiCompendiumIndex extends GuiScreen implements GuiYesNoCallback{
 				continue;
 
 			GuiButtonCompendiumTab tab = new GuiButtonCompendiumTab(idCount++, tabX, tabY, category.getCategoryLabel(), category.getCategoryName(), category.getRepresentItem());
-			if (this.activeCategory.equals(category)){
-				tab.setActive(true);
-			}
 			if (tabWidth < tab.getWidth())
 				tabWidth = tab.getWidth();
 			tabY += 18;
@@ -352,8 +330,7 @@ public class GuiCompendiumIndex extends GuiScreen implements GuiYesNoCallback{
 
 		int numPages = 0;
 
-		for (int i = 0; i < itemsInCategory.size(); ++i){
-			CompendiumEntry entry = itemsInCategory.get(i);
+		for (CompendiumEntry entry : itemsInCategory){
 			if (entry.isLocked() || !checkSCMLimit(entry)) continue;
 			String buttonLabel = entry.getName();
 			while (fontRendererObj.getStringWidth(buttonLabel) > 125){
@@ -391,7 +368,7 @@ public class GuiCompendiumIndex extends GuiScreen implements GuiYesNoCallback{
 		int l = (width - xSize) / 2;
 		int i1 = (height - ySize) / 2;
 
-		boolean entryHasDescription = !entry.getDescription().equals("");
+		boolean entryHasDescription = !entry.getDescription().isEmpty();
 		int buttonXStart = entryHasDescription ? l + 185 : l + 40;
 
 		int buttonX = buttonXStart;
@@ -493,10 +470,10 @@ public class GuiCompendiumIndex extends GuiScreen implements GuiYesNoCallback{
 
 		Tessellator var9 = Tessellator.instance;
 		var9.startDrawingQuads();
-		var9.addVertexWithUV(dst_x + 0, dst_y + dst_height, this.zLevel, (src_x + 0) * var7, (src_y + src_height) * var8);
+		var9.addVertexWithUV(dst_x, dst_y + dst_height, this.zLevel, (src_x) * var7, (src_y + src_height) * var8);
 		var9.addVertexWithUV(dst_x + dst_width, dst_y + dst_height, this.zLevel, (src_x + src_width) * var7, (src_y + src_height) * var8);
-		var9.addVertexWithUV(dst_x + dst_width, dst_y + 0, this.zLevel, (src_x + src_width) * var7, (src_y + 0) * var8);
-		var9.addVertexWithUV(dst_x + 0, dst_y + 0, this.zLevel, (src_x + 0) * var7, (src_y + 0) * var8);
+		var9.addVertexWithUV(dst_x + dst_width, dst_y, this.zLevel, (src_x + src_width) * var7, (src_y) * var8);
+		var9.addVertexWithUV(dst_x, dst_y, this.zLevel, (src_x) * var7, (src_y) * var8);
 		var9.draw();
 	}
 

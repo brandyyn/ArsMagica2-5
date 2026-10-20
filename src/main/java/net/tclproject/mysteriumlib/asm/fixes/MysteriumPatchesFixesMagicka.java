@@ -397,8 +397,7 @@ public class MysteriumPatchesFixesMagicka{
 	@Fix(returnSetting = EnumReturnSetting.ON_TRUE)
 	public static boolean setLivingAnimations(ModelSkeleton mmc, EntityLivingBase elb, float p_78086_2_, float p_78086_3_, float p_78086_4_)
 	{
-		if (elb instanceof EntityHallucination) return true;
-		return false;
+		return elb instanceof EntityHallucination;
 	}
 
 	public static long servertickrate = 50L; // changing
@@ -409,93 +408,91 @@ public class MysteriumPatchesFixesMagicka{
 
 	// a few of the following methods are courtesy of Guichaguri (TickrateChanger mod)
 
-	public static void changeTickrate(float ticksPerSecond) {
-		if (AMCore.config.isGlobalTimeManipulationEnabled()) {
-			changeServerTickrate(ticksPerSecond);
-			changeClientTickratePublic(ticksPerSecond);
-		}
-	}
+//	public static void changeTickrate(float ticksPerSecond) {
+//		if (AMCore.config.isGlobalTimeManipulationEnabled()) {
+//			changeServerTickrate(ticksPerSecond);
+//			changeClientTickratePublic(ticksPerSecond);
+//		}
+//	}
 
-	public static void changeClientTickratePublic(float ticksPerSecond) {
-		MinecraftServer server = MinecraftServer.getServer();
-		if((server != null) && (server.getConfigurationManager() != null)) { // Is a server or singleplayer
-			for(EntityPlayer p : (List<EntityPlayer>)server.getConfigurationManager().playerEntityList) {
-				changeClientTickratePublic(p, ticksPerSecond);
-			}
-		} else { // Is in menu or a player connected in a server. We can say this is client.
-			changeClientTickratePublic(null, ticksPerSecond);
-		}
-	}
+//	public static void changeClientTickratePublic(float ticksPerSecond) {
+//		MinecraftServer server = MinecraftServer.getServer();
+//		if((server != null) && (server.getConfigurationManager() != null)) { // Is a server or singleplayer
+//			for(EntityPlayer p : (List<EntityPlayer>)server.getConfigurationManager().playerEntityList) {
+//				changeClientTickratePublic(p, ticksPerSecond);
+//			}
+//		} else { // Is in menu or a player connected in a server. We can say this is client.
+//			changeClientTickratePublic(null, ticksPerSecond);
+//		}
+//	}
 
-	public static void changeClientTickratePublic(EntityPlayer player, float ticksPerSecond) {
-		if((player == null) || (player.worldObj.isRemote)) { // Client
-			if(FMLCommonHandler.instance().getSide() != Side.CLIENT) return;
-			if((player != null) && (player != Minecraft.getMinecraft().thePlayer)) return;
-			changeClientTickrate(ticksPerSecond);
-		} else { // Server
-			AMCore.NETWORK.sendTo(new TickrateMessage(ticksPerSecond), (EntityPlayerMP)player);
-		}
-	}
+//	public static void changeClientTickratePublic(EntityPlayer player, float ticksPerSecond) {
+//		if((player == null) || (player.worldObj.isRemote)) { // Client
+//			if(FMLCommonHandler.instance().getSide() != Side.CLIENT) return;
+//			if((player != null) && (player != Minecraft.getMinecraft().thePlayer)) return;
+//			changeClientTickrate(ticksPerSecond);
+//		} else { // Server
+//			AMCore.NETWORK.sendTo(new TickrateMessage(ticksPerSecond), (EntityPlayerMP)player);
+//		}
+//	}
 
-	private static final MethodHandle isDrawingGet = createIsDrawingGet();
-
-	private static MethodHandle createIsDrawingGet() {
-		try {
-			Minecraft.getMinecraft(); // roundabout way to check for client
-			return createIsDrawingGetDelegate();
-		} catch (RuntimeException e) {
-		} catch (NoClassDefFoundError e) {
-		} catch (Exception e) {
-		}
-		return null;
-	}
-
-	@SideOnly(Side.CLIENT)
-	private static MethodHandle createIsDrawingGetDelegate() {
-		try {
-			Field field = CustomLoadingPlugin.isObfuscated() ? Tessellator.class.getDeclaredField("field_78415_z") : Tessellator.class.getDeclaredField("isDrawing");
-			field.setAccessible(true);
-			return MethodHandles.publicLookup().unreflectGetter(field);
-		} catch (Exception e) {
-			LogHelper.error("Did not find tesselator isDrawing field! Only report this error if you're seeing it on a client!");
-			return null;
-		}
-	}
-
-	// Completely removes the "already tessellating" error
-	@SideOnly(Side.CLIENT)
-	@Fix(returnSetting = EnumReturnSetting.ON_TRUE)
-	public static boolean startDrawing(Tessellator tsl, int p_78371_1_)
-	{
-		boolean isDrawing = false;
-		try {
-			isDrawing = (boolean) isDrawingGet.invokeExact((Tessellator) tsl);
-		} catch (Throwable e) {
-			throw new RuntimeException("Could not invoke isDrawing field! Only report this error if you're seeing it on a client!", e);
-		}
-		if (isDrawing)
-		{
-			return true;
-		}
-		return false;
-	}
-
-	// Completely removes the "already tessellating" error - part 2, electric boogaloo
-	@SideOnly(Side.CLIENT)
-	@Fix(returnSetting = EnumReturnSetting.ON_TRUE)
-	public static boolean draw(Tessellator tsl) {
-		boolean isDrawing = false;
-		try {
-			isDrawing = (boolean) isDrawingGet.invokeExact((Tessellator) tsl);
-		} catch (Throwable e) {
-			throw new RuntimeException("Could not invoke isDrawing field! Only report this error if you're seeing it on a client!", e);
-		}
-		if (!isDrawing)
-		{
-			return true;
-		}
-		return false;
-	}
+//	private static final MethodHandle isDrawingGet = createIsDrawingGet();
+//
+//	private static MethodHandle createIsDrawingGet(){
+//		try {
+//			Minecraft.getMinecraft(); // roundabout way to check for client
+//			return createIsDrawingGetDelegate();
+//		} catch (NoClassDefFoundError | Exception ignored) {
+//		}
+//		return null;
+//	}
+//
+//	@SideOnly(Side.CLIENT)
+//	private static MethodHandle createIsDrawingGetDelegate() {
+//		try {
+//			Field field = CustomLoadingPlugin.isObfuscated() ? Tessellator.class.getDeclaredField("field_78415_z") : Tessellator.class.getDeclaredField("isDrawing");
+//			field.setAccessible(true);
+//			return MethodHandles.publicLookup().unreflectGetter(field);
+//		} catch (Exception e) {
+//			LogHelper.error("Did not find tesselator isDrawing field! Only report this error if you're seeing it on a client!");
+//			return null;
+//		}
+//	}
+//
+//	// Completely removes the "already tessellating" error
+//	@SideOnly(Side.CLIENT)
+//	@Fix(returnSetting = EnumReturnSetting.ON_TRUE)
+//	public static boolean startDrawing(Tessellator tsl, int p_78371_1_)
+//	{
+//		boolean isDrawing = false;
+//		try {
+//			isDrawing = (boolean) isDrawingGet.invokeExact((Tessellator) tsl);
+//		} catch (Throwable e) {
+//			throw new RuntimeException("Could not invoke isDrawing field! Only report this error if you're seeing it on a client!", e);
+//		}
+//		if (isDrawing)
+//		{
+//			return true;
+//		}
+//		return false;
+//	}
+//
+//	// Completely removes the "already tessellating" error - part 2, electric boogaloo
+//	@SideOnly(Side.CLIENT)
+//	@Fix(returnSetting = EnumReturnSetting.ON_TRUE)
+//	public static boolean draw(Tessellator tsl) {
+//		boolean isDrawing = false;
+//		try {
+//			isDrawing = (boolean) isDrawingGet.invokeExact((Tessellator) tsl);
+//		} catch (Throwable e) {
+//			throw new RuntimeException("Could not invoke isDrawing field! Only report this error if you're seeing it on a client!", e);
+//		}
+//		if (!isDrawing)
+//		{
+//			return true;
+//		}
+//		return false;
+//	}
 
 	private static Field timerField = null;
 	@SideOnly(Side.CLIENT)

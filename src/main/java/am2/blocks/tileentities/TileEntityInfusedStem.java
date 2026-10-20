@@ -1,15 +1,8 @@
 package am2.blocks.tileentities;
 
-import am2.AMCore;
 import am2.blocks.BlocksCommonProxy;
-import am2.particles.AMParticle;
-import am2.particles.ParticleExpandingCollapsingRingAtPoint;
-import am2.particles.ParticleFadeOut;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 
@@ -17,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Math.max;
-import static java.lang.Math.min;
 
 public class TileEntityInfusedStem extends TileEntity {
 

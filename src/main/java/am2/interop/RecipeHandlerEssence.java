@@ -121,12 +121,7 @@ public class RecipeHandlerEssence extends TemplateRecipeHandler {
 					.build();
 			GuiRecipeTab.handlerMap.put(getHandlerId(), info);
 		}
-		List<RecipeArsMagica> list = new ArrayList();
-		for (Object r : RecipesEssenceRefiner.essenceRefinement().GetRecipeList().values()) {
-			RecipeArsMagica recipe = (RecipeArsMagica) r;
-			list.add(recipe);
-		}
-		return list;
+		return new ArrayList<>(RecipesEssenceRefiner.essenceRefinement().GetRecipeList());
 	}
 
 	public CachedRefinerRecipe getCachedRecipe(RecipeArsMagica recipe) {

@@ -10,15 +10,21 @@ import am2.entities.models.ModelHecate;
 import am2.entities.renderers.*;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
+import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.model.*;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class EntityManager implements IEntityManager{
 
@@ -27,58 +33,57 @@ public class EntityManager implements IEntityManager{
 	private EntityManager(){
 	}
 
-	public String WispMobID = "MobWisp";
-	public String ManaElemMobID = "MobManaElemental";
-	public String MageVillagerMobID = "MobMageVillager";
-	public String HecateMobID = "MobHecate";
-	public String ManaCreeperMobID = "MobManaCreeper";
-	public String DryadMobID = "MobDryad";
-	public String LightMageMobID = "MobLightMage";
-	public String DarkMageMobID = "MobDarkMage";
-	public String SummonedSkeletonMobID = "SummonedSkeleton";
-	public String SummonedLichMobID = "SummonedLich";
-	public String EarthGolemMobID = "EarthElemental";
-	public String SummonedBattleChickenMobID = "BattleChicken";
-	public String InsectSwarmMobID = "InsectSwarm";
-	public String ZoneSpellID = "ZoneSpell";
-	public String WaterElementalMobID = "MobWaterElemental";
-	public String FireElementalMobID = "MobFireElemental";
-	public String SummonedShadowMobID = "SummonedShadow";
-	public String ManaVortexID = "ManaVortex";
-	public String GatewayPortalID = "GatewayPortal";
-	public String SpellProjectileID = "SpellProjectile";
-	public String DarklingID = "MobDarkling";
-	public String RiftStorageID = "RiftStorage";
-	public String WhirlwindID = "Whirlwind";
-	public String ShockwaveID = "Shockwave";
-	public String HellCowID = "HellCow";
-	public String BroomID = "DaBroom";
-	public String AirSledID = "AirSled";
-	public String FlickerID = "Flicker";
-	public String ShadowHelperID = "ShadowHelper";
+	public static String WispMobID = "MobWisp";
+	public static String SummonedSkeletonMobID = "SummonedSkeleton";
+	public static String SummonedLichMobID = "SummonedLich";
+	public static String InsectSwarmMobID = "InsectSwarm";
+	public static String SummonedShadowMobID = "SummonedShadow";
+	public static String GatewayPortalID = "GatewayPortal";
+	public static String ManaElemMobID = "MobManaElemental";
+	public static String MageVillagerMobID = "MobMageVillager";
+	public static String HecateMobID = "MobHecate";
+	public static String ManaCreeperMobID = "MobManaCreeper";
+	public static String DryadMobID = "MobDryad";
+	public static String LightMageMobID = "MobLightMage";
+	public static String DarkMageMobID = "MobDarkMage";
+	public static String EarthGolemMobID = "EarthElemental";
+	public static String SummonedBattleChickenMobID = "BattleChicken";
+	public static String ZoneSpellID = "ZoneSpell";
+	public static String WaterElementalMobID = "MobWaterElemental";
+	public static String FireElementalMobID = "MobFireElemental";
+	public static String ManaVortexID = "ManaVortex";
+	public static String SpellProjectileID = "SpellProjectile";
+	public static String DarklingID = "MobDarkling";
+	public static String RiftStorageID = "RiftStorage";
+	public static String WhirlwindID = "Whirlwind";
+	public static String ShockwaveID = "Shockwave";
+	public static String HellCowID = "HellCow";
+	public static String BroomID = "DaBroom";
+	public static String AirSledID = "AirSled";
+	public static String FlickerID = "Flicker";
+	public static String ShadowHelperID = "ShadowHelper";
+	public static String NatureGuardianMobID = "BossNatureGuardian";
+	public static String ArcaneGuardianMobID = "BossArcaneGuardian";
+	public static String EarthGuardianMobID = "BossEarthGuardian";
+	public static String WaterGuardianMobID = "BossWaterGuardian";
+	public static String WinterGuardianMobID = "BossWinterGuardian";
+	public static String AirGuardianMobID = "BossAirGuardian";
+	public static String FireGuardianMobID = "BossFireGuardian";
+	public static String LifeGuardianMobID = "BossLifeGuardian";
+	public static String LightningGuardianMobID = "BossLightningGuardian";
+	public static String EnderGuardianMobID = "BossEnderGuardian";
 
-	public String NatureGuardianMobID = "BossNatureGuardian";
-	public String ArcaneGuardianMobID = "BossArcaneGuardian";
-	public String EarthGuardianMobID = "BossEarthGuardian";
-	public String WaterGuardianMobID = "BossWaterGuardian";
-	public String WinterGuardianMobID = "BossWinterGuardian";
-	public String AirGuardianMobID = "BossAirGuardian";
-	public String FireGuardianMobID = "BossFireGuardian";
-	public String LifeGuardianMobID = "BossLifeGuardian";
-	public String LightningGuardianMobID = "BossLightningGuardian";
-	public String EnderGuardianMobID = "BossEnderGuardian";
+	public static String HAL1ID = "HallucinationMagmacube";
+	public static String HAL2ID = "HallucinationWitherSkeleton";
+	public static String HAL3ID = "HallucinationSpider";
+	public static String HAL4ID = "HallucinationEndermite";
+	public static String HAL5ID = "HallucinationEnderman";
+	public static String HAL6ID = "HallucinationZombie";
+	public static String HAL7ID = "HallucinationCreeper";
 
-	public String HAL1ID = "HallucinationMagmacube";
-	public String HAL2ID = "HallucinationWitherSkeleton";
-	public String HAL3ID = "HallucinationSpider";
-	public String HAL4ID = "HallucinationEndermite";
-	public String HAL5ID = "HallucinationEnderman";
-	public String HAL6ID = "HallucinationZombie";
-	public String HAL7ID = "HallucinationCreeper";
-
-	public String ThrownSickleID = "ThrownSickle";
-	public String ThrownRockID = "ThrownRock";
-	public String ThrownArmID = "ThrownArm";
+	public static String ThrownSickleID = "ThrownSickle";
+	public static String ThrownRockID = "ThrownRock";
+	public static String ThrownArmID = "ThrownArm";
 
 	private static final SpawnListEntry flickerSpawns = new SpawnListEntry(EntityFlicker.class, 3, 2, 4);
 
@@ -193,84 +198,54 @@ public class EntityManager implements IEntityManager{
 
 	public void initializeSpawns(){
 		BiomeDictionary.registerAllBiomes();
-
-		//SpawnListEntry wisps = new SpawnListEntry(EntityWisp.class, 1, 1, 1);
-		SpawnListEntry manaElementals = new SpawnListEntry(EntityManaElemental.class, AMCore.config.GetManaElementalSpawnRate(), 1, 1);
-		SpawnListEntry dryads = new SpawnListEntry(EntityDryad.class, AMCore.config.GetDryadSpawnRate(), 1, 2);
-		SpawnListEntry hecates_nonHell = new SpawnListEntry(EntityHecate.class, AMCore.config.GetHecateSpawnRate(), 1, 1);
-		SpawnListEntry hecates_hell = new SpawnListEntry(EntityHecate.class, AMCore.config.GetHecateSpawnRate() * 2, 1, 2);
-		SpawnListEntry manaCreepers = new SpawnListEntry(EntityManaCreeper.class, AMCore.config.GetManaCreeperSpawnRate(), 1, 1);
-		SpawnListEntry lightMages = new SpawnListEntry(EntityLightMage.class, AMCore.config.GetMageSpawnRate(), 1, 3);
-		SpawnListEntry darkMages = new SpawnListEntry(EntityDarkMage.class, AMCore.config.GetMageSpawnRate(), 1, 3);
-		SpawnListEntry waterElementals = new SpawnListEntry(EntityWaterElemental.class, AMCore.config.GetWaterElementalSpawnRate(), 1, 3);
-		SpawnListEntry darklings = new SpawnListEntry(EntityDarkling.class, AMCore.config.GetDarklingSpawnRate(), 4, 8);
-		SpawnListEntry earthElementals = new SpawnListEntry(EntityEarthElemental.class, AMCore.config.GetEarthElementalSpawnRate(), 1, 2);
-		SpawnListEntry fireElementals = new SpawnListEntry(EntityFireElemental.class, AMCore.config.GetFireElementalSpawnRate(), 1, 1);
-
-		initSpawnsForBiomeTypes(manaElementals, EnumCreatureType.monster, new Type[]{Type.BEACH, Type.SANDY, Type.FOREST, Type.SNOWY, Type.HILLS, Type.JUNGLE, Type.MAGICAL, Type.MOUNTAIN, Type.PLAINS, Type.SWAMP, Type.WASTELAND}, new Type[]{Type.END, Type.NETHER, Type.MUSHROOM});
-
-		initSpawnsForBiomeTypes(dryads, EnumCreatureType.creature, new Type[]{Type.BEACH, Type.FOREST, Type.MAGICAL, Type.HILLS, Type.JUNGLE, Type.MOUNTAIN, Type.PLAINS}, new Type[]{Type.END, Type.SNOWY, Type.MUSHROOM, Type.NETHER, Type.WASTELAND, Type.SWAMP, Type.SANDY, Type.DEAD, Type.WASTELAND});
-
-		initSpawnsForBiomeTypes(hecates_nonHell, EnumCreatureType.monster, new Type[]{Type.BEACH, Type.SANDY, Type.FOREST, Type.SNOWY, Type.HILLS, Type.JUNGLE, Type.MAGICAL, Type.MOUNTAIN, Type.PLAINS, Type.SWAMP, Type.WASTELAND}, new Type[]{Type.END, Type.NETHER, Type.MUSHROOM});
-
-		initSpawnsForBiomeTypes(hecates_hell, EnumCreatureType.monster, new Type[]{Type.NETHER}, new Type[]{Type.MUSHROOM});
-
-		initSpawnsForBiomeTypes(darklings, EnumCreatureType.monster, new Type[]{Type.NETHER}, new Type[]{Type.MUSHROOM});
-
-		initSpawnsForBiomeTypes(manaCreepers, EnumCreatureType.monster, new Type[]{Type.BEACH, Type.SANDY, Type.FOREST, Type.SNOWY, Type.HILLS, Type.JUNGLE, Type.MAGICAL, Type.MOUNTAIN, Type.PLAINS, Type.SWAMP, Type.WASTELAND}, new Type[]{Type.END, Type.NETHER, Type.MUSHROOM});
-
-		initSpawnsForBiomeTypes(lightMages, EnumCreatureType.monster, new Type[]{Type.BEACH, Type.SANDY, Type.FOREST, Type.SNOWY, Type.HILLS, Type.JUNGLE, Type.MAGICAL, Type.MOUNTAIN, Type.PLAINS, Type.SWAMP, Type.WASTELAND}, new Type[]{Type.END, Type.NETHER, Type.MUSHROOM});
-
-		initSpawnsForBiomeTypes(darkMages, EnumCreatureType.monster, new Type[]{Type.BEACH, Type.SANDY, Type.FOREST, Type.SNOWY, Type.HILLS, Type.JUNGLE, Type.MAGICAL, Type.MOUNTAIN, Type.PLAINS, Type.SWAMP, Type.WASTELAND}, new Type[]{Type.END, Type.NETHER, Type.MUSHROOM});
-
-		initSpawnsForBiomeTypes(waterElementals, EnumCreatureType.monster, new Type[]{Type.WATER}, new Type[]{Type.END, Type.NETHER, Type.MUSHROOM});
-		initSpawnsForBiomeTypes(waterElementals, EnumCreatureType.waterCreature, new Type[]{Type.WATER}, new Type[]{Type.END, Type.NETHER, Type.MUSHROOM});
-
-		initSpawnsForBiomeTypes(earthElementals, EnumCreatureType.monster, new Type[]{Type.HILLS, Type.MOUNTAIN}, new Type[]{Type.MUSHROOM});
-		initSpawnsForBiomeTypes(fireElementals, EnumCreatureType.monster, new Type[]{Type.NETHER}, new Type[]{Type.MUSHROOM});
+		EntityRegistry.addSpawn(EntityDryad.class,AMCore.config.GetDryadSpawnRate(),1,2,EnumCreatureType.creature, getBiomes(EntityDryad.class));
+		EntityRegistry.addSpawn(EntityHecate.class,AMCore.config.GetHecateSpawnRate(),1, 1,EnumCreatureType.monster, getBiomes(EntityHecate.class));
+		EntityRegistry.addSpawn(EntityManaCreeper.class, AMCore.config.GetManaCreeperSpawnRate(), 1, 1,EnumCreatureType.monster, getBiomes(EntityManaCreeper.class));
+		EntityRegistry.addSpawn(EntityLightMage.class, AMCore.config.GetMageSpawnRate(), 1, 3,EnumCreatureType.creature, getBiomes(EntityLightMage.class));
+		EntityRegistry.addSpawn(EntityDarkMage.class, AMCore.config.GetMageSpawnRate(), 1, 3,EnumCreatureType.creature, getBiomes(EntityDarkMage.class));
+		EntityRegistry.addSpawn(EntityDarkling.class, AMCore.config.GetDarklingSpawnRate(), 4, 8,EnumCreatureType.monster, getBiomes(EntityDarkling.class));
+		EntityRegistry.addSpawn(EntityWaterElemental.class, AMCore.config.GetWaterElementalSpawnRate(), 1, 3,EnumCreatureType.waterCreature, getBiomes(EntityWaterElemental.class));
+		EntityRegistry.addSpawn(EntityEarthElemental.class, AMCore.config.GetEarthElementalSpawnRate(), 1, 2,EnumCreatureType.monster, getBiomes(EntityEarthElemental.class));
+		EntityRegistry.addSpawn(EntityFireElemental.class, AMCore.config.GetFireElementalSpawnRate(), 1, 1,EnumCreatureType.monster, getBiomes(EntityFireElemental.class));
+		EntityRegistry.addSpawn(EntityManaElemental.class, AMCore.config.GetManaElementalSpawnRate(), 1, 1,EnumCreatureType.monster, getBiomes(EntityManaElemental.class));
 
 	}
-
-	private void initSpawnsForBiomeTypes(SpawnListEntry spawnListEntry, EnumCreatureType creatureType, Type[] types, Type[] exclusions){
-		if (spawnListEntry.itemWeight == 0){
-			LogHelper.info("Skipping spawn list entry for %s (as type %s), as the weight is set to 0.  This can be changed in config.", spawnListEntry.entityClass.getName(), creatureType.toString());
-			return;
-		}
-		for (Type type : types){
-			initSpawnsForBiomes(BiomeDictionary.getBiomesForType(type), spawnListEntry, creatureType, exclusions);
-		}
-	}
-
-	private void initSpawnsForBiomes(BiomeGenBase[] biomes, SpawnListEntry spawnListEntry, EnumCreatureType creatureType, Type[] exclusions){
-		if (biomes == null) return;
-		for (BiomeGenBase biome : biomes){
-			if (biomeIsExcluded(biome, exclusions)) continue;
-			if (!biome.getSpawnableList(creatureType).contains(spawnListEntry))
-				biome.getSpawnableList(creatureType).add(spawnListEntry);
-		}
-	}
-
-	private boolean biomeIsExcluded(BiomeGenBase biome, Type[] exclusions){
-
-		Type biomeTypes[] = BiomeDictionary.getTypesForBiome(biome);
-
-		for (Type exclusion : exclusions){
-			for (Type biomeType : biomeTypes){
-				if (biomeType == exclusion) return true;
+	public static BiomeGenBase[] getBiomes(Class<? extends Entity> entity){
+		List<BiomeGenBase> array = new ArrayList<>();
+		if(entity == EntityDryad.class){
+			Type[] types = {Type.FOREST, Type.MAGICAL, Type.HILLS, Type.JUNGLE, Type.MOUNTAIN, Type.PLAINS};
+			for(Type type : types){
+				array.addAll(Arrays.asList(BiomeDictionary.getBiomesForType(type)));
+			}
+		}else if(entity == EntityWaterElemental.class){
+			Type[] types = {Type.OCEAN,Type.RIVER};
+			for(Type type : types){
+				array.addAll(Arrays.asList(BiomeDictionary.getBiomesForType(type)));
+			}
+		}else if(entity == EntityEarthElemental.class){
+			Type[] types = {Type.HILLS, Type.MOUNTAIN,Type.BEACH, Type.SANDY};
+			for(Type type : types){
+				array.addAll(Arrays.asList(BiomeDictionary.getBiomesForType(type)));
+			}
+		}else if(entity == EntityManaElemental.class){
+			Type[] types = { Type.SNOWY, Type.HILLS, Type.MAGICAL, Type.MOUNTAIN, Type.PLAINS};
+			for(Type type : types){
+				array.addAll(Arrays.asList(BiomeDictionary.getBiomesForType(type)));
 			}
 		}
-		return false;
-	}
 
-	@Override
-	public void addButcheryBlacklist(Class... clazz){
-		for (Class l_clazz : clazz)
-			SpawnBlacklists.addButcheryBlacklist(l_clazz);
-	}
-
-	@Override
-	public void addProgenyBlacklist(Class... clazz){
-		for (Class l_clazz : clazz)
-			SpawnBlacklists.addProgenyBlacklist(l_clazz);
+		else if(entity == EntityDarkMage.class ||  entity == EntityLightMage.class || entity == EntityManaCreeper.class){
+			Type[] types = {Type.BEACH, Type.SANDY, Type.FOREST, Type.SNOWY, Type.HILLS, Type.JUNGLE, Type.MAGICAL, Type.MOUNTAIN, Type.PLAINS, Type.SWAMP, Type.WASTELAND};
+			for(Type type : types){
+				array.addAll(Arrays.asList(BiomeDictionary.getBiomesForType(type)));
+			}
+		}
+		else if(entity == EntityHecate.class || entity == EntityDarkling.class || entity == EntityFireElemental.class){
+			Type[] types = {Type.NETHER};
+			for(Type type : types){
+				array.addAll(Arrays.asList(BiomeDictionary.getBiomesForType(type)));
+			}
+		}
+		return array.toArray(new BiomeGenBase[]{});
 	}
 }

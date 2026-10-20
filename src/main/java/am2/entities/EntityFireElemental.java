@@ -79,20 +79,20 @@ public class EntityFireElemental extends EntityMob{
 		return true;
 	}
 
-	@Override
-	protected String getLivingSound(){
-		return "fire_elem_living";
-	}
-
-	@Override
-	protected String getHurtSound(){
-		return "fire_elem_hurt";
-	}
-
-	@Override
-	protected String getDeathSound(){
-		return "fire_elem_death";
-	}
+//	@Override
+//	protected String getLivingSound(){
+//		return "fire_elem_living";
+//	}
+//
+//	@Override
+//	protected String getHurtSound(){
+//		return "fire_elem_hurt";
+//	}
+//
+//	@Override
+//	protected String getDeathSound(){
+//		return "fire_elem_death";
+//	}
 
 	public int getEntityBrightnessForRender(float f){
 		return 0xf000f0;

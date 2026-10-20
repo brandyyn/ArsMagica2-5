@@ -10,8 +10,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 
-import java.util.Random;
-
 public class ParticleManagerServer{
 	public static final byte PKT_BOLT_ENT_ENT = 64;
 	public static final byte PKT_BOLT_PT_PT = 63;

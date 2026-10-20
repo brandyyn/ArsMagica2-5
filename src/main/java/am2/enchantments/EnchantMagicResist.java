@@ -18,16 +18,6 @@ public class EnchantMagicResist extends Enchantment{
 	public int getMaxLevel(){
 		return 5;
 	}
-
-	@Override
-	public int getMinEnchantability(int level) {
-		return 1 + 10 * (level - 1);
-	}
-
-	@Override
-	public int getMaxEnchantability(int level) {
-		return super.getMinEnchantability(level) + 10;
-	}
 	public int calcModifierDamage(int level, DamageSource source){
 		if(!source.isMagicDamage()) return 0;
 		else {

@@ -4,12 +4,17 @@ import am2.AMCore;
 import am2.api.events.ManaCostEvent;
 import am2.api.math.AMVector3;
 import am2.api.spell.ItemSpellBase;
+import am2.api.spell.component.interfaces.ISkillTreeEntry;
+import am2.api.spell.component.interfaces.ISpellComponent;
+import am2.api.spell.component.interfaces.ISpellModifier;
 import am2.api.spell.component.interfaces.ISpellShape;
 import am2.api.spell.enums.Affinity;
 import am2.guis.ArsMagicaGuiIdList;
 import am2.playerextensions.SkillData;
 import am2.spell.*;
 import am2.spell.SpellUtils.SpellRequirements;
+import am2.spell.components.MissingComponent;
+import am2.spell.modifiers.MissingModifier;
 import am2.spell.shapes.MissingShape;
 import am2.texture.ResourceManager;
 import am2.utility.MathUtilities;
@@ -18,6 +23,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -110,12 +116,12 @@ public class SpellBase extends ItemSpellBase{
 
 		manaCost = mce.manaCost;
 
-		list.add(String.format("\2477Mana Cost: %.2f", manaCost));
+		list.add(I18n.format("Mana Cost: %s", (int)manaCost));
 
-		if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)){
+		if (!par4 && Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)){
 			HashMap<Affinity, Float> affinityData = SpellUtils.instance.AffinityFor(legacySpell);
 			for (Affinity aff : affinityData.keySet()){
-				list.add(String.format("%s (%.2f%%)", aff.toString(), affinityData.get(aff) * 100));
+				list.add(String.format("  %s (%.2f%%)",aff.getColor() + aff.toString(), affinityData.get(aff) * 100));
 			}
 
 			if (stack.stackTagCompound.hasKey("Lore")){
@@ -127,8 +133,58 @@ public class SpellBase extends ItemSpellBase{
 					}
 				}
 			}
-		}else{
+		}else if (!par4){
 			list.add(StatCollector.translateToLocal("am2.tooltip.shiftForAffinity"));
+		}
+		if(par4 && Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)){
+			int stages = SpellUtils.instance.numStages(legacySpell);
+			if(stages == 1){
+				ISpellShape shapes = SpellUtils.instance.getShapeForStage(legacySpell,0);
+				ISpellComponent[] components = SpellUtils.instance.getComponentsForStage(legacySpell,0);
+				ISpellModifier[] modifiers = SpellUtils.instance.getModifiersForStage(legacySpell,0);
+				String shapename = SkillManager.instance.getDisplayName(shapes);
+
+				list.add(EnumChatFormatting.DARK_GRAY+ "Stage 1: ");
+				list.add(EnumChatFormatting.GOLD + String.format("  [Shape] %s",shapename));
+				for(ISpellComponent component : components){
+					if(component instanceof MissingComponent) continue;
+					String cname = SkillManager.instance.getDisplayName(component);
+					list.add(EnumChatFormatting.GREEN + String.format("  [Component] %s",cname));
+				}
+				for(ISpellModifier modifier : modifiers){
+					if(modifier instanceof MissingModifier) continue;
+					String mname = SkillManager.instance.getDisplayName(modifier);
+					list.add(EnumChatFormatting.AQUA + String.format("  [Modifier] %s",mname));
+				}
+
+			}
+			else{
+				for(int i = 0; i < stages; i++){
+					list.add(EnumChatFormatting.DARK_GRAY + String.format("Stage %s: ", i + 1));
+
+					ISpellShape shape = SpellUtils.instance.getShapeForStage(legacySpell,i);
+					String sname = SkillManager.instance.getDisplayName(shape);
+					list.add(EnumChatFormatting.GOLD + String.format("  [Shape] %s",sname));
+
+					ISpellComponent[] components = SpellUtils.instance.getComponentsForStage(legacySpell,i);
+					ISpellModifier[] modifiers = SpellUtils.instance.getModifiersForStage(legacySpell,i);
+					for(ISpellComponent component : components){
+						if(component instanceof MissingComponent) continue;
+						String cname = SkillManager.instance.getDisplayName(component);
+						list.add(EnumChatFormatting.GREEN + String.format("  [Component] %s",cname));
+					}
+					for(ISpellModifier modifier : modifiers){
+						if(modifier instanceof MissingModifier) continue;
+						String mname = SkillManager.instance.getDisplayName(modifier);
+						list.add(EnumChatFormatting.AQUA + String.format("  [Modifier] %s",mname));
+					}
+
+
+				}
+			}
+		}else if (par4){
+			list.add(StatCollector.translateToLocal("am2.tooltip.shiftForDetails"));
+
 		}
 	}
 
@@ -160,9 +216,6 @@ public class SpellBase extends ItemSpellBase{
 		if (shape != null){
 			if (!shape.isChanneled())
 				SpellHelper.instance.applyStackStage(stack, player, null, player.posX, player.posY, player.posZ, 0, world, true, true, 0);
-			if (world.isRemote && shape.isChanneled()){
-				//SoundHelper.instance.stopSound(shape.getSoundForAffinity(SpellUtils.instance.mainAffinityFor(stack), stack, null));
-			}
 		}
 	}
 

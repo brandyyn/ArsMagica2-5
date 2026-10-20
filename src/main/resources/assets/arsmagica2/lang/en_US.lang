@@ -185,7 +185,7 @@ item.arsmagica2:soulspike.name=Soulspike
 item.arsmagica2:boxOfIllusions.name=Box of Illusions
 item.arsmagica2:etheriumExtractor.name=Etherium Extractor
 item.arsmagica2:cognitivedust.name=Cognitive Dust
-item.arsmagica2:nightmareessence.name=Nightmare Essence
+item.arsmagica2:nightmareEssence.name=Nightmare Essence
 item.arsmagica2:fractalfragment.name=Fractal Fragment
 item.arsmagica2:soulfragment.name=Soul Fragment
 item.arsmagica2:bound_bow.name=Bound Bow
@@ -270,6 +270,7 @@ tile.arsmagica2:spell_sealed_door.name=Spell-Sealed Door
 tile.arsmagica2:stairsWitchwood.name=Witchwood Stairs
 tile.arsmagica2:summoner.name=Summoner
 tile.arsmagica2:spellReplicator.name=Spell Replicator
+tile.arsmagica2:cosmicRock.name=Cosmic Rock
 tile.arsmagica2:tarmaroot.name=Tarma Root
 tile.arsmagica2:sanguineAmaryllis.name=Sanguine Amaryllis
 tile.arsmagica2:effervescentSnowdrop.name=Effervescent Snowdrop
@@ -698,6 +699,7 @@ am2.gui.negativeBuffs=Negative Buffs
 am2.gui.neutralPower=Neutral Etherium
 am2.gui.next=Next
 am2.gui.no=No
+am2.gui.rotate=Click and drag to rotate
 am2.gui.noneAffinity=None
 am2.gui.notLearned=not learned
 am2.gui.numericValues=Numeric
@@ -777,7 +779,6 @@ am2.affinity.waterweakness=Weakness to Water
 ##fire
 am2.affinity.firepunch=Fire Punch
 am2.affinity.fireresistance=Resistant to Fire
-am2.affinity.waterweakness=Weakness to Water
 
 ##ice
 am2.affinity.coldblooded=Cold Blooded

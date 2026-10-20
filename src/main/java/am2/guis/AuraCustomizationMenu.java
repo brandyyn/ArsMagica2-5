@@ -1,6 +1,7 @@
 package am2.guis;
 
 import am2.AMCore;
+import am2.PlayerTracker;
 import am2.guis.controls.GuiButtonVariableDims;
 import am2.guis.controls.GuiSlideControl;
 import am2.network.AMDataWriter;
@@ -38,7 +39,7 @@ public class AuraCustomizationMenu extends GuiScreen{
 
 	private GuiButton activeButton;
 
-	private GuiScreen parent;
+	private final GuiScreen parent;
 
 	public AuraCustomizationMenu(){
 		this.mc = Minecraft.getMinecraft();
@@ -235,7 +236,7 @@ public class AuraCustomizationMenu extends GuiScreen{
 				index--;
 				if (index < 0) index = AMParticle.particleTypes.length - 1;
 
-				while (AMParticle.particleTypes[index].startsWith("lightning_bolt")){
+				while (AMParticle.particleTypes[index].startsWith("lightning_bolt") && !PlayerTracker.getAAL(Minecraft.getMinecraft().thePlayer)){
 					index--;
 					if (index < 0) index = AMParticle.particleTypes.length - 1;
 				}

@@ -1,8 +1,8 @@
 package am2.blocks;
 
 import am2.AMCore;
+import am2.api.items.armor.IManaGoggle;
 import am2.blocks.tileentities.TileEntityBrokenPowerLink;
-import am2.items.ItemsCommonProxy;
 import am2.texture.ResourceManager;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -47,7 +47,7 @@ public class BlockBrokenPowerLink extends BlockContainer{
 	public void setBlockBoundsBasedOnState(IBlockAccess par1iBlockAccess, int par2, int par3, int par4){
 		EntityPlayer player = AMCore.proxy.getLocalPlayer();
 		if (player != null){
-			if ((par2 == 0 && par3 == 0 && par4 == 0) || player.getCurrentArmor(3) != null && player.getCurrentArmor(3).getItem() == ItemsCommonProxy.magitechGoggles){
+			if ((par2 == 0 && par3 == 0 && par4 == 0) || player.getCurrentArmor(3) != null && player.getCurrentArmor(3).getItem() instanceof IManaGoggle){
 				this.setBlockBounds(0, 0, 0, 1, 1, 1);
 				return;
 			}
@@ -67,7 +67,7 @@ public class BlockBrokenPowerLink extends BlockContainer{
 
 		EntityPlayer localPlayer = AMCore.proxy.getLocalPlayer();
 		if (localPlayer != null){
-			if (localPlayer.getCurrentArmor(3) != null && localPlayer.getCurrentArmor(3).getItem() == ItemsCommonProxy.magitechGoggles){
+			if (localPlayer.getCurrentArmor(3) != null && localPlayer.getCurrentArmor(3).getItem() instanceof IManaGoggle){
 				return super.getCollisionBoundingBoxFromPool(par1World, par2, par3, par4);
 			}
 		}

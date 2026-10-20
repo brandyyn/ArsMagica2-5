@@ -14,7 +14,10 @@ import java.io.File;
 
 public class AMConfig extends Configuration{
 
-
+	private final String KEY_PlayerSpellsDamageTerrain = "Player_Spells_Destroy_Terrain";
+	private final String KEY_NPCSpellsDamageTerrain = "NPC_Spells_Destroy_Terrain";
+	private final String KEY_TowergenGridSize = "Towergen_Grid_Size";
+	private final String KEY_EnableWorldGen = "EnableWorldGen";
 	private final String KEY_RetroactiveWorldGen = "RetroactiveWorldGen";
 
 	private final String KEY_SecondarySkillTreeTierCap = "SecondarySkillTreeTierCap";
@@ -386,9 +389,9 @@ public class AMConfig extends Configuration{
 		witchwoodLeafParticles = get(CATEGORY_GENERAL, KEY_witchwoodLeavesFall, true, "Disable this if you experience low FPS in witchwood forests").getBoolean(true);
 		alternativeStart = get(CATEGORY_GENERAL, KEY_alternativeStart, false, "Arcane Compendium creation requires Witchwood Trees instead of Ethereum Lakes").getBoolean(false);
 		EasyStart = get(CATEGORY_GENERAL, KEY_EasyStart, false, "start with 3 basic shapes unlocked (projectile, touch, self)").getBoolean(false);
-		InscriptionRework = get(CATEGORY_GENERAL,KEY_INSCRIPTION_REWORK, true,"modify inscription table to make shape spell only in shape box + only 1 shape. DISABLE THIS ONLY IF YOU'RE OK WITH YOUR SPELLS CAUSING ISSUES I WON'T FIX ANYTHING RELATED TO THIS").getBoolean(true);
 		debugVortex = get(CATEGORY_GENERAL, KEY_DebugVortex, false, "Enable if you're having issues with spatial vortices and want to report it. This enables a lot of verbose output about their inner workings at all stages to make it easier for me to debug.").getBoolean(false);
 		enableWitchwoodForest = get(CATEGORY_GENERAL, KEY_EnableWitchwoodForest, true, "Disable this if you prefer the witchwood forest to not generate").getBoolean(true);
+		InscriptionRework = get(CATEGORY_GENERAL,KEY_INSCRIPTION_REWORK, true,"modify inscription table to make shape spell only in shape box + only 1 shape. DISABLE THIS ONLY IF YOU'RE OK WITH YOUR SPELLS CAUSING ISSUES I WON'T FIX ANYTHING RELATED TO THIS").getBoolean(true);
 		UnlockSilverSpellWithGuardian = get(CATEGORY_GENERAL, KEY_GuardianSilverSpells, true, "Silver Spells are unlocked by killing guardian").getBoolean(true);
 
 		allowCreativeTargets = get(CATEGORY_GENERAL, KEY_allowCreativeTargets, true, "Disable this to prevent spell effects on creative players").getBoolean(true);
@@ -416,13 +419,14 @@ public class AMConfig extends Configuration{
 		disarmAffectsPlayers = get(CATEGORY_GENERAL, KEY_DisarmAffectsPlayers, true, "If false, disarm won't work on players.").getBoolean(true);
 		BurnoutEffects = get(CATEGORY_GENERAL,KEY_NewBurnoutEffects,true,"Set this to false to disable new Burnout effects.").getBoolean(true);
 		manaCap = get(CATEGORY_GENERAL, KEY_ManaCap, 0, "Sets the maximum mana a player can have (0 for no cap)").getDouble(0);
-		MaxSummons = get(CATEGORY_GENERAL,KEY_MaxSummons, 0, "Set the maximum amount of summons players can have ").getInt(0);
+		MaxSummons = get(CATEGORY_GENERAL,KEY_MaxSummons, 1, "Set the maximum amount of summons players can have ").getInt(1);
 
 		digBreaksTileEntities = get(CATEGORY_GENERAL, KEY_DigBreaksTEs, true, "Can the dig component break blocks that have a tile entity?").getBoolean(true);
 
 		savePowerOnWorldSave = get(CATEGORY_GENERAL, KEY_SavePowerOnWorldSave, true, "Set this to false if you are experiencing tick lage due to AM2 saving power data alongside the world save.  This will instead cache the power data in memory to be saved later.  This comes with more risk in the event of a crash, and a larger memory footprint, but increased performance. Can be used alongside chunk unload save config. Power data is still always saved at world unload (server shutdown).").getBoolean(true);
 
 		canDryadsDespawn = get(CATEGORY_MOBS, KEY_CanDryadsDespawn, true, "Set this to false if you don't want dryads to despawn.").getBoolean(true);
+		
 		
 		witchwoodFrequency = get(CATEGORY_GENERAL, KEY_WitchwoodFrequency, 35, "The chance of a witchwood tree generating. Lower numbers give more trees.").getInt(35);
 		poolFrequency = get(CATEGORY_GENERAL, KEY_EssenceLakeFrequency, 25, "The chance of an etherium pool generating. Lower numbers give more pools. Any number lower than, or equals to 0 will disable this particular pool type as a compatibility feature with the LE fork.").getInt(25);
@@ -461,7 +465,7 @@ public class AMConfig extends Configuration{
 		worldgenWhitelist = new int[asplit.length];
 		int count1 = 0;
 		for (String s : asplit){
-			if (s.equals("")) continue;
+			if (s.isEmpty()) continue;
 			try{
 				worldgenWhitelist[count1] = Integer.parseInt(s.trim());
 			}catch (Throwable t){
@@ -478,7 +482,7 @@ public class AMConfig extends Configuration{
 		worldgenBlacklist = new int[split.length];
 		int count = 0;
 		for (String s : split){
-			if (s.equals("")) continue;
+			if (s.isEmpty()) continue;
 			try{
 				worldgenBlacklist[count] = Integer.parseInt(s.trim());
 			}catch (Throwable t){
@@ -497,10 +501,11 @@ public class AMConfig extends Configuration{
 		blacklistAffectTrees = get(CATEGORY_GENERAL, KEY_blacklistAffectTrees, true, "Should Dimension Worldgen Blacklists apply to trees?").getBoolean(true);
 		blacklistAffectPools = get(CATEGORY_GENERAL, KEY_blacklistAffectPools, true, "Should Dimension Worldgen Blacklists apply to essence pools>").getBoolean(true);
 
+		/*Class <? extends Entity > entityClazz = (Class<? extends Entity>) EntityList.stringToClassMapping.get(entityName); */
 		mobBlacklist = new int[split2.length];
 		int count2 = 0;
 		for (String s : split2){
-			if (s.equals("")) continue;
+			if (s.isEmpty()) continue;
 			try{
 				mobBlacklist[count2] = Integer.parseInt(s.trim());
 			}catch (Throwable t){
@@ -520,7 +525,7 @@ public class AMConfig extends Configuration{
 		appropriationMobBlacklist = new Class[split.length];
 		count = 0;
 		for (String s : split){
-			if (s.equals("")) continue;
+			if (s.isEmpty()) continue;
 			try{
 				appropriationMobBlacklist[count] = Class.forName(s);
 			}catch (Throwable t){
@@ -595,6 +600,7 @@ public class AMConfig extends Configuration{
 	public boolean spawnHugeTrees(){
 		return SpawnHugeTrees;
 	}
+
 
 	public boolean isGlobalTimeManipulationEnabled(){
 		return enableGlobalTime;
@@ -785,6 +791,7 @@ public class AMConfig extends Configuration{
 	public boolean getBurnoutEffects(){
 		return BurnoutEffects;
 	}
+
 
 
 	public double getManaCap(){
@@ -1009,48 +1016,48 @@ public class AMConfig extends Configuration{
 	}
 
 	public int GetHecateSpawnRate(){
-		Property prop = get(CATEGORY_MOBS, KEY_hecateSpawnRate, 2);
-		return Math.max(prop.getInt(2), 0);
+		Property prop = get(CATEGORY_MOBS, KEY_hecateSpawnRate, 20);
+		return Math.max(prop.getInt(20), 0);
 	}
 
 	public int GetMageSpawnRate(){
-		Property prop = get(CATEGORY_MOBS, KEY_mageSpawnRate, 1);
-		return Math.max(prop.getInt(1), 0);
+		Property prop = get(CATEGORY_MOBS, KEY_mageSpawnRate, 10);
+		return Math.max(prop.getInt(10), 0);
 	}
 
 	public int GetWaterElementalSpawnRate(){
-		Property prop = get(CATEGORY_MOBS, KEY_waterElementalSpawnRate, 3);
-		return Math.max(prop.getInt(3), 0);
+		Property prop = get(CATEGORY_MOBS, KEY_waterElementalSpawnRate, 30);
+		return Math.max(prop.getInt(30), 0);
 	}
 
 	public int GetManaElementalSpawnRate(){
-		Property prop = get(CATEGORY_MOBS, KEY_manaElementalSpawnRate, 2);
-		return Math.max(prop.getInt(2), 0);
+		Property prop = get(CATEGORY_MOBS, KEY_manaElementalSpawnRate, 20);
+		return Math.max(prop.getInt(20), 0);
 	}
 
 	public int GetDryadSpawnRate(){
-		Property prop = get(CATEGORY_MOBS, KEY_dryadSpawnRate, 5);
-		return Math.max(prop.getInt(5), 0);
+		Property prop = get(CATEGORY_MOBS, KEY_dryadSpawnRate, 50);
+		return Math.max(prop.getInt(50), 0);
 	}
 
 	public int GetManaCreeperSpawnRate(){
-		Property prop = get(CATEGORY_MOBS, KEY_manaCreeperSpawnRate, 3);
-		return Math.max(prop.getInt(3), 0);
+		Property prop = get(CATEGORY_MOBS, KEY_manaCreeperSpawnRate, 30);
+		return Math.max(prop.getInt(30), 0);
 	}
 
 	public int GetDarklingSpawnRate(){
-		Property prop = get(CATEGORY_MOBS, KEY_darklingSpawnRate, 5);
-		return Math.max(prop.getInt(5), 0);
+		Property prop = get(CATEGORY_MOBS, KEY_darklingSpawnRate, 50);
+		return Math.max(prop.getInt(50), 0);
 	}
 
 	public int GetEarthElementalSpawnRate(){
-		Property prop = get(CATEGORY_MOBS, KEY_earthElementalSpawnRate, 2);
-		return Math.max(prop.getInt(2), 0);
+		Property prop = get(CATEGORY_MOBS, KEY_earthElementalSpawnRate, 20);
+		return Math.max(prop.getInt(20), 0);
 	}
 
 	public int GetFireElementalSpawnRate(){
-		Property prop = get(CATEGORY_MOBS, KEY_fireElementalSpawnRate, 2);
-		return Math.max(prop.getInt(2), 0);
+		Property prop = get(CATEGORY_MOBS, KEY_fireElementalSpawnRate, 20);
+		return Math.max(prop.getInt(20), 0);
 	}
 
 	public int GetFlickerSpawnRate(){

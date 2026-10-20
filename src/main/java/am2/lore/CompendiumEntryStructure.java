@@ -35,14 +35,12 @@ public class CompendiumEntryStructure extends CompendiumEntry{
 	@SideOnly(Side.CLIENT)
 	protected GuiArcaneCompendium getCompendiumGui(String searchID, int meta){
 		if (this.controllerClass != null){
-			Class tileEntityClass = (Class)((Map)ReflectionHelper.getPrivateValue(TileEntity.class, null, 1)).get(controllerClass);
+			Class tileEntityClass = (Class)((Map<?, ?>)ReflectionHelper.getPrivateValue(TileEntity.class, null, 1)).get(controllerClass);
 			if (tileEntityClass != null && IMultiblockStructureController.class.isAssignableFrom(tileEntityClass)){
 				try{
 					TileEntity te = (TileEntity)tileEntityClass.newInstance();
 					return new GuiArcaneCompendium(((IMultiblockStructureController)te).getDefinition(), te);
-				}catch (InstantiationException e){
-					e.printStackTrace();
-				}catch (IllegalAccessException e){
+				}catch (InstantiationException | IllegalAccessException e){
 					e.printStackTrace();
 				}
 			}

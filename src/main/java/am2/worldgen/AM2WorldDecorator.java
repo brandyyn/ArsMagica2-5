@@ -1,8 +1,8 @@
 package am2.worldgen;
 
 import am2.AMCore;
+import am2.blocks.BlockAMOre;
 import am2.blocks.BlocksCommonProxy;
-import am2.configuration.AMConfig;
 import am2.entities.SpawnBlacklists;
 import cpw.mods.fml.common.IWorldGenerator;
 import net.minecraft.init.Blocks;
@@ -18,8 +18,6 @@ import net.minecraftforge.event.terraingen.TerrainGen;
 
 import java.util.ArrayList;
 import java.util.Random;
-
-import javax.security.auth.callback.ConfirmationCallback;
 
 import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.LAKE;
 
@@ -38,37 +36,36 @@ public class AM2WorldDecorator implements IWorldGenerator{
 	private final AM2FlowerGen aum;
 	private final AM2FlowerGen tarmaRoot;
 
-	private ArrayList<Integer> dimensionBlacklist = new ArrayList<Integer>();
+	private final ArrayList<Integer> dimensionBlacklist = new ArrayList<Integer>();
 
 
 	//pools
 	private final AM2PoolGen pools;
-	private final WorldGenEssenceLakes lakes;
-	
+
 	//config
-	private int witchChance = AMCore.config.getWitchwoodFrequency();
-	private int poolChance = AMCore.config.getPoolFrequency();
-	private int wakeChance = AMCore.config.getWakebloomFrequency();
+	private final int witchChance = AMCore.config.getWitchwoodFrequency();
+	private final int poolChance = AMCore.config.getPoolFrequency();
+	private final int wakeChance = AMCore.config.getWakebloomFrequency();
 	
-	private int vinteumMin = AMCore.config.getVinteumMinHeight();
-	private int vinteumMax = AMCore.config.getVinteumMaxHeight();
-	private int vinteumVein = AMCore.config.getVinteumVeinSize();
-	private int vinteumFrequency = AMCore.config.getVinteumFrequency();
+	private final int vinteumMin = AMCore.config.getVinteumMinHeight();
+	private final int vinteumMax = AMCore.config.getVinteumMaxHeight();
+	private final int vinteumVein = AMCore.config.getVinteumVeinSize();
+	private final int vinteumFrequency = AMCore.config.getVinteumFrequency();
 	
-	private int chimeriteMin = AMCore.config.getChimeriteMinHeight();
-	private int chimeriteMax = AMCore.config.getChimeriteMaxHeight();
-	private int chimeriteVein = AMCore.config.getChimeriteVeinSize();
-	private int chimeriteFrequency = AMCore.config.getChimeriteFrequency();
+	private final int chimeriteMin = AMCore.config.getChimeriteMinHeight();
+	private final int chimeriteMax = AMCore.config.getChimeriteMaxHeight();
+	private final int chimeriteVein = AMCore.config.getChimeriteVeinSize();
+	private final int chimeriteFrequency = AMCore.config.getChimeriteFrequency();
 	
-	private int topazMin = AMCore.config.getTopazMinHeight();
-	private int topazMax = AMCore.config.getTopazMaxHeight();
-	private int topazVein = AMCore.config.getTopazVeinSize();
-	private int topazFrequency = AMCore.config.getTopazFrequency();	
+	private final int topazMin = AMCore.config.getTopazMinHeight();
+	private final int topazMax = AMCore.config.getTopazMaxHeight();
+	private final int topazVein = AMCore.config.getTopazVeinSize();
+	private final int topazFrequency = AMCore.config.getTopazFrequency();
 	
-	private int sunstoneMin = AMCore.config.getSunstoneMinHeight();
-	private int sunstoneMax = AMCore.config.getSunstoneMaxHeight();
-	private int sunstoneVein = AMCore.config.getSunstoneVeinSize();
-	private int sunstoneFrequency = AMCore.config.getSunstoneFrequency();
+	private final int sunstoneMin = AMCore.config.getSunstoneMinHeight();
+	private final int sunstoneMax = AMCore.config.getSunstoneMaxHeight();
+	private final int sunstoneVein = AMCore.config.getSunstoneVeinSize();
+	private final int sunstoneFrequency = AMCore.config.getSunstoneFrequency();
 
 	public AM2WorldDecorator(){
 
@@ -86,10 +83,10 @@ public class AM2WorldDecorator implements IWorldGenerator{
 			}
 		}
 
-		vinteum = new WorldGenMinable(BlocksCommonProxy.AMOres, BlocksCommonProxy.AMOres.META_VINTEUM_ORE, vinteumVein, Blocks.stone);
-		chimerite = new WorldGenMinable(BlocksCommonProxy.AMOres, BlocksCommonProxy.AMOres.META_CHIMERITE_ORE, chimeriteVein, Blocks.stone);
-		blueTopaz = new WorldGenMinable(BlocksCommonProxy.AMOres, BlocksCommonProxy.AMOres.META_BLUE_TOPAZ_ORE, topazVein, Blocks.stone);
-		sunstone = new WorldGenMinable(BlocksCommonProxy.AMOres, BlocksCommonProxy.AMOres.META_SUNSTONE_ORE, sunstoneVein, Blocks.lava);
+		vinteum = new WorldGenMinable(BlocksCommonProxy.AMOres, BlockAMOre.META_VINTEUM_ORE, vinteumVein, Blocks.stone);
+		chimerite = new WorldGenMinable(BlocksCommonProxy.AMOres, BlockAMOre.META_CHIMERITE_ORE, chimeriteVein, Blocks.stone);
+		blueTopaz = new WorldGenMinable(BlocksCommonProxy.AMOres, BlockAMOre.META_BLUE_TOPAZ_ORE, topazVein, Blocks.stone);
+		sunstone = new WorldGenMinable(BlocksCommonProxy.AMOres, BlockAMOre.META_SUNSTONE_ORE, sunstoneVein, Blocks.lava);
 
 		blueOrchid = new AM2FlowerGen(BlocksCommonProxy.cerublossom, 0);
 		desertNova = new AM2FlowerGen(BlocksCommonProxy.desertNova, 0);
@@ -99,7 +96,7 @@ public class AM2WorldDecorator implements IWorldGenerator{
 
 		pools = new AM2PoolGen();
 
-		lakes = new WorldGenEssenceLakes(BlocksCommonProxy.liquidEssence);
+		WorldGenEssenceLakes lakes = new WorldGenEssenceLakes(BlocksCommonProxy.liquidEssence);
 	}
 
 	@Override
@@ -123,7 +120,7 @@ public class AM2WorldDecorator implements IWorldGenerator{
 	public void generateNether(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider){
 		boolean isDimensionBlacklisted = dimensionBlacklist.contains(world.provider.dimensionId);
 
-		if ((AMCore.config.BlacklistAffectOres() && isDimensionBlacklisted) == false){
+		if (!(AMCore.config.BlacklistAffectOres() && isDimensionBlacklisted)){
 			generateOre(sunstone, 20, world, random, 5, 120, chunkX, chunkZ);
 		}
 	}
@@ -150,18 +147,18 @@ public class AM2WorldDecorator implements IWorldGenerator{
 			}
 		}
 
-		if ((AMCore.config.BlacklistAffectOres() && isDimensionBlacklisted) == false){
+		if (!(AMCore.config.BlacklistAffectOres() && isDimensionBlacklisted)){
 			generateOre(vinteum, vinteumFrequency, world, random, vinteumMin, vinteumMax, chunkX, chunkZ);
 			generateOre(chimerite, chimeriteFrequency, world, random, chimeriteMin, chimeriteMax, chunkX, chunkZ);
 			generateOre(blueTopaz, topazFrequency, world, random, topazMin, topazMax, chunkX, chunkZ);
 			generateOre(sunstone, sunstoneFrequency, world, random, sunstoneMin, sunstoneMax, chunkX, chunkZ);
 		}
-		if ((AMCore.config.BlacklistAffectTrees() && isDimensionBlacklisted) == false){
+		if (!(AMCore.config.BlacklistAffectTrees() && isDimensionBlacklisted)){
 			if (random.nextInt(witchChance) == 0){
 				generateTree(random.nextInt(AMCore.config.spawnHugeTrees() ? 6 : 1) == 0 ? new WitchwoodTreeHuge(true) : new WitchwoodTreeEvenMoreHuge(true), world, random, chunkX, chunkZ);
 			}
 		}
-		if ((AMCore.config.BlacklistAffectFlora() && isDimensionBlacklisted) == false){
+		if (!(AMCore.config.BlacklistAffectFlora() && isDimensionBlacklisted)){
 			generateFlowers(blueOrchid, world, random, chunkX, chunkZ);
 			generateFlowers(desertNova, world, random, chunkX, chunkZ);
 			generateFlowers(tarmaRoot, world, random, chunkX, chunkZ);
@@ -170,7 +167,7 @@ public class AM2WorldDecorator implements IWorldGenerator{
 				generateFlowers(wakebloom, world, random, chunkX, chunkZ);
 			}
 		}
-		if ((AMCore.config.BlacklistAffectPools() && isDimensionBlacklisted) == false){
+		if (!(AMCore.config.BlacklistAffectPools() && isDimensionBlacklisted)){
 			if (poolChance > 0){
 				if (random.nextInt(poolChance) == 0){
 					generatePools(world, random, chunkX, chunkZ);

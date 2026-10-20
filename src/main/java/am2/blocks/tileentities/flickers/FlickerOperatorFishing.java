@@ -3,6 +3,7 @@ package am2.blocks.tileentities.flickers;
 import am2.api.flickers.IFlickerController;
 import am2.api.flickers.IFlickerFunctionality;
 import am2.api.spell.enums.Affinity;
+import am2.items.ItemOre;
 import am2.items.ItemsCommonProxy;
 import am2.utility.InventoryUtilities;
 import net.minecraft.block.Block;
@@ -24,11 +25,11 @@ import java.util.Random;
 
 public class FlickerOperatorFishing implements IFlickerFunctionality{
 
-	private static final List common_items = Arrays.asList(new WeightedRandomFishable[]{(new WeightedRandomFishable(new ItemStack(Items.leather_boots), 10)).func_150709_a(0.9F), new WeightedRandomFishable(new ItemStack(Items.leather), 10), new WeightedRandomFishable(new ItemStack(Items.bone), 10), new WeightedRandomFishable(new ItemStack(Items.potionitem), 10), new WeightedRandomFishable(new ItemStack(Items.string), 5), (new WeightedRandomFishable(new ItemStack(Items.fishing_rod), 2)).func_150709_a(0.9F), new WeightedRandomFishable(new ItemStack(Items.bowl), 10), new WeightedRandomFishable(new ItemStack(Items.stick), 5), new WeightedRandomFishable(new ItemStack(Items.dye, 10, 0), 1), new WeightedRandomFishable(new ItemStack(Blocks.tripwire_hook), 10), new WeightedRandomFishable(new ItemStack(Items.rotten_flesh), 10)});
-	private static final List rare_items = Arrays.asList(new WeightedRandomFishable[]{new WeightedRandomFishable(new ItemStack(Blocks.waterlily), 1), new WeightedRandomFishable(new ItemStack(Items.name_tag), 1), new WeightedRandomFishable(new ItemStack(Items.saddle), 1), (new WeightedRandomFishable(new ItemStack(Items.bow), 1)).func_150709_a(0.25F).func_150707_a(), (new WeightedRandomFishable(new ItemStack(Items.fishing_rod), 1)).func_150709_a(0.25F).func_150707_a(), (new WeightedRandomFishable(new ItemStack(Items.book), 1)).func_150707_a()});
-	private static final List uncommon_items = Arrays.asList(new WeightedRandomFishable[]{new WeightedRandomFishable(new ItemStack(Items.fish, 1, ItemFishFood.FishType.COD.func_150976_a()), 60), new WeightedRandomFishable(new ItemStack(Items.fish, 1, ItemFishFood.FishType.SALMON.func_150976_a()), 25), new WeightedRandomFishable(new ItemStack(Items.fish, 1, ItemFishFood.FishType.CLOWNFISH.func_150976_a()), 2), new WeightedRandomFishable(new ItemStack(Items.fish, 1, ItemFishFood.FishType.PUFFERFISH.func_150976_a()), 13)});
-	private static final List nether_items = Arrays.asList(new WeightedRandomFishable[]{new WeightedRandomFishable(new ItemStack(ItemsCommonProxy.itemOre, 1, ItemsCommonProxy.itemOre.META_PYROGENICSEDIMENT), 10), new WeightedRandomFishable(new ItemStack(Items.blaze_powder), 25), new WeightedRandomFishable(new ItemStack(Items.nether_wart), 25), new WeightedRandomFishable(new ItemStack(ItemsCommonProxy.itemOre, 1, ItemsCommonProxy.itemOre.META_SUNSTONEFRAGMENT), 5)});
-	private static final List ender_items = Arrays.asList(new WeightedRandomFishable[]{new WeightedRandomFishable(new ItemStack(ItemsCommonProxy.itemOre, 1, ItemsCommonProxy.itemOre.META_COSMICDUST), 10), new WeightedRandomFishable(new ItemStack(Items.ender_pearl), 25), new WeightedRandomFishable(new ItemStack(Items.ender_eye), 25), new WeightedRandomFishable(new ItemStack(ItemsCommonProxy.itemOre, 1, ItemsCommonProxy.itemOre.META_MOONSTONEFRAGMENT), 5)});
+	private static final List<WeightedRandomFishable> common_items = Arrays.asList((new WeightedRandomFishable(new ItemStack(Items.leather_boots), 10)).func_150709_a(0.9F), new WeightedRandomFishable(new ItemStack(Items.leather), 10), new WeightedRandomFishable(new ItemStack(Items.bone), 10), new WeightedRandomFishable(new ItemStack(Items.potionitem), 10), new WeightedRandomFishable(new ItemStack(Items.string), 5), (new WeightedRandomFishable(new ItemStack(Items.fishing_rod), 2)).func_150709_a(0.9F), new WeightedRandomFishable(new ItemStack(Items.bowl), 10), new WeightedRandomFishable(new ItemStack(Items.stick), 5), new WeightedRandomFishable(new ItemStack(Items.dye, 10, 0), 1), new WeightedRandomFishable(new ItemStack(Blocks.tripwire_hook), 10), new WeightedRandomFishable(new ItemStack(Items.rotten_flesh), 10));
+	private static final List<WeightedRandomFishable> rare_items = Arrays.asList(new WeightedRandomFishable(new ItemStack(Blocks.waterlily), 1), new WeightedRandomFishable(new ItemStack(Items.name_tag), 1), new WeightedRandomFishable(new ItemStack(Items.saddle), 1), (new WeightedRandomFishable(new ItemStack(Items.bow), 1)).func_150709_a(0.25F).func_150707_a(), (new WeightedRandomFishable(new ItemStack(Items.fishing_rod), 1)).func_150709_a(0.25F).func_150707_a(), (new WeightedRandomFishable(new ItemStack(Items.book), 1)).func_150707_a());
+	private static final List<WeightedRandomFishable> uncommon_items = Arrays.asList(new WeightedRandomFishable(new ItemStack(Items.fish, 1, ItemFishFood.FishType.COD.func_150976_a()), 60), new WeightedRandomFishable(new ItemStack(Items.fish, 1, ItemFishFood.FishType.SALMON.func_150976_a()), 25), new WeightedRandomFishable(new ItemStack(Items.fish, 1, ItemFishFood.FishType.CLOWNFISH.func_150976_a()), 2), new WeightedRandomFishable(new ItemStack(Items.fish, 1, ItemFishFood.FishType.PUFFERFISH.func_150976_a()), 13));
+	private static final List<WeightedRandomFishable> nether_items = Arrays.asList(new WeightedRandomFishable(new ItemStack(ItemsCommonProxy.itemOre, 1, ItemOre.META_PYROGENICSEDIMENT), 10), new WeightedRandomFishable(new ItemStack(Items.blaze_powder), 25), new WeightedRandomFishable(new ItemStack(Items.nether_wart), 25), new WeightedRandomFishable(new ItemStack(ItemsCommonProxy.itemOre, 1, ItemOre.META_SUNSTONEFRAGMENT), 5));
+	private static final List<WeightedRandomFishable> ender_items = Arrays.asList(new WeightedRandomFishable(new ItemStack(ItemsCommonProxy.itemOre, 1, ItemOre.META_COSMICDUST), 10), new WeightedRandomFishable(new ItemStack(Items.ender_pearl), 25), new WeightedRandomFishable(new ItemStack(Items.ender_eye), 25), new WeightedRandomFishable(new ItemStack(ItemsCommonProxy.itemOre, 1, ItemOre.META_MOONSTONEFRAGMENT), 5));
 
 	@Override
 	public boolean RequiresPower(){
@@ -124,7 +125,7 @@ public class FlickerOperatorFishing implements IFlickerFunctionality{
 					if (i == 0 && j == 0 && k == 0)
 						continue;
 					TileEntity te = worldObj.getTileEntity(xCoord + i, yCoord + j, zCoord + k);
-					if (te != null && te instanceof IInventory){
+					if (te instanceof IInventory){
 						for (int side = 0; side < 6; ++side){
 							if (InventoryUtilities.mergeIntoInventory((IInventory)te, stack, stack.stackSize, side))
 								return;
@@ -165,10 +166,10 @@ public class FlickerOperatorFishing implements IFlickerFunctionality{
 				" F ",
 				"N W",
 				" R ",
-				Character.valueOf('F'), Items.fish,
-				Character.valueOf('W'), new ItemStack(ItemsCommonProxy.flickerJar, 1, Affinity.WATER.ordinal()),
-				Character.valueOf('N'), new ItemStack(ItemsCommonProxy.flickerJar, 1, Affinity.NATURE.ordinal()),
-				Character.valueOf('R'), ItemsCommonProxy.itemInfernalFishingRod
+				'F', Items.fish,
+				'W', new ItemStack(ItemsCommonProxy.flickerJar, 1, Affinity.WATER.ordinal()),
+				'N', new ItemStack(ItemsCommonProxy.flickerJar, 1, Affinity.NATURE.ordinal()),
+				'R', ItemsCommonProxy.itemInfernalFishingRod
 		};
 	}
 

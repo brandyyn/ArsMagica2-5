@@ -275,7 +275,7 @@ public class InventoryUtilities{
 	public static int getInventorySlotIndexFor(IInventory inventory, ItemStack search){
 		for (int i = 0; i < inventory.getSizeInventory(); ++i){
 			ItemStack stack = inventory.getStackInSlot(i);
-			if (stack != null && compareItemStacks(stack, search, false, false, true, true))
+			if (compareItemStacks(stack, search, false, false, true, true))
 				return i;
 		}
 		return -1;
@@ -285,17 +285,14 @@ public class InventoryUtilities{
 		if (stack1 == null || stack2 == null)
 			return false;
 
-		if (!compareItemStacks(stack1, stack2, true, false, true, true))
-			return false;
-
-		return true;
+		return compareItemStacks(stack1, stack2, true, false, true, true);
 	}
 
 	public static int getLikeItemCount(IInventory inventory, ItemStack stack){
 		int totalCount = 0;
 		for (int i = 0; i < inventory.getSizeInventory(); ++i){
 			ItemStack invStack = inventory.getStackInSlot(i);
-			if (invStack != null && compareItemStacks(invStack, stack, true, false, true, true))
+			if (compareItemStacks(invStack, stack, true, false, true, true))
 				totalCount += invStack.stackSize;
 		}
 
@@ -310,7 +307,7 @@ public class InventoryUtilities{
 
 			for (int i = 0; i < slots.length; i++){
 				ItemStack invStack = inventory.getStackInSlot(slots[i]);
-				if (invStack != null && compareItemStacks(invStack, stack, true, false, true, true))
+				if (compareItemStacks(invStack, stack, true, false, true, true))
 					totalCount += invStack.stackSize;
 			}
 
@@ -321,7 +318,7 @@ public class InventoryUtilities{
 	}
 
 	public static boolean canInsertItemToInventory(IInventory inventory, ItemStack itemStack, int slot, int side){
-		return !inventory.isItemValidForSlot(slot, itemStack) ? false : !(inventory instanceof ISidedInventory) || ((ISidedInventory)inventory).canInsertItem(slot, itemStack, side);
+		return inventory.isItemValidForSlot(slot, itemStack) && (!(inventory instanceof ISidedInventory) || ((ISidedInventory)inventory).canInsertItem(slot, itemStack, side));
 	}
 
 	private static boolean canExtractItemFromInventory(IInventory inventory, ItemStack itemStack, int slot, int side){
@@ -419,9 +416,6 @@ public class InventoryUtilities{
 		if (matchStackSize && a.stackSize != b.stackSize)
 			return false;
 
-		if (matchNBT && !ItemStack.areItemStackTagsEqual(a, b))
-			return false;
-
-		return true;
+		return !matchNBT || ItemStack.areItemStackTagsEqual(a, b);
 	}
 }

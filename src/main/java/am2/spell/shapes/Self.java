@@ -6,6 +6,7 @@ import am2.api.spell.component.interfaces.ISpellShape;
 import am2.api.spell.enums.Affinity;
 import am2.api.spell.enums.SpellCastResult;
 import am2.blocks.BlocksCommonProxy;
+import am2.items.ItemOre;
 import am2.items.ItemsCommonProxy;
 import am2.spell.SpellHelper;
 import am2.spell.SpellUtils;
@@ -40,7 +41,7 @@ public class Self implements ISpellShape{
 	public Object[] getRecipeItems(){
 		return new Object[]{
 				BlocksCommonProxy.aum,
-				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemsCommonProxy.itemOre.META_VINTEUMDUST),
+				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemOre.META_VINTEUMDUST),
 				ItemsCommonProxy.lesserFocus,
 				String.format("E:%d", PowerTypes.NEUTRAL.ID()), 500
 		};

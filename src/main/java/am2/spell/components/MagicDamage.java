@@ -30,7 +30,7 @@ public class MagicDamage implements ISpellComponent{
 		if (!(target instanceof EntityLivingBase)) return false;
 		float baseDamage = 6;
 		double damage = SpellUtils.instance.getModifiedDouble_Add(baseDamage, stack, caster, target, world, 0, SpellModifiers.DAMAGE);
-		return SpellHelper.instance.attackTargetSpecial(stack, target, DamageSources.causeEntityMagicDamage(caster), SpellUtils.instance.modifyDamage(caster, (float)damage));
+		return SpellHelper.instance.attackTargetSpecial(stack, target, DamageSources.causeEntityMagicDamage(caster), (float)damage);
 	}
 
 	@Override

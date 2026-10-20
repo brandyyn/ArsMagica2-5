@@ -1,12 +1,13 @@
 package am2.blocks;
 
+import am2.api.items.ICompendium;
 import am2.lore.CompendiumUnlockHandler;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 
-public abstract class AMBlockContainer extends BlockContainer{
+public abstract class AMBlockContainer extends BlockContainer implements ICompendium{
 	protected AMBlockContainer(Material par2Material){
 		super(par2Material);
 	}

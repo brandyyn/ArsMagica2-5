@@ -4,6 +4,7 @@ import am2.AMCore;
 import am2.api.blocks.MultiblockStructureDefinition;
 import am2.api.blocks.MultiblockStructureDefinition.StructureGroup;
 import am2.api.power.PowerTypes;
+import am2.blocks.BlockAMOre;
 import am2.blocks.BlocksCommonProxy;
 import am2.buffs.BuffEffectManaRegen;
 import am2.buffs.BuffList;
@@ -19,7 +20,7 @@ import java.util.List;
 
 public class TileEntityCelestialPrism extends TileEntityObelisk implements IMultiblockStructureController{
 
-	private StructureGroup moonstone;
+	private final StructureGroup moonstone;
 	private int particleCounter = 0;
 
 	private boolean onlyChargeAtNight = false;
@@ -38,7 +39,7 @@ public class TileEntityCelestialPrism extends TileEntityObelisk implements IMult
 
 		pillars = structure.createGroup("pillars", 4);
 
-		caps = new HashMap<StructureGroup, Float>();
+		caps = new HashMap<>();
 		caps.put(glass, 1.1f);
 		caps.put(gold, 1.4f);
 		caps.put(diamond, 2f);
@@ -52,7 +53,7 @@ public class TileEntityCelestialPrism extends TileEntityObelisk implements IMult
 		structure.addAllowedBlock(glass, -2, 2, -2, Blocks.glass);
 		structure.addAllowedBlock(gold, -2, 2, -2, Blocks.gold_block);
 		structure.addAllowedBlock(diamond, -2, 2, -2, Blocks.diamond_block);
-		structure.addAllowedBlock(moonstone, -2, 2, -2, BlocksCommonProxy.AMOres, BlocksCommonProxy.AMOres.META_MOONSTONE_BLOCK);
+		structure.addAllowedBlock(moonstone, -2, 2, -2, BlocksCommonProxy.AMOres, BlockAMOre.META_MOONSTONE_BLOCK);
 
 		structure.addAllowedBlock(pillars, 2, 0, -2, Blocks.quartz_block);
 		structure.addAllowedBlock(pillars, 2, 1, -2, Blocks.quartz_block);
@@ -60,7 +61,7 @@ public class TileEntityCelestialPrism extends TileEntityObelisk implements IMult
 		structure.addAllowedBlock(glass, 2, 2, -2, Blocks.glass);
 		structure.addAllowedBlock(gold, 2, 2, -2, Blocks.gold_block);
 		structure.addAllowedBlock(diamond, 2, 2, -2, Blocks.diamond_block);
-		structure.addAllowedBlock(moonstone, 2, 2, -2, BlocksCommonProxy.AMOres, BlocksCommonProxy.AMOres.META_MOONSTONE_BLOCK);
+		structure.addAllowedBlock(moonstone, 2, 2, -2, BlocksCommonProxy.AMOres, BlockAMOre.META_MOONSTONE_BLOCK);
 
 		structure.addAllowedBlock(pillars, -2, 0, 2, Blocks.quartz_block);
 		structure.addAllowedBlock(pillars, -2, 1, 2, Blocks.quartz_block);
@@ -68,7 +69,7 @@ public class TileEntityCelestialPrism extends TileEntityObelisk implements IMult
 		structure.addAllowedBlock(glass, -2, 2, 2, Blocks.glass);
 		structure.addAllowedBlock(gold, -2, 2, 2, Blocks.gold_block);
 		structure.addAllowedBlock(diamond, -2, 2, 2, Blocks.diamond_block);
-		structure.addAllowedBlock(moonstone, -2, 2, 2, BlocksCommonProxy.AMOres, BlocksCommonProxy.AMOres.META_MOONSTONE_BLOCK);
+		structure.addAllowedBlock(moonstone, -2, 2, 2, BlocksCommonProxy.AMOres, BlockAMOre.META_MOONSTONE_BLOCK);
 
 		structure.addAllowedBlock(pillars, 2, 0, 2, Blocks.quartz_block);
 		structure.addAllowedBlock(pillars, 2, 1, 2, Blocks.quartz_block);
@@ -76,7 +77,7 @@ public class TileEntityCelestialPrism extends TileEntityObelisk implements IMult
 		structure.addAllowedBlock(glass, 2, 2, 2, Blocks.glass);
 		structure.addAllowedBlock(gold, 2, 2, 2, Blocks.gold_block);
 		structure.addAllowedBlock(diamond, 2, 2, 2, Blocks.diamond_block);
-		structure.addAllowedBlock(moonstone, 2, 2, 2, BlocksCommonProxy.AMOres, BlocksCommonProxy.AMOres.META_MOONSTONE_BLOCK);
+		structure.addAllowedBlock(moonstone, 2, 2, 2, BlocksCommonProxy.AMOres, BlockAMOre.META_MOONSTONE_BLOCK);
 
 		wizardChalkCircle = addWizChalkGroupToStructure(structure, 1);
 	}
@@ -98,10 +99,7 @@ public class TileEntityCelestialPrism extends TileEntityObelisk implements IMult
 			for (StructureGroup cap : caps.keySet()){
 				if (group == cap){
 					capsLevel = caps.get(cap);
-					if (group == moonstone)
-						onlyChargeAtNight = true;
-					else
-						onlyChargeAtNight = false;
+					onlyChargeAtNight = group == moonstone;
 					break;
 				}
 			}

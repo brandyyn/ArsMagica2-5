@@ -4,6 +4,7 @@ import am2.AMCore;
 import am2.EntityItemWatcher;
 import am2.LogHelper;
 import am2.MeteorSpawnHelper;
+import am2.api.items.armor.IManaGoggle;
 import am2.api.math.AMVector3;
 import am2.api.power.IPowerNode;
 import am2.api.power.PowerTypes;
@@ -114,7 +115,6 @@ public class ClientTickHandler{
 			ArcaneCompendium.instance.loadUnlockData();
 			compendiumLoad = false;
 		}
-		AMCore.proxy.itemFrameWatcher.checkWatchedFrames();
 	}
 
 	private void applyDeferredPotionEffects(){
@@ -210,12 +210,12 @@ public class ClientTickHandler{
 								TileEntity teStart = Minecraft.getMinecraft().theWorld.getTileEntity((int)start.x, (int)start.y, (int)start.z);
 								TileEntity teEnd = Minecraft.getMinecraft().theWorld.getTileEntity((int)end.x, (int)end.y, (int)end.z);
 
-								if (teEnd == null || !(teEnd instanceof IPowerNode))
+								if (!(teEnd instanceof IPowerNode))
 									break;
 
-								double startX = start.x + ((teStart != null && teStart instanceof IPowerNode) ? ((IPowerNode)teStart).particleOffset(0) : 0.5f);
-								double startY = start.y + ((teStart != null && teStart instanceof IPowerNode) ? ((IPowerNode)teStart).particleOffset(1) : 0.5f);
-								double startZ = start.z + ((teStart != null && teStart instanceof IPowerNode) ? ((IPowerNode)teStart).particleOffset(2) : 0.5f);
+								double startX = start.x + ((teStart instanceof IPowerNode) ? ((IPowerNode)teStart).particleOffset(0) : 0.5f);
+								double startY = start.y + ((teStart instanceof IPowerNode) ? ((IPowerNode)teStart).particleOffset(1) : 0.5f);
+								double startZ = start.z + ((teStart instanceof IPowerNode) ? ((IPowerNode)teStart).particleOffset(2) : 0.5f);
 
 								double endX = end.x + ((IPowerNode)teEnd).particleOffset(0);
 								double endY = end.y + ((IPowerNode)teEnd).particleOffset(1);
@@ -274,7 +274,6 @@ public class ClientTickHandler{
 					byte subID = 0;
 					if (this.mouseWheelValue < 0){
 						isb.SetNextSlot(Minecraft.getMinecraft().thePlayer.getCurrentEquippedItem());
-						subID = ItemSpellBook.ID_NEXT_SPELL;
 					}else{
 						isb.SetPrevSlot(Minecraft.getMinecraft().thePlayer.getCurrentEquippedItem());
 						subID = ItemSpellBook.ID_PREV_SPELL;
@@ -336,17 +335,14 @@ public class ClientTickHandler{
 	public void onClientTick(TickEvent.ClientTickEvent event){
 		if (event.phase == TickEvent.Phase.START){
 			GuiScreen guiscreen = Minecraft.getMinecraft().currentScreen;
-			if (guiscreen != null){
-			}else{
+			if (guiscreen == null){
 				gameTick_Start();
 			}
 		}else if (event.phase == TickEvent.Phase.END){
 			GuiScreen guiscreen = Minecraft.getMinecraft().currentScreen;
-			if (guiscreen != null){
-			}else{
+			if (guiscreen == null){
 				gameTick_End();
 			}
-
 			if (Minecraft.getMinecraft().theWorld != null)
 				spawnPowerPathVisuals();
 		}
@@ -386,7 +382,7 @@ public class ClientTickHandler{
 
 			if (Minecraft.getMinecraft().theWorld != null) {
 				//update lingering spells
-				if (lingeringSpellList.size() > 0){
+				if (!lingeringSpellList.isEmpty()){
 					SpellHelper.LingeringSpell[] toRemove = new SpellHelper.LingeringSpell[lingeringSpellList.size()];
 					for (int i = 0; i < lingeringSpellList.size(); i++){
 						boolean toRemoveThis = lingeringSpellList.get(i).doUpdate();
@@ -394,9 +390,9 @@ public class ClientTickHandler{
 						else toRemove[i] = null;
 					}
 
-					for (int j = 0; j < toRemove.length; j++){
-						if (toRemove[j] != null){
-							lingeringSpellList.remove(toRemove[j]);
+					for (SpellHelper.LingeringSpell lingeringSpell : toRemove){
+						if (lingeringSpell != null){
+							lingeringSpellList.remove(lingeringSpell);
 						}
 					}
 				}
@@ -480,7 +476,7 @@ public class ClientTickHandler{
 		if (delayEquipmentCheck == 20) {
 			delayEquipmentCheck = 0;
 			hasPathsVisuals = player.getCurrentArmor(3) != null &&
-					(player.getCurrentArmor(3).getItem() == ItemsCommonProxy.magitechGoggles ||
+					(player.getCurrentArmor(3).getItem() instanceof IManaGoggle ||
 							ArmorHelper.isInfusionPreset(player.getCurrentArmor(3), GenericImbuement.magitechGoggleIntegration));
 		}
 		return hasPathsVisuals;

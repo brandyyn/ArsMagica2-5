@@ -1,5 +1,6 @@
 package am2.spell.modifiers;
 
+import net.minecraft.client.entity.EntityOtherPlayerMP;
 import am2.api.spell.component.interfaces.ISpellModifier;
 import am2.api.spell.enums.SpellModifiers;
 import am2.items.ItemsCommonProxy;
@@ -26,6 +27,7 @@ public class Lunar implements ISpellModifier{
 	@SuppressWarnings("incomplete-switch")
 	@Override
 	public float getModifier(SpellModifiers type, EntityLivingBase caster, Entity target, World world, byte[] metadata){
+		if(world.isRemote && caster instanceof EntityOtherPlayerMP) return 0;
 		ExtendedProperties properties = ExtendedProperties.For(caster);
 		float manaRatio = properties.getCurrentMana() / properties.getMaxMana();
 		float spellBonus = getSpellTypeBonus(type);

@@ -4,22 +4,23 @@ import am2.AMCore;
 import am2.LogHelper;
 import com.google.common.collect.ArrayListMultimap;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 
 import java.util.ArrayList;
 
 public class SpawnBlacklists{
-	private static ArrayListMultimap<Integer, Class> blacklistedDimensionSpawns = ArrayListMultimap.create();
-	private static ArrayListMultimap<Integer, Class> blacklistedBiomeSpawns = ArrayListMultimap.create();
-	private static ArrayList<Integer> blacklistedWorldgenDimensions = new ArrayList<Integer>();
-	private static ArrayList<Class> progenyBlacklist = new ArrayList<Class>();
-	private static ArrayList<Class> butcheryBlacklist = new ArrayList<Class>();
+	private static final ArrayListMultimap<Integer, Class<? extends EntityLivingBase>> blacklistedDimensionSpawns = ArrayListMultimap.create();
+	private static final ArrayListMultimap<Integer, Class<? extends EntityLivingBase>> blacklistedBiomeSpawns = ArrayListMultimap.create();
+	private static final ArrayList<Integer> blacklistedWorldgenDimensions = new ArrayList<>();
+	private static final ArrayList<Class<? extends EntityAnimal>> progenyBlacklist = new ArrayList<>();
+	private static final ArrayList<Class<? extends EntityAnimal>> butcheryBlacklist = new ArrayList<>();
 
 	public static void addBlacklistedDimensionSpawn(String entityClass, Integer dimensionID){
-		Class clazz;
+		Class<? extends EntityLivingBase> clazz;
 		try{
-			clazz = Class.forName(entityClass);
+			clazz = Class.forName(entityClass).asSubclass(EntityLivingBase.class);
 			blacklistedDimensionSpawns.put(dimensionID, clazz);
 			LogHelper.info("Blacklisted %s from spawning in dimension %d.", entityClass, dimensionID);
 		}catch (ClassNotFoundException e){
@@ -28,9 +29,9 @@ public class SpawnBlacklists{
 	}
 
 	public static void addBlacklistedBiomeSpawn(String entityClass, Integer biomeID){
-		Class clazz;
+		Class<? extends EntityLivingBase> clazz;
 		try{
-			clazz = Class.forName(entityClass);
+			clazz = Class.forName(entityClass).asSubclass(EntityLivingBase.class);
 			blacklistedBiomeSpawns.put(biomeID, clazz);
 			LogHelper.info("Blacklisted %s from spawning in biome %d.", entityClass, biomeID);
 		}catch (ClassNotFoundException e){
@@ -44,8 +45,7 @@ public class SpawnBlacklists{
 		BiomeGenBase biome = world.getBiomeGenForCoords((int)x, (int)z);
 		if (blacklistedBiomeSpawns.containsEntry(biome.biomeID, entity.getClass()))
 			return false;
-		if (!getPermanentBlacklistValue(world, entity)) return false;
-		return true;
+		return getPermanentBlacklistValue(world, entity);
 	}
 
 	public static boolean getPermanentBlacklistValue(World world, EntityLivingBase entity){
@@ -68,21 +68,21 @@ public class SpawnBlacklists{
 		return !blacklistedWorldgenDimensions.contains(dimensionID);
 	}
 
-	public static void addButcheryBlacklist(Class clazz){
+	public static void addButcheryBlacklist(Class<? extends EntityAnimal> clazz){
 		if (!butcheryBlacklist.contains(clazz))
 			butcheryBlacklist.add(clazz);
 	}
 
-	public static void addProgenyBlacklist(Class clazz){
+	public static void addProgenyBlacklist(Class<? extends EntityAnimal> clazz){
 		if (!progenyBlacklist.contains(clazz))
 			progenyBlacklist.add(clazz);
 	}
 
-	public static boolean canButcheryAffect(Class clazz){
+	public static boolean canButcheryAffect(Class<? extends EntityAnimal> clazz){
 		return !butcheryBlacklist.contains(clazz);
 	}
 
-	public static boolean canProgenyAffect(Class clazz){
+	public static boolean canProgenyAffect(Class<? extends EntityAnimal> clazz){
 		return !progenyBlacklist.contains(clazz);
 	}
 }

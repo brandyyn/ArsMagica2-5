@@ -1,25 +1,12 @@
 package am2.blocks;
 
-import am2.AMCore;
-import am2.blocks.tileentities.TileEntityCandle;
 import am2.blocks.tileentities.TileEntityInfusedStem;
 import am2.lore.CompendiumUnlockHandler;
-import am2.particles.AMParticle;
-import am2.particles.ParticleExpandingCollapsingRingAtPoint;
-import am2.particles.ParticleFadeOut;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
-
-import java.util.List;
-import java.util.Random;
 
 public class BlockInfusedStem extends AMFlower implements ITileEntityProvider {
 

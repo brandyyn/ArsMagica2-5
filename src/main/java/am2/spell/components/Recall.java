@@ -9,6 +9,8 @@ import am2.api.spell.component.interfaces.IRitualInteraction;
 import am2.api.spell.component.interfaces.ISpellComponent;
 import am2.api.spell.enums.Affinity;
 import am2.buffs.BuffList;
+import am2.items.ItemOre;
+import am2.items.ItemRune;
 import am2.items.ItemsCommonProxy;
 import am2.particles.AMParticle;
 import am2.particles.ParticleExpandingCollapsingRingAtPoint;
@@ -82,7 +84,7 @@ public class Recall implements ISpellComponent, IRitualInteraction{
 
 		boolean hasVinteumDust = false;
 		for (ItemStack stack : ritualRunes){
-			if (stack.getItem() == ItemsCommonProxy.itemOre && stack.getItemDamage() == ItemsCommonProxy.itemOre.META_VINTEUMDUST){
+			if (stack.getItem() == ItemsCommonProxy.itemOre && stack.getItemDamage() == ItemOre.META_VINTEUMDUST){
 				hasVinteumDust = true;
 				break;
 			}
@@ -108,7 +110,7 @@ public class Recall implements ISpellComponent, IRitualInteraction{
 					copy.add(stack);
 				}
 			}
-			ItemStack[] newRunes = copy.toArray(new ItemStack[copy.size()]);
+			ItemStack[] newRunes = copy.toArray(new ItemStack[0]);
 			long key = KeystoneUtilities.instance.getKeyFromRunes(newRunes);
 			EntityPlayer player = EntityUtilities.getPlayerForCombo(world, (int)key);
 			if (player == null){
@@ -116,7 +118,7 @@ public class Recall implements ISpellComponent, IRitualInteraction{
 					((EntityPlayer)caster).addChatMessage(new ChatComponentText("am2.tooltip.noMatchingPlayer"));
 				return false;
 			}else if (player == caster){
-				if (caster instanceof EntityPlayer && !world.isRemote)
+				if (!world.isRemote)
 					((EntityPlayer)caster).addChatMessage(new ChatComponentText("am2.tooltip.cantSummonSelf"));
 				return false;
 			}else{
@@ -170,7 +172,7 @@ public class Recall implements ISpellComponent, IRitualInteraction{
 	@Override
 	public Object[] getRecipeItems(){
 		return new Object[]{
-				new ItemStack(ItemsCommonProxy.rune, 1, ItemsCommonProxy.rune.META_ORANGE),
+				new ItemStack(ItemsCommonProxy.rune, 1, ItemRune.META_ORANGE),
 				Items.compass,
 				new ItemStack(Items.map, 1, Short.MAX_VALUE),
 				Items.ender_pearl

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 
 public class GuiArmorImbuer extends GuiContainer{
 
-	private TileEntityArmorImbuer tileEntity;
+	private final TileEntityArmorImbuer tileEntity;
 
 	private static final ResourceLocation foreground = new ResourceLocation("arsmagica2", ResourceManager.GetGuiTexturePath("ArmorUpgradeGUI.png"));
 	private static final ResourceLocation background = new ResourceLocation("arsmagica2", ResourceManager.GetGuiTexturePath("ArmorUpgradeGUIIcons.png"));
@@ -93,7 +93,6 @@ public class GuiArmorImbuer extends GuiContainer{
 				drawX = startX;
 			}
 
-			drawX = startX;
 			drawY = startY;
 
 			int highestSelectedTier = 0;
@@ -136,17 +135,12 @@ public class GuiArmorImbuer extends GuiContainer{
 		mc.renderEngine.bindTexture(foreground);
 		drawTexturedModalRect(l, i1, 0, 0, xSize, ySize);
 
-		if (hoverLines.size() > 0)
-			AMGuiHelper.instance.drawHoveringText(hoverLines, i, j, fontRendererObj, width, height);
+		if (!hoverLines.isEmpty())
+			AMGuiHelper.drawHoveringText(hoverLines, i, j, fontRendererObj, width, height);
 	}
 
 	private void drawInfusionIconAt(int x, int y, int index){
-		drawTexturedModalRect(x, y, (index % 5) * spriteWidth, (int)Math.floor(index / 5) * spriteHeight, spriteWidth, spriteHeight);
-	}
-
-	@Override
-	protected void drawGuiContainerForegroundLayer(int par1, int par2){
-
+		drawTexturedModalRect(x, y, (index % 5) * spriteWidth, (int)(double)(index / 5) * spriteHeight, spriteWidth, spriteHeight);
 	}
 
 }

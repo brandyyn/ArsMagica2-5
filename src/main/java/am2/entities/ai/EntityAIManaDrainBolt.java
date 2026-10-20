@@ -11,8 +11,6 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 
-import java.util.Random;
-
 public class EntityAIManaDrainBolt extends EntityAIBase{
 
 	World worldObj;

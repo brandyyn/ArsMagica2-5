@@ -1,7 +1,6 @@
 package am2.api.items;
 
 import am2.api.blocks.IKeystoneLockable;
-import am2.api.items.KeystoneAccessType;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;

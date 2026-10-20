@@ -19,7 +19,6 @@ import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntityEnchantmentTable;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public class TileEntityLectern extends TileEntityEnchantmentTable{
 	private ItemStack stack;

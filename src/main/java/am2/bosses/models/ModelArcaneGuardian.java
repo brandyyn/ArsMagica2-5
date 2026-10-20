@@ -1,6 +1,5 @@
 package am2.bosses.models;
 
-import am2.armor.ArmorEventHandler;
 import am2.bosses.EntityArcaneGuardian;
 import am2.entities.renderers.AM2ModelRenderer;
 import net.minecraft.client.model.ModelBase;

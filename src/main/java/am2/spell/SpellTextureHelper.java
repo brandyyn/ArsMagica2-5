@@ -38,7 +38,7 @@ public class SpellTextureHelper{
 		List<String> resources;
 		try{
 			resources = getResourceListing();
-			if (resources.size() == 0){
+			if (resources.isEmpty()){
 				LogHelper.error("No spell IIcons found?!?");
 			}else{
 				LogHelper.info("Located %d spell IIcons", resources.size());
@@ -71,14 +71,14 @@ public class SpellTextureHelper{
 					JarEntry entry = entries.nextElement();
 					if (entry.getName().startsWith("assets/arsmagica2/textures/items/spells/icons/")){
 						String name = entry.getName().replace("assets/arsmagica2/textures/items/spells/icons/", "");
-						if (name.equals("")) continue;
+						if (name.isEmpty()) continue;
 						toReturn.add("spells/icons/" + name.replace(".png", ""));
 					}
 				}
 				jarFile.close();
 			}else if (jar.getProtocol().equals("file")){
 				String path = (Util.getOSType() == Util.EnumOS.LINUX ? "/" : "") + jar.toURI().toString().replace("/am2/AMCore.class", iconsPath).replace("file:/", "").replace("%20", " ").replace('/', File.separatorChar);
-				System.out.println(path);
+				LogHelper.debug(path);
 				File file = new File(path);
 				if (file.exists() && file.isDirectory()){
 					for (File sub : file.listFiles()){
@@ -87,7 +87,7 @@ public class SpellTextureHelper{
 				}
 			}
 		}
-		Collections.sort(toReturn, String.CASE_INSENSITIVE_ORDER);
+		toReturn.sort(String.CASE_INSENSITIVE_ORDER);
 
 		return toReturn;
 	}

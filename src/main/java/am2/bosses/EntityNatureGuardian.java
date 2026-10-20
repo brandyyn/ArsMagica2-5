@@ -5,6 +5,8 @@ import am2.bosses.ai.*;
 import am2.damage.DamageSourceFire;
 import am2.damage.DamageSourceFrost;
 import am2.damage.DamageSources;
+import am2.items.ItemEssence;
+import am2.items.ItemRune;
 import am2.items.ItemsCommonProxy;
 import am2.network.AMNetHandler;
 import am2.particles.AMParticle;
@@ -66,7 +68,7 @@ public class EntityNatureGuardian extends AM2Boss{
 		this.tasks.addTask(1, new EntityAICastSpell(this, NPCSpells.instance.dispel, 16, 23, 50, BossActions.CASTING, new ISpellCastCallback<EntityNatureGuardian>(){
 			@Override
 			public boolean shouldCast(EntityNatureGuardian host, ItemStack spell){
-				return host.getActivePotionEffects().size() > 0;
+				return !host.getActivePotionEffects().isEmpty();
 			}
 		}));
 		this.tasks.addTask(3, new EntityAIPlantGuardianThrowSickle(this, 0.75f));
@@ -79,6 +81,7 @@ public class EntityNatureGuardian extends AM2Boss{
 	public void onUpdate(){
 		if (worldObj.isRemote){
 			updateMovementAngles();
+			if(rand.nextInt(2) == 0)
 			spawnParticles();
 		}
 		super.onUpdate();
@@ -90,7 +93,7 @@ public class EntityNatureGuardian extends AM2Boss{
 	}
 
 	private void spawnParticles(){
-		AMParticle leaf = (AMParticle)AMCore.proxy.particleManager.spawn(worldObj, "leaf", posX + (rand.nextDouble() * 3) - 1.5f, posY + (rand.nextDouble() * 5f), posZ + (rand.nextDouble() * 3) - 1.5f);
+		AMParticle leaf = (AMParticle)AMCore.proxy.particleManager.spawn(worldObj, "leaf", posX + (rand.nextDouble() * 5) - 2.5f, posY + (rand.nextDouble() * 5f), posZ + (rand.nextDouble() * 5) - 2.5f);
 		if (leaf != null){
 			leaf.setMaxAge(20);
 			leaf.setIgnoreMaxAge(false);
@@ -156,12 +159,12 @@ public class EntityNatureGuardian extends AM2Boss{
 	@Override
 	protected void dropFewItems(boolean par1, int par2){
 		if (par1)
-			this.entityDropItem(new ItemStack(ItemsCommonProxy.rune, 1, ItemsCommonProxy.rune.META_INF_ORB_RED), 0.0f);
+			this.entityDropItem(new ItemStack(ItemsCommonProxy.rune, 1, ItemRune.META_INF_ORB_RED), 0.0f);
 
 		int i = rand.nextInt(4);
 
 		for (int j = 0; j < i; j++){
-			this.entityDropItem(new ItemStack(ItemsCommonProxy.essence, 1, ItemsCommonProxy.essence.META_NATURE), 0.0f);
+			this.entityDropItem(new ItemStack(ItemsCommonProxy.essence, 1, ItemEssence.META_NATURE), 0.0f);
 		}
 
 		i = rand.nextInt(10);

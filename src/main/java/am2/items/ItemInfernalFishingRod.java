@@ -1,6 +1,5 @@
 package am2.items;
 
-import am2.entities.EntityFishHookArcane;
 import am2.entities.EntityFishHookInfernal;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;

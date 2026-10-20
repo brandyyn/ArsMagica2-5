@@ -10,7 +10,6 @@ import am2.entities.ai.selectors.SummonEntitySelector;
 import am2.items.ItemCrystalPhylactery;
 import am2.items.ItemsCommonProxy;
 import am2.playerextensions.ExtendedProperties;
-import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
@@ -38,8 +37,8 @@ import java.util.HashMap;
 import java.util.List;
 
 public class EntityUtilities{
-	private static final HashMap<Integer, ArrayList> storedTasks = new HashMap<Integer, ArrayList>();
-	private static final HashMap<Integer, ArrayList> storedAITasks = new HashMap<Integer, ArrayList>();
+	private static final HashMap<Integer, ArrayList> storedTasks = new HashMap<>();
+	private static final HashMap<Integer, ArrayList> storedAITasks = new HashMap<>();
 	private static final String isSummonKey = "AM2_Entity_Is_Made_Summon";
 	private static final String summonEntityIDs = "AM2_Summon_Entity_IDs";
 	private static final String summonDurationKey = "AM2_Summon_Duration";
@@ -48,7 +47,7 @@ public class EntityUtilities{
 	private static final String summonTileYKey = "AM2_Summon_Tile_Y";
 	private static final String summonTileZKey = "AM2_Summon_Tile_Z";
 
-	private static Method ptrSetSize = null;
+	private final static Method ptrSetSize = null;
 
 	public static boolean isAIEnabled(EntityCreature ent){
 		Method m = null;
@@ -151,11 +150,11 @@ public class EntityUtilities{
 		}
 	}
 
-	public static boolean revertAI(EntityCreature entityliving){
+	public static void revertAI(EntityCreature entityliving){
 
 		int ownerID = getOwner(entityliving);
 		Entity owner = entityliving.worldObj.getEntityByID(ownerID);
-		if (owner != null && owner instanceof EntityLivingBase){
+		if (owner instanceof EntityLivingBase){
 			ExtendedProperties.For((EntityLivingBase)owner).removeSummon();
 			if (ExtendedProperties.For((EntityLivingBase)owner).isManaLinkedTo(entityliving)){
 				ExtendedProperties.For((EntityLivingBase)owner).updateManaLink(entityliving);
@@ -190,10 +189,8 @@ public class EntityUtilities{
 			if (entityliving instanceof EntityTameable){
 				((EntityTameable)entityliving).setTamed(false);
 			}
-			return true;
 		}
 
-		return false;
 	}
 
 	public static boolean isSummon(EntityLivingBase entityliving){
@@ -221,14 +218,13 @@ public class EntityUtilities{
 	}
 
 	public static boolean isTileSpawnedAndValid(EntityLivingBase entityliving){
-		Integer tileX = entityliving.getEntityData().getInteger(summonTileXKey);
-		Integer tileY = entityliving.getEntityData().getInteger(summonTileYKey);
-		Integer tileZ = entityliving.getEntityData().getInteger(summonTileZKey);
-		if (tileX == null || tileY == null || tileZ == null) return false;
+		int tileX = entityliving.getEntityData().getInteger(summonTileXKey);
+		int tileY = entityliving.getEntityData().getInteger(summonTileYKey);
+		int tileZ = entityliving.getEntityData().getInteger(summonTileZKey);
 
 		TileEntity te = entityliving.worldObj.getTileEntity(tileX, tileY, tileZ);
 
-		return te != null && te instanceof TileEntitySummoner;
+		return te instanceof TileEntitySummoner;
 	}
 
 	public static void setGuardSpawnLocation(EntityCreature entity, double x, double y, double z){
@@ -239,37 +235,60 @@ public class EntityUtilities{
 
 	public static int getOwner(EntityLivingBase entityliving){
 		if (!isSummon(entityliving)) return -1;
-		Integer ownerID = entityliving.getEntityData().getInteger(summonOwnerKey);
-		return ownerID == null ? -1 : ownerID;
+		return entityliving.getEntityData().getInteger(summonOwnerKey);
 	}
 
 	public static float[] getSize(EntityLivingBase entityliving){
 		float[] ret = new float[2];
-		ret[0] = ReflectionHelper.getPrivateValue(Entity.class, entityliving, "field_70130_N", "width");
-		ret[1] = ReflectionHelper.getPrivateValue(Entity.class, entityliving, "field_70131_O", "height");
+		ret[0] = entityliving.width;
+		ret[1] = entityliving.height;
 		return ret;
 	}
+	/*from net.minecraft.entity */
+	public static void setSize(EntityLivingBase entity,float p_70105_1_, float p_70105_2_)
+	{
+		float f2;
 
-	public static void setSize(EntityLivingBase entityliving, float width, float height){
-		if (entityliving.width == width && entityliving.height == height)
-			return;
-		if (ptrSetSize == null){
-			try{
-				ptrSetSize = ReflectionHelper.findMethod(Entity.class, entityliving, new String[]{"func_70105_a", "setSize"}, Float.TYPE, Float.TYPE);
-			}catch (Throwable t){
-				t.printStackTrace();
-				return;
+		if (p_70105_1_ != entity.width || p_70105_2_ != entity.height)
+		{
+			f2 = entity.width;
+			entity.width = p_70105_1_;
+			entity.height = p_70105_2_;
+			entity.boundingBox.maxX = entity.boundingBox.minX + (double)entity.width;
+			entity.boundingBox.maxZ = entity.boundingBox.minZ + (double)entity.width;
+			entity.boundingBox.maxY = entity.boundingBox.minY + (double)entity.height;
+
+			if (entity.width > f2 &&  !entity.worldObj.isRemote)
+			{
+				entity.moveEntity(f2 - entity.width, 0.0D, f2 - entity.width);
 			}
 		}
-		if (ptrSetSize != null){
-			try{
-				ptrSetSize.setAccessible(true);
-				ptrSetSize.invoke(entityliving, width, height);
-				entityliving.yOffset = entityliving.height * 0.8f;
-			}catch (Throwable t){
-				t.printStackTrace();
-				return;
+
+		f2 = p_70105_1_ % 2.0F;
+
+		if ((double)f2 < 0.375D)
+		{
+			entity.myEntitySize = Entity.EnumEntitySize.SIZE_1;
 			}
+		else if ((double)f2 < 0.75D)
+		{
+			entity.myEntitySize = Entity.EnumEntitySize.SIZE_2;
+		}
+		else if ((double)f2 < 1.0D)
+		{
+			entity.myEntitySize = Entity.EnumEntitySize.SIZE_3;
+		}
+		else if ((double)f2 < 1.375D)
+		{
+			entity.myEntitySize = Entity.EnumEntitySize.SIZE_4;
+		}
+		else if ((double)f2 < 1.75D)
+		{
+			entity.myEntitySize = Entity.EnumEntitySize.SIZE_5;
+		}
+		else
+		{
+			entity.myEntitySize = Entity.EnumEntitySize.SIZE_6;
 		}
 	}
 
@@ -350,7 +369,7 @@ public class EntityUtilities{
 		// since we already calculate the player's total XP here,
 		// we may as well do the zero check and pass the result (how much was actually deducted) back
 		// there's no sense in duplicating work
-		int removedXP = effectiveTotal >= amount ? amount : effectiveTotal;
+		int removedXP = Math.min(effectiveTotal, amount);
 		
 		int newTotal = effectiveTotal - amount;
 		if(newTotal < 0)

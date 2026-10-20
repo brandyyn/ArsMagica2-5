@@ -59,7 +59,7 @@ public class BlockCraftingAltar extends PoweredBlock{
 
 		TileEntity te = world.getTileEntity(x, y, z);
 
-		if (te == null || !(te instanceof TileEntityCraftingAltar) || !((TileEntityCraftingAltar)te).structureValid())
+		if (!(te instanceof TileEntityCraftingAltar) || !((TileEntityCraftingAltar)te).structureValid())
 			return this;
 
 		Block[] blocks = new Block[4];
@@ -99,7 +99,7 @@ public class BlockCraftingAltar extends PoweredBlock{
 	public boolean onBlockActivated(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer, int par6, float par7, float par8, float par9){
 		if (super.onBlockActivated(par1World, par2, par3, par4, par5EntityPlayer, par6, par7, par8, par9)){
 			TileEntity te = par1World.getTileEntity(par2, par3, par4);
-			if (te != null && te instanceof TileEntityCraftingAltar){
+			if (te instanceof TileEntityCraftingAltar){
 				((TileEntityCraftingAltar)te).deactivate();
 			}
 			return false;

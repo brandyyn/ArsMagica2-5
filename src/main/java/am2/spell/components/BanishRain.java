@@ -31,7 +31,7 @@ public class BanishRain implements ISpellComponent, IRitualInteraction{
 			return true;
 		}
 		if (!world.isRaining()) return false;
-		world.getWorldInfo().setRainTime(24000);
+		world.getWorldInfo().setRainTime(0);
 		world.getWorldInfo().setRaining(false);
 		return true;
 	}
@@ -46,7 +46,7 @@ public class BanishRain implements ISpellComponent, IRitualInteraction{
 			return true;
 		}
 		if (!world.isRaining()) return false;
-		world.getWorldInfo().setRainTime(24000);
+		world.getWorldInfo().setRainTime(0);
 		world.getWorldInfo().setRaining(false);
 		return true;
 	}

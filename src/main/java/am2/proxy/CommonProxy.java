@@ -7,13 +7,14 @@ import am2.api.power.IPowerNode;
 import am2.api.power.PowerTypes;
 import am2.armor.ArmorEventHandler;
 import am2.armor.infusions.*;
+import am2.blocks.BlockAMOre;
 import am2.blocks.BlocksCommonProxy;
 import am2.blocks.tileentities.TileEntityParticleEmitter;
 import am2.buffs.BuffList;
-import am2.configuration.AMConfig;
 import am2.enchantments.AMEnchantments;
 import am2.entities.EntityManager;
 import am2.entities.ai.MageVillagerTrade;
+import am2.items.ItemOre;
 import am2.items.ItemsCommonProxy;
 import am2.network.AMNetHandler;
 import am2.network.AMPacketProcessorServer;
@@ -56,18 +57,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-public class CommonProxy{
-	private ArrayList<AMVector3> pendingFlickerLinks;
+import static am2.blocks.BlocksCommonProxy.AMOres;
 
+public class CommonProxy{
+
+	private ArrayList<AMVector3> pendingFlickerLinks;
 	public BlocksCommonProxy blocks;
 	public ItemsCommonProxy items;
-	public PlayerTracker playerTracker;
 	public static HashMap<String, String> teamHostility;
 	public ParticleManagerServer particleManager;
 	public NBTTagCompound cwCopyLoc;
 	public AM2WorldDecorator worldGen;
 	public AMEnchantments enchantments;
-
 	public ItemFrameWatcher itemFrameWatcher;
 	protected ProxyUtilitiesCommon utils;
 	public static EntityManager entities;
@@ -75,17 +76,16 @@ public class CommonProxy{
 
 	private ServerTickHandler serverTickHandler;
 
-	private HashMap<EntityLivingBase, ArrayList<PotionEffect>> deferredPotionEffects = new HashMap<EntityLivingBase, ArrayList<PotionEffect>>();
-	private HashMap<EntityLivingBase, Integer> deferredDimensionTransfers = new HashMap<EntityLivingBase, Integer>();
+	private final HashMap<EntityLivingBase, ArrayList<PotionEffect>> deferredPotionEffects = new HashMap<EntityLivingBase, ArrayList<PotionEffect>>();
+	private final HashMap<EntityLivingBase, Integer> deferredDimensionTransfers = new HashMap<EntityLivingBase, Integer>();
 
 	private int totalFlickerCount = 0;
 
 	public CommonProxy(){
-		teamHostility = new HashMap<String, String>();
-		playerTracker = new PlayerTracker();
+		teamHostility = new HashMap<>();
 		particleManager = new ParticleManagerServer();
 		itemFrameWatcher = new ItemFrameWatcher();
-		pendingFlickerLinks = new ArrayList<AMVector3>();
+		pendingFlickerLinks = new ArrayList<>();
 		cwCopyLoc = null;
 	}
 
@@ -93,8 +93,6 @@ public class CommonProxy{
 
 		blocks.setupSpellConstraints();
 		items.postInit();
-
-		playerTracker.postInit();
 		
 		BuffList.postInit();
 
@@ -107,6 +105,9 @@ public class CommonProxy{
 		FMLCommonHandler.instance().bus().register(new ArmorEventHandler());
 		MinecraftForge.EVENT_BUS.register(EntityManager.instance);
 		MinecraftForge.EVENT_BUS.register(new AMWorldEventHandler());
+		serverTickHandler = new ServerTickHandler();
+		FMLCommonHandler.instance().bus().register(new ServerTickHandler());
+		MinecraftForge.EVENT_BUS.register(new ServerTickHandler());
 
 		if (!SkillTreeManager.instance.isSkillDisabled(SkillManager.instance.getSkill("Shrink")))
 			MinecraftForge.EVENT_BUS.register(new ShrinkHandler());
@@ -114,7 +115,7 @@ public class CommonProxy{
 		MinecraftForge.EVENT_BUS.register(particleManager);
 		FMLCommonHandler.instance().bus().register(particleManager);
 
-		FMLCommonHandler.instance().bus().register(playerTracker);
+		FMLCommonHandler.instance().bus().register(new PlayerTracker());
 	}
 
 	public void preinit(){
@@ -131,9 +132,12 @@ public class CommonProxy{
 
 		blocks.InstantiateBlocks();
 		items.InstantiateItems();
+		blocks.RegisterBlocks();
+		blocks.RegisterTileEntities();
 
-		ObeliskFuelHelper.instance.registerFuelType(new ItemStack(ItemsCommonProxy.itemOre, 0, ItemsCommonProxy.itemOre.META_VINTEUMDUST), 200);
+		ObeliskFuelHelper.instance.registerFuelType(new ItemStack(ItemsCommonProxy.itemOre, 0, ItemOre.META_VINTEUMDUST), 200);
 		ObeliskFuelHelper.instance.registerFuelType(new ItemStack(ItemsCommonProxy.itemAMBucket, 0, Short.MAX_VALUE), 2000);
+		ObeliskFuelHelper.instance.registerFuelType(new ItemStack(AMOres, 0, BlockAMOre.META_VINTEUM_BLOCK), 2700);
 
 		EnervatorRecipeHelper.instance.registerRecipe(new ItemStack(Blocks.stonebrick), new ItemStack(Blocks.stonebrick, 1, 2));
 		EnervatorRecipeHelper.instance.registerRecipe(new ItemStack(Items.bone), new ItemStack(Items.dye, 1, 15));
@@ -159,8 +163,7 @@ public class CommonProxy{
 
 		registerInfusions();
 
-		blocks.RegisterBlocks();
-		blocks.RegisterTileEntities();
+
 	}
 
 	public void init(){
@@ -191,12 +194,6 @@ public class CommonProxy{
 	public void InitializeAndRegisterHandlers(){
 		guiManager = new ServerGuiManager();
 		NetworkRegistry.INSTANCE.registerGuiHandler(AMCore.instance, guiManager);
-
-		serverTickHandler = new ServerTickHandler();
-
-		FMLCommonHandler.instance().bus().register(serverTickHandler);
-		MinecraftForge.EVENT_BUS.register(serverTickHandler);
-
 		AMNetHandler.INSTANCE.registerChannels(new AMPacketProcessorServer());
 	}
 
@@ -209,7 +206,7 @@ public class CommonProxy{
 		}
 
 		chunks.add(pair);
-		RetroactiveWorldgenerator.instance.deferredChunkGeneration.put(dimensionID, chunks);
+		RetroactiveWorldgenerator.deferredChunkGeneration.put(dimensionID, chunks);
 	}
 
 	public void flashManaBar(){
@@ -271,13 +268,6 @@ public class CommonProxy{
 	}
 
 	public void renderGameOverlay(){
-	}
-
-	/* LOCALIZATION */
-	public void addName(Object obj, String s){
-	}
-
-	public void addLocalization(String s1, String string){
 	}
 
 	public String getItemStackDisplayName(ItemStack newStack){

@@ -9,6 +9,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
 
 public class ItemRuneBag extends Item{
@@ -20,7 +21,7 @@ public class ItemRuneBag extends Item{
 
 	@Override
 	public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer entityplayer){
-		if (entityplayer.isSneaking()){
+		if (!world.isRemote){
 			FMLNetworkHandler.openGui(entityplayer, AMCore.instance, ArsMagicaGuiIdList.GUI_RUNE_BAG, world, (int)entityplayer.posX, (int)entityplayer.posY, (int)entityplayer.posZ);
 		}
 		return stack;
@@ -31,54 +32,33 @@ public class ItemRuneBag extends Item{
 	}
 
 	public void UpdateStackTagCompound(ItemStack itemStack, ItemStack[] values){
-		if (itemStack.stackTagCompound == null){
-			itemStack.stackTagCompound = new NBTTagCompound();
+		NBTTagList stacks = new NBTTagList();
+		for(int slot = 0; slot < values.length; ++slot){
+			if(values[slot] != null){
+				NBTTagCompound item = new NBTTagCompound();
+				item.setByte("Slot",(byte) slot);
+				values[slot].writeToNBT(item);
+				stacks.appendTag(item);
+			}
 		}
-		for (int i = 0; i < values.length; ++i){
-			ItemStack stack = values[i];
-			if (stack == null){
-				itemStack.stackTagCompound.removeTag("runebagmeta" + i);
-				continue;
-			}else{
-				itemStack.stackTagCompound.setInteger("runebagmeta" + i, stack.getItemDamage());
+		itemStack.setTagInfo("Inventory", stacks);
+
+	}
+
+	public ItemStack[] ReadFromStackTagCompound(ItemStack item){
+		ItemStack[] stackList = new ItemStack[16];
+		if(item.hasTagCompound()) {
+			NBTTagList var2 = item.stackTagCompound.getTagList("Inventory", 10);
+
+			for(int var3 = 0; var3 < var2.tagCount(); ++var3) {
+				NBTTagCompound var4 = var2.getCompoundTagAt(var3);
+				int var5 = var4.getByte("Slot") & 255;
+				if(var5 >= 0 && var5 < stackList.length) {
+					stackList[var5] = ItemStack.loadItemStackFromNBT(var4);
 			}
 		}
 	}
-
-	@Override
-	public boolean getShareTag(){
-		return true;
-	}
-
-	public void UpdateStackTagCompound(ItemStack itemStack, InventoryRuneBag inventory){
-		if (itemStack.stackTagCompound == null){
-			itemStack.stackTagCompound = new NBTTagCompound();
-		}
-		for (int i = 0; i < inventory.getSizeInventory(); ++i){
-			ItemStack stack = inventory.getStackInSlot(i);
-			if (stack == null){
-				continue;
-			}else{
-				itemStack.stackTagCompound.setInteger("runebagmeta" + i, stack.getItemDamage());
-			}
-		}
-	}
-
-	public ItemStack[] ReadFromStackTagCompound(ItemStack itemStack){
-		if (itemStack.stackTagCompound == null){
-			return new ItemStack[InventoryRuneBag.inventorySize];
-		}
-		ItemStack[] items = new ItemStack[InventoryRuneBag.inventorySize];
-		for (int i = 0; i < items.length; ++i){
-			if (!itemStack.stackTagCompound.hasKey("runebagmeta" + i) || itemStack.stackTagCompound.getInteger("runebagmeta" + i) == -1){
-				items[i] = null;
-				continue;
-			}
-			int meta = 0;
-			meta = itemStack.stackTagCompound.getInteger("runebagmeta" + i);
-			items[i] = new ItemStack(ItemsCommonProxy.rune, 1, meta);
-		}
-		return items;
+		return stackList;
 	}
 
 	public InventoryRuneBag ConvertToInventory(ItemStack runeBagStack){

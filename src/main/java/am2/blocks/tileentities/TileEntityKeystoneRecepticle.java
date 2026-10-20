@@ -27,11 +27,9 @@ import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public class TileEntityKeystoneRecepticle extends TileEntityAMPower implements IInventory, IMultiblockStructureController, IKeystoneLockable{
 
@@ -125,7 +123,7 @@ public class TileEntityKeystoneRecepticle extends TileEntityAMPower implements I
 
 	@Override
 	public void invalidate(){
-		AMCore.instance.proxy.blocks.removeKeystonePortal(xCoord, yCoord, zCoord, worldObj.provider.dimensionId);
+		AMCore.proxy.blocks.removeKeystonePortal(xCoord, yCoord, zCoord, worldObj.provider.dimensionId);
 
 		if (!worldObj.isRemote){
 			AMChunkLoader.INSTANCE.releaseStaticChunkLoad(this.getClass(), this.xCoord, this.yCoord, this.zCoord, this.worldObj);

@@ -5,7 +5,6 @@ import am2.api.power.PowerTypes;
 import am2.blocks.tileentities.TileEntityAMPower;
 import am2.items.ItemsCommonProxy;
 import am2.power.PowerNodeRegistry;
-import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;

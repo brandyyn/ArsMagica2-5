@@ -1,14 +1,13 @@
 package am2.entities;
 
+import am2.items.ItemOre;
+import am2.items.ItemEssence;
 import am2.items.ItemsCommonProxy;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.*;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
@@ -125,7 +124,7 @@ public class EntityHallucination extends EntityMob {
     }
 
     protected void dropFewItems(boolean recentlyHit, int looting) {
-        if (rand.nextInt(3) == 0) this.entityDropItem(new ItemStack(ItemsCommonProxy.itemOre, 1, ItemsCommonProxy.itemOre.META_NIGHTMAREESSENCE), 0);
+        if (rand.nextInt(3) == 0) this.entityDropItem(new ItemStack(ItemsCommonProxy.itemOre, 1, ItemOre.META_NIGHTMAREESSENCE), 0);
     }
 
 

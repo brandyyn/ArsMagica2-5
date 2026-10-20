@@ -4,12 +4,11 @@ import am2.api.IAMRecipeManager;
 import am2.blocks.CraftingEssenceExtractor;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-
-import java.util.Map;
+import java.util.List;
 
 public abstract class RecipesArsMagica implements IAMRecipeManager{
 
-	protected Map RecipeList;
+	protected List<RecipeArsMagica> RecipeList;
 
 	@Override
 	public void addRefinerRecipe(ItemStack output, ItemStack[] components){
@@ -29,7 +28,7 @@ public abstract class RecipesArsMagica implements IAMRecipeManager{
 				return;
 			}
 		}
-		RecipeList.put(RecipeList.size(), newRecipe);
+		RecipeList.add( newRecipe);
 	}
 
 	public ItemStack GetResult(ItemStack[] items, EntityPlayer player){
@@ -76,10 +75,10 @@ public abstract class RecipesArsMagica implements IAMRecipeManager{
 	}
 
 	public RecipeArsMagica itemAt(int i){
-		return (RecipeArsMagica)RecipeList.get(Integer.valueOf(i));
+		return RecipeList.get(i);
 	}
 
-	public Map GetRecipeList(){
+	public List<RecipeArsMagica> GetRecipeList(){
 		return RecipeList;
 	}
 }

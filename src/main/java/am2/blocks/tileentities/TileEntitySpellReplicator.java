@@ -3,7 +3,6 @@ package am2.blocks.tileentities;
 import am2.AMCore;
 import am2.api.power.PowerTypes;
 import am2.items.SpellBase;
-import am2.network.AMNetHandler;
 import am2.particles.AMParticle;
 import am2.particles.ParticleHoldPosition;
 import am2.power.PowerNodeRegistry;
@@ -20,7 +19,6 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.common.util.Constants;
 

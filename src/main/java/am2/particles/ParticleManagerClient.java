@@ -1,6 +1,7 @@
 package am2.particles;
 
 import am2.AMCore;
+import am2.PlayerTracker;
 import am2.api.math.AMVector3;
 import am2.buffs.BuffList;
 import am2.codechicken.LightningBolt;
@@ -441,10 +442,10 @@ public class ParticleManagerClient extends ParticleManagerServer{
 		if (particleIndex == 31) //fix radiant particle's scaling issues...
 			particleScale /= 10;
 
-		if (ent.worldObj.isRemote && ent instanceof EntityPlayer && AMCore.proxy.playerTracker.hasAA((EntityPlayer)ent)){
+		if (ent.worldObj.isRemote && ent instanceof EntityPlayer && PlayerTracker.hasAA((EntityPlayer)ent)){
 			if (Minecraft.getMinecraft().thePlayer != ent || Minecraft.getMinecraft().gameSettings.thirdPersonView > 0){
 				if (AMParticle.particleTypes[particleIndex].startsWith("lightning_bolts")){
-					int type = Integer.parseInt(new String(new char[]{AMParticle.particleTypes[particleIndex].charAt(AMParticle.particleTypes[particleIndex].length() - 1)}));
+					int type = Integer.parseInt(String.valueOf(AMParticle.particleTypes[particleIndex].charAt(AMParticle.particleTypes[particleIndex].length() - 1)));
 					if (ent.worldObj.rand.nextInt(100) < 90){
 						BoltFromPointToPoint(ent.worldObj,
 								ent.posX + (ent.worldObj.rand.nextFloat() - 0.5f),
@@ -560,7 +561,7 @@ public class ParticleManagerClient extends ParticleManagerServer{
 	public ParticleController createDefaultParticleController(int type, Object eff, AMVector3 location, float modifier, int meta){
 		AMParticle effect = (AMParticle)eff;
 		switch (type){
-		default:
+
 		case 0: //fade
 			return new ParticleFadeOut(effect, 1, false).setFadeSpeed(0.02f * modifier);
 		case 1: //float
@@ -580,6 +581,8 @@ public class ParticleManagerClient extends ParticleManagerServer{
 			else if ((meta & ~0x8) == 1)
 				meta |= 0x2;
 			return new ParticleMoveOnHeading(effect, (meta & ~0x8) * 90, 0, 0.02f * modifier, 1, false);
+		default:
+			return new ParticleFadeOut(effect, 1, false).setFadeSpeed(0.02f * modifier);
 		}
 	}
 
@@ -587,7 +590,6 @@ public class ParticleManagerClient extends ParticleManagerServer{
 	public ParticleController createDefaultParticleController(int type, Object eff, EntityLivingBase ent){
 		AMParticle effect = (AMParticle)eff;
 		switch (type){
-		default:
 		case 0: //fade
 			return new ParticleFadeOut(effect, 1, false).setFadeSpeed(0.02f);
 		case 1: //float
@@ -602,6 +604,8 @@ public class ParticleManagerClient extends ParticleManagerServer{
 			return new ParticleFleeEntity(effect, ent, 0.05f, 2D, 1, false);
 		case 6: //forward
 			return new ParticleMoveOnHeading(effect, ent.rotationYaw + 90, ent.rotationPitch, 0.05f, 1, false);
+		default:
+			return new ParticleFadeOut(effect, 1, false).setFadeSpeed(0.02f);
 		}
 	}
 }

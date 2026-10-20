@@ -16,8 +16,6 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings.GameType;
 
-import java.util.Random;
-
 public class BlockLectern extends AMSpecialRenderBlockContainer{
 
 	protected BlockLectern(){

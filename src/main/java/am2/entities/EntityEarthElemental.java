@@ -49,20 +49,20 @@ public class EntityEarthElemental extends EntityMob{
 		return 0.4f;
 	}
 
-	@Override
-	protected String getLivingSound(){
-		return "golem_living";
-	}
-
-	@Override
-	protected String getHurtSound(){
-		return "golem_hurt";
-	}
-
-	@Override
-	protected String getDeathSound(){
-		return "golem_death";
-	}
+//	@Override
+//	protected String getLivingSound(){
+//		return "golem_living";
+//	}
+//
+//	@Override
+//	protected String getHurtSound(){
+//		return "golem_hurt";
+//	}
+//
+//	@Override
+//	protected String getDeathSound(){
+//		return "golem_death";
+//	}
 
 	@Override
 	protected void attackEntity(Entity entity, float f){

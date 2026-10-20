@@ -97,7 +97,7 @@ public class TileEntityObelisk extends TileEntityAMPower implements IMultiblockS
 		structure = new MultiblockStructureDefinition("obelisk_structure");
 
 		pillars = structure.createGroup("pillars", 2);
-		caps = new HashMap<StructureGroup, Float>();
+		caps = new HashMap<>();
 		StructureGroup chiseled = structure.createGroup("caps_chiseled_stone", 4);
 		caps.put(chiseled, 1.35f);
 
@@ -161,8 +161,7 @@ public class TileEntityObelisk extends TileEntityAMPower implements IMultiblockS
 	public Packet getDescriptionPacket(){
 		NBTTagCompound compound = new NBTTagCompound();
 		this.writeToNBT(compound);
-		S35PacketUpdateTileEntity packet = new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, worldObj.getBlockMetadata(xCoord, yCoord, zCoord), compound);
-		return packet;
+		return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, worldObj.getBlockMetadata(xCoord, yCoord, zCoord), compound);
 	}
 
 	@Override
@@ -178,7 +177,7 @@ public class TileEntityObelisk extends TileEntityAMPower implements IMultiblockS
 
 	public void handlePacket(byte[] data){
 		AMDataReader rdr = new AMDataReader(data);
-		if (rdr.ID == this.PK_BURNTIME_CHANGE)
+		if (rdr.ID == PK_BURNTIME_CHANGE)
 			this.burnTimeRemaining = rdr.getInt();
 	}
 
@@ -261,7 +260,7 @@ public class TileEntityObelisk extends TileEntityAMPower implements IMultiblockS
 			NBTTagList nbttaglist = new NBTTagList();
 			for (int i = 0; i < inventory.length; i++){
 				if (inventory[i] != null){
-					String tag = String.format("ArrayIndex", i);
+					String tag = String.format("ArrayIndex:%s", i);
 					NBTTagCompound nbttagcompound1 = new NBTTagCompound();
 					nbttagcompound1.setByte(tag, (byte)i);
 					inventory[i].writeToNBT(nbttagcompound1);
@@ -283,8 +282,8 @@ public class TileEntityObelisk extends TileEntityAMPower implements IMultiblockS
 			NBTTagList nbttaglist = nbttagcompound.getTagList("BurnInventory", Constants.NBT.TAG_COMPOUND);
 			inventory = new ItemStack[getSizeInventory()];
 			for (int i = 0; i < nbttaglist.tagCount(); i++){
-				String tag = String.format("ArrayIndex", i);
-				NBTTagCompound nbttagcompound1 = (NBTTagCompound)nbttaglist.getCompoundTagAt(i);
+				String tag = String.format("ArrayIndex:%s", i);
+				NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
 				byte byte0 = nbttagcompound1.getByte(tag);
 				if (byte0 >= 0 && byte0 < inventory.length){
 					inventory[byte0] = ItemStack.loadItemStackFromNBT(nbttagcompound1);

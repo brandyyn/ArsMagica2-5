@@ -1,7 +1,5 @@
 package am2.particles;
 
-import java.util.Random;
-
 public final class ParticleOrbitPoint extends ParticleController{
 
 	private CoordStore target;

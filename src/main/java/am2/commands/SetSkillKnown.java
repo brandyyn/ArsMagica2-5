@@ -50,29 +50,30 @@ public class SetSkillKnown extends CommandBase{
 			skill = var2[0];
 		}
 		if (player == null) return;
-		LearnSkill(var1, player, skill);
-	}
-	public void LearnSkill(ICommandSender sender, EntityPlayer player, String skill){
+		learnSkill(var1,player,skill);
 
+
+
+	}
+	public void learnSkill(ICommandSender sender, EntityPlayer player, String skill){
 		ISkillTreeEntry entry = SkillManager.instance.getSkill(skill);
-		if(SkillTreeManager.instance.getSkillPointTypeForPart(entry) == SkillPointTypes.SILVER){
-			SkillData.For(player).incrementSpellPoints(SkillPointTypes.SILVER);
-		}
+		SkillPointTypes type =  SkillTreeManager.instance.getSkillPointTypeForPart(entry);
+		SkillData.For(player).incrementSpellPoints(type);
 		SkillData.For(player).learn(entry);
 		SkillData.For(player).forceSync();
-		func_152373_a(sender, this, "Unlocking " + entry + " for " + player.getCommandSenderName(), new Object[0]);
+		func_152373_a(sender, this, "Unlocking " + skill + " for " + player.getCommandSenderName(), new Object[0]);
 	}
 
 	@Override
 	public List addTabCompletionOptions(ICommandSender var1, String[] var2){
 		ArrayList<String> completions = new ArrayList<String>();
-		if (var2.length == 1){
+		if (var2.length == 2){
 			for (String s : SkillManager.instance.getAllSkillNames()){
-				if (s.replace(' ', '_').toLowerCase().startsWith(var2[0].toLowerCase())){
+				if (s.replace(' ', '_').toLowerCase().startsWith(var2[1].toLowerCase())){
 					completions.add(s.replace(' ', '_'));
 				}
 			}
-		}else if (var2.length == 0){
+		}else if (var2.length == 1){
 			EntityPlayer player = getCommandSenderAsPlayer(var1);
 			for (Object o : player.worldObj.playerEntities){
 				EntityPlayer p = (EntityPlayer)o;

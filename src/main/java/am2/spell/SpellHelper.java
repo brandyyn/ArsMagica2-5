@@ -19,6 +19,7 @@ import am2.entities.EntityDarkMage;
 import am2.entities.EntityLightMage;
 import am2.entities.EntitySpellEffect;
 import am2.items.ItemKeystone;
+import am2.items.ItemOre;
 import am2.items.ItemsCommonProxy;
 import am2.network.AMDataWriter;
 import am2.network.AMNetHandler;
@@ -37,6 +38,7 @@ import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
@@ -295,7 +297,7 @@ public class SpellHelper{
 		if (consumeMBR){
 			checkEvent = preSpellCast(parsedStack, caster, false);
 			if (checkEvent.castResult != SpellCastResult.SUCCESS){
-				if (checkEvent.castResult == SpellCastResult.NOT_ENOUGH_MANA && caster.worldObj.isRemote && caster instanceof EntityPlayer){
+				if (checkEvent.castResult == SpellCastResult.NOT_ENOUGH_MANA && caster.worldObj.isRemote){
 					AMCore.proxy.flashManaBar();
 				}
 				SpellCastingEvent.Post event = new SpellCastingEvent().new Post(parsedStack, (ItemSpellBase)parsedStack.getItem(), caster, checkEvent.manaCost, checkEvent.burnout, false, checkEvent.castResult);
@@ -361,8 +363,6 @@ public class SpellHelper{
 				if (sfx != null){
 					if (!shape.isChanneled()){
 						world.playSound(caster.posX, caster.posY, caster.posZ, sfx, 0.4f, world.rand.nextFloat() * 0.1F + 0.9F, false);
-					}else{
-						//SoundHelper.instance.loopSound(world, (float)x, (float)y, (float)z, sfx, 0.6f);
 					}
 				}
 			}
@@ -405,7 +405,7 @@ public class SpellHelper{
 				}else if (source instanceof EntityPlayer && target instanceof EntityPlayer && !target.worldObj.isRemote && (!MinecraftServer.getServer().isPVPEnabled() || ((EntityPlayer)target).capabilities.isCreativeMode)){
 					return false;
 				}
-
+				magnitude = modifyDamage(source, magnitude);
 				if (source.isPotionActive(BuffList.fury))
 					magnitude += 4;
 			}
@@ -447,11 +447,12 @@ public class SpellHelper{
 
 		if (dmgSrcPlayer != null){
 			if (spellStack != null && target instanceof EntityLivingBase){
-				if (!target.worldObj.isRemote &&
-						((EntityLivingBase)target).getHealth() <= 0 &&
-						SpellUtils.instance.modifierIsPresent(SpellModifiers.DISMEMBERING_LEVEL, spellStack, 0)){
+				if (!target.worldObj.isRemote && ((EntityLivingBase)target).getHealth() <= 0 && SpellUtils.instance.modifierIsPresent(SpellModifiers.DISMEMBERING_LEVEL, spellStack, 0)){
 					double chance = SpellUtils.instance.getModifiedDouble_Add(0, spellStack, dmgSrcPlayer, target, dmgSrcPlayer.worldObj, 0, SpellModifiers.DISMEMBERING_LEVEL);
 					if (dmgSrcPlayer.worldObj.rand.nextDouble() <= chance){
+						if(target instanceof EntityPlayer || target instanceof EntityVillager){
+							dropSoulFragment(target, dmgSrcPlayer.worldObj);
+						}
 						dropHead(target, dmgSrcPlayer.worldObj);
 					}
 				}
@@ -460,6 +461,28 @@ public class SpellHelper{
 
 		return success;
 	}
+
+	/**
+	 * Modifies the damage based on the caster's magic level
+	 *
+	 * @return
+	 */
+	public float modifyDamage(EntityLivingBase caster, float damage){
+		float factor = (float)(ExtendedProperties.For(caster).getMagicLevel() < 20 ?
+				0.5 + (0.5 * ExtendedProperties.For(caster).getMagicLevel() / 19) :
+				1.0 + (1.0 * (ExtendedProperties.For(caster).getMagicLevel() - 20) / 79));
+		return damage * factor;
+	}
+	private void dropSoulFragment(Entity target, World world){
+		EntityItem item = new EntityItem(world);
+		ItemStack itemStack = new ItemStack(ItemsCommonProxy.itemOre, 1, ItemOre.META_SOULFRAGMENT);
+		item.setEntityItemStack(itemStack);
+		item.setPosition(target.posX,target.posY,target.posZ);
+		world.spawnEntityInWorld(item);
+		target.worldObj.playSoundAtEntity(target, "ambient.weather.thunder",2F, 2F);
+	}
+
+
 	private void dropHead(Entity target, World world){
 		if (target.getClass() == EntitySkeleton.class){
 			dropHead_do(world, target.posX, target.posY, target.posZ, ((EntitySkeleton)target).getSkeletonType() == 1 ? 1 : 0);

@@ -1,8 +1,5 @@
 package am2.blocks.renderers;
 
-import am2.blocks.tileentities.TileEntityBlackAurem;
-import am2.blocks.tileentities.TileEntityCelestialPrism;
-import am2.blocks.tileentities.TileEntityObelisk;
 import am2.blocks.tileentities.TileEntitySpatialVortex;
 import am2.texture.ResourceManager;
 import net.minecraft.client.Minecraft;
@@ -12,8 +9,6 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.AdvancedModelLoader;
-import net.minecraftforge.client.model.obj.WavefrontObject;
 import org.lwjgl.opengl.GL11;
 
 public class SpatialVortexRenderer extends TileEntitySpecialRenderer{

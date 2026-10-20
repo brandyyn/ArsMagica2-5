@@ -9,6 +9,8 @@ import am2.api.spell.component.interfaces.ISpellComponent;
 import am2.api.spell.enums.Affinity;
 import am2.api.spell.enums.SpellModifiers;
 import am2.buffs.BuffList;
+import am2.items.ItemOre;
+import am2.items.ItemRune;
 import am2.items.ItemsCommonProxy;
 import am2.network.AMDataWriter;
 import am2.network.AMNetHandler;
@@ -38,7 +40,6 @@ public class Deafen implements ISpellComponent, IRitualInteraction {
         if (target instanceof EntityPlayer){
             int duration = SpellUtils.instance.getModifiedInt_Mul(BuffList.default_buff_duration, stack, caster, target, world, 0, SpellModifiers.DURATION);
             duration = SpellUtils.instance.modifyDurationBasedOnArmor(caster, duration);
-
             int x = (int)Math.floor(target.posX);
             int y = (int)Math.floor(target.posY);
             int z = (int)Math.floor(target.posZ);
@@ -47,7 +48,7 @@ public class Deafen implements ISpellComponent, IRitualInteraction {
                 RitualShapeHelper.instance.consumeRitualReagents(this, world, x, y, z);
             }
 
-            ((EntityPlayer)target).worldObj.playSoundAtEntity(((EntityPlayer)target), "ambient.weather.thunder",3F, 1F);
+            target.worldObj.playSoundAtEntity(target, "ambient.weather.thunder",3F, 1F);
             AMDataWriter writer1 = new AMDataWriter();
             writer1.add(duration);
             if (!world.isRemote) AMNetHandler.INSTANCE.sendPacketToAllClientsNear(world.provider.dimensionId, x, y, z, 3, AMPacketIDs.DEAFEN, writer1.generate());
@@ -63,7 +64,7 @@ public class Deafen implements ISpellComponent, IRitualInteraction {
 
     @Override
     public float burnout(EntityLivingBase caster){
-        return ArsMagicaApi.instance.getBurnoutFromMana(manaCost(caster));
+        return ArsMagicaApi.getBurnoutFromMana(manaCost(caster));
     }
 
 	@Override
@@ -94,9 +95,9 @@ public class Deafen implements ISpellComponent, IRitualInteraction {
     @Override
     public Object[] getRecipeItems(){
         return new Object[]{
-                new ItemStack(ItemsCommonProxy.rune, 1, ItemsCommonProxy.rune.META_BROWN),
-                new ItemStack(ItemsCommonProxy.rune, 1, ItemsCommonProxy.rune.META_WHITE),
-                new ItemStack(ItemsCommonProxy.itemOre, 1, ItemsCommonProxy.itemOre.META_ANIMALFAT),
+                new ItemStack(ItemsCommonProxy.rune, 1, ItemRune.META_BROWN),
+                new ItemStack(ItemsCommonProxy.rune, 1, ItemRune.META_WHITE),
+                new ItemStack(ItemsCommonProxy.itemOre, 1, ItemOre.META_ANIMALFAT),
                 new ItemStack(Items.record_11)
         };
     }

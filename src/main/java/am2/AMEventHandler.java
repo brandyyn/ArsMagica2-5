@@ -90,7 +90,6 @@ import net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed;
 import net.minecraftforge.event.world.BlockEvent;
 import net.tclproject.mysteriumlib.asm.fixes.MysteriumPatchesFixesMagicka;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 @SuppressWarnings("unused")
@@ -127,6 +126,7 @@ public class AMEventHandler{
 
 	}
 	@SubscribeEvent
+	@SuppressWarnings("deprecation")
 	public void onPotionBrewed(PotionBrewedEvent brewEvent){
 		for (ItemStack stack : brewEvent.brewingStacks){
 			if (stack == null) continue;
@@ -176,20 +176,22 @@ public class AMEventHandler{
 
 	@SubscribeEvent
 	public void onEntityConstructing(EntityConstructing event){
-		if (event.entity instanceof EntityLivingBase){
-			event.entity.registerExtendedProperties(ExtendedProperties.identifier, new ExtendedProperties());
-			((EntityLivingBase)event.entity).getAttributeMap().registerAttribute(ArsMagicaApi.maxManaBonus);
-			((EntityLivingBase)event.entity).getAttributeMap().registerAttribute(ArsMagicaApi.maxBurnoutBonus);
-			((EntityLivingBase)event.entity).getAttributeMap().registerAttribute(ArsMagicaApi.xpGainModifier);
-			((EntityLivingBase)event.entity).getAttributeMap().registerAttribute(ArsMagicaApi.burnoutReductionRate);
-			((EntityLivingBase)event.entity).getAttributeMap().registerAttribute(ArsMagicaApi.manaRegenTimeModifier);
 
+		if (event.entity instanceof EntityLivingBase){
+			EntityLivingBase entityLB = (EntityLivingBase) event.entity;
+			entityLB.registerExtendedProperties(ExtendedProperties.identifier, new ExtendedProperties());
+			entityLB.getAttributeMap().registerAttribute(ArsMagicaApi.maxManaBonus);
+			entityLB.getAttributeMap().registerAttribute(ArsMagicaApi.maxBurnoutBonus);
+			entityLB.getAttributeMap().registerAttribute(ArsMagicaApi.xpGainModifier);
+			entityLB.getAttributeMap().registerAttribute(ArsMagicaApi.burnoutReductionRate);
+			entityLB.getAttributeMap().registerAttribute(ArsMagicaApi.manaRegenTimeModifier);
+			ExtendedProperties.For(entityLB).register(event.entity.worldObj, entityLB);
 			if (event.entity instanceof EntityPlayer){
 				event.entity.registerExtendedProperties(RiftStorage.identifier, new RiftStorage());
 				event.entity.registerExtendedProperties(AffinityData.identifier, new AffinityData());
 				event.entity.registerExtendedProperties(SkillData.identifier, new SkillData((EntityPlayer)event.entity));
 			}
-		}else if (event.entity instanceof EntityItemFrame){
+		}else if (event.entity instanceof EntityItemFrame && !event.entity.worldObj.isRemote){
 			AMCore.proxy.itemFrameWatcher.startWatchingFrame((EntityItemFrame)event.entity);
 		}
 	}
@@ -365,15 +367,13 @@ public class AMEventHandler{
 				exProps.addToExtraVariables("karma", "bad");
 			}
 		}
-
-		 if (soonToBeDead instanceof EntityCreature){
+		else if (soonToBeDead instanceof EntityCreature){
 			if (!EntityUtilities.isSummon(soonToBeDead) && EntityUtilities.isAIEnabled((EntityCreature)soonToBeDead) && event.source.getSourceOfDamage() instanceof EntityPlayer){
 				EntityUtilities.handleCrystalPhialAdd((EntityCreature)soonToBeDead, (EntityPlayer)event.source.getSourceOfDamage());
 			}
 		}
 
 		if (EntityUtilities.isSummon(soonToBeDead)){
-			ReflectionHelper.setPrivateValue(EntityLivingBase.class, soonToBeDead, 0, "field_70718_bc", "recentlyHit");
 			int ownerID = EntityUtilities.getOwner(soonToBeDead);
 			Entity e = soonToBeDead.worldObj.getEntityByID(ownerID);
 			if (e != null & e instanceof EntityLivingBase){
@@ -381,7 +381,7 @@ public class AMEventHandler{
 			}
 		}
 
-		if (soonToBeDead instanceof EntityVillager && soonToBeDead.isChild()){
+		if (soonToBeDead instanceof EntityVillager){
 			BossSpawnHelper.instance.onVillagerChildKilled((EntityVillager)soonToBeDead);
 		}
 
@@ -552,31 +552,6 @@ public class AMEventHandler{
 		}
 	}
 
-	@SubscribeEvent
-	public void disconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) { // fired at the client. this is to reset it to normal after disconnecting
-		MysteriumPatchesFixesMagicka.changeServerTickrate(MysteriumPatchesFixesMagicka.clienttickratedefault); // this is ok because it converts it to the server format anyway
-		MysteriumPatchesFixesMagicka.changeClientTickratePublic(null, MysteriumPatchesFixesMagicka.clienttickratedefault);
-	}
-
-	@SubscribeEvent
-	public void connect(FMLNetworkEvent.ClientConnectedToServerEvent event) { // fired at client when connects to server
-		if(event.isLocal) { // single player game
-			float tickrate = MysteriumPatchesFixesMagicka.clienttickratedefault;
-			MysteriumPatchesFixesMagicka.changeServerTickrate(tickrate); // this is ok because it converts it to the server format anyway
-			MysteriumPatchesFixesMagicka.changeClientTickratePublic(null, tickrate);
-		} else {
-			MysteriumPatchesFixesMagicka.changeClientTickratePublic(null, 20F); // it forces it serverside anyway
-		}
-	}
-
-	@SubscribeEvent
-	public void connect(PlayerEvent.PlayerLoggedInEvent event) {
-		if(FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
-			float tickrate = 1000L / MysteriumPatchesFixesMagicka.servertickrate; // 1000/50 = 20 ticks, etc
-			MysteriumPatchesFixesMagicka.changeClientTickratePublic(event.player, tickrate);
-		}
-	}
-
 	private static int tick = 0;
 
 	private static int[] getMinIndex(int[] array) {
@@ -610,14 +585,12 @@ public class AMEventHandler{
 	public void onEntityLiving(LivingUpdateEvent event){
 
 		EntityLivingBase ent = event.entityLiving;
-
 		if (!SkillTreeManager.instance.isSkillDisabled(SkillManager.instance.getSkill("DiluteTime"))) {
 			String UUID = ent.getUniqueID().toString();
-			if (slowedEntitiesUUIDs.containsKey(UUID)) {
-				if (ent.ticksExisted % slowedEntitiesUUIDs.get(UUID) != 0) {
-					event.setCanceled(true);
-					return;
-				}
+			Integer entity = slowedEntitiesUUIDs.get(UUID);
+			if (entity != null && ent.ticksExisted % entity != 0) {
+				event.setCanceled(true);
+				return;
 			}
 		}
 
@@ -684,9 +657,9 @@ public class AMEventHandler{
 				if (event.entityLiving instanceof EntityPlayer){
 					if (ent.motionY > 0){
 						if (world.isRemote)
-							ent.fallDistance += ent.posY - ent.prevPosY;
+							ent.fallDistance += (float)(ent.posY - ent.prevPosY);
 						else
-							ent.fallDistance += (((EntityPlayer)ent).field_71095_bQ - ((EntityPlayer)ent).field_71096_bN) * 2;
+							ent.fallDistance += (float)((((EntityPlayer)ent).field_71095_bQ - ((EntityPlayer)ent).field_71096_bN) * 2);
 					}
 				}
 				ent.onGround = false;
@@ -738,7 +711,7 @@ public class AMEventHandler{
 				ent.attackEntityFrom(DamageSources.unsummon, 5000);
 			}
 			if (owner == -1 || ownerEnt == null || ownerEnt.isDead || ownerEnt.getDistanceSqToEntity(ent) > 900){
-				if (ent instanceof EntityLiving && !((EntityLiving)ent).getCustomNameTag().equals("")){
+				if (ent instanceof EntityLiving && !((EntityLiving)ent).getCustomNameTag().isEmpty()){
 					EntityUtilities.setOwner(ent, null);
 					EntityUtilities.setSummonDuration(ent, -1);
 					EntityUtilities.revertAI((EntityCreature)ent);
@@ -1366,12 +1339,8 @@ public class AMEventHandler{
 		int y = MathHelper.floor_double(player.posY);
 		int z = MathHelper.floor_double(player.posZ);
 		if(player.worldObj.rand.nextInt(550) == 0) {
-			Class halclass;
+			Class<? extends EntityHallucination> halclass = null;
 			switch (player.worldObj.rand.nextInt(5)) {
-				case 0:
-				default:
-					halclass = EntitySpecificHallucinations.EntityHallucinationCreeper.class;
-					break;
 				case 1:
 					halclass = EntitySpecificHallucinations.EntityHallucinationZombie.class;
 					break;
@@ -1384,12 +1353,13 @@ public class AMEventHandler{
 				case 4:
 					halclass = EntitySpecificHallucinations.EntityHallucinationMagmacube.class;
 					break;
+				default:
+					halclass = EntitySpecificHallucinations.EntityHallucinationCreeper.class;
+					break;
 			}
 
 			EntityCreature summoned = summonCreature(player.worldObj, halclass, x, y, z, player, 4, 9);
-			if (hallucinationMap.get(player) == null) {
-				hallucinationMap.put(player, new ArrayList<EntityCreature>());
-			}
+			hallucinationMap.computeIfAbsent(player, k -> new ArrayList<>());
 			hallucinationMap.get(player).add(summoned);
 		}
 		if(player.worldObj.rand.nextInt(100) == 0) { // dust
@@ -1397,9 +1367,7 @@ public class AMEventHandler{
 			item.setPosition((x-15) + player.worldObj.rand.nextInt(16), y + player.worldObj.rand.nextInt(6), (z-15) + player.worldObj.rand.nextInt(16));
 			item.setEntityItemStack(new ItemStack(ItemsCommonProxy.itemOre, 1, ItemOre.META_COGNITIVEDUST));
 			player.worldObj.spawnEntityInWorld(item);
-			if (dustMap.get(player) == null) {
-				dustMap.put(player, new ArrayList<EntityItem>());
-			}
+			dustMap.computeIfAbsent(player, k -> new ArrayList<EntityItem>());
 			dustMap.get(player).add(item);
 		}
 	}
@@ -1415,10 +1383,6 @@ public class AMEventHandler{
 		if(player.worldObj.rand.nextInt(80) == 0) { // random noises
 			String soundString = null;
 			switch (player.worldObj.rand.nextInt(8)) {
-				case 0:
-				default:
-					soundString = "mob.zombie.say";
-					break;
 				case 1:
 					soundString = "mob.skeleton.say";
 					break;
@@ -1439,6 +1403,9 @@ public class AMEventHandler{
 					break;
 				case 7:
 					soundString = "random.fuse";
+					break;
+				default:
+					soundString = "mob.zombie.say";
 					break;
 			}
 			player.worldObj.playSoundAtEntity(player, soundString,1F, 1F);
@@ -1468,12 +1435,8 @@ public class AMEventHandler{
 			player.setPositionAndRotation(player.posX + cx, player.posY + cy, player.posZ + cz, player.rotationYaw * (rand.nextFloat() + rand.nextFloat()), player.rotationPitch * (rand.nextFloat() + rand.nextFloat()));
 		}
 		if(player.worldObj.rand.nextInt(750) == 0) { // even more hallucinations + ones specific to end
-			Class halclass = null;
+			Class<? extends EntityHallucination> halclass = null;
 			switch (player.worldObj.rand.nextInt(8)) {
-				case 0:
-				default:
-					halclass = EntitySpecificHallucinations.EntityHallucinationCreeper.class;
-					break;
 				case 1:
 					halclass = EntitySpecificHallucinations.EntityHallucinationZombie.class;
 					break;
@@ -1491,17 +1454,18 @@ public class AMEventHandler{
 				case 7:
 					halclass = EntitySpecificHallucinations.EntityHallucinationEndermite.class;
 					break;
+				default:
+					halclass = EntitySpecificHallucinations.EntityHallucinationCreeper.class;
+					break;
 			}
 
 			EntityCreature summoned = summonCreature(player.worldObj, halclass, x, y, z, player, 5, 13);
-			if (hallucinationMap.get(player) == null) {
-				hallucinationMap.put(player, new ArrayList<EntityCreature>());
-			}
+			hallucinationMap.computeIfAbsent(player, k -> new ArrayList<>());
 			hallucinationMap.get(player).add(summoned);
 		}
 	}
 
-	public static EntityCreature summonCreature(World world, Class creatureClass, int x, int y, int z, EntityLivingBase target, int minRange, int maxRange) {
+	public static EntityCreature summonCreature(World world, Class<? extends EntityHallucination> creatureClass, int x, int y, int z, EntityLivingBase target, int minRange, int maxRange) {
 		if(!world.isRemote) {
 			int activeRadius = maxRange - minRange;
 			int ax = world.rand.nextInt(activeRadius * 2 + 1);
@@ -1515,39 +1479,31 @@ public class AMEventHandler{
 			}
 			int nz = z - maxRange + az;
 			int ny;
-			for(ny = y; !world.isAirBlock(nx, ny, nz) && ny < y + 8; ++ny) {
-				;
+			for(ny = y; ny < y + 8; ++ny) {
+				if(world.isAirBlock(nx, ny, nz)) break;
 			}
 			while(world.isAirBlock(nx, ny, nz) && ny > 0) {
 				--ny;
 			}
 			int hy;
-			for(hy = 0; world.isAirBlock(nx, ny + hy + 1, nz) && hy < 6; ++hy) {
-				;
+			for(hy = 0;hy < 6; ++hy) {
+				if(!world.isAirBlock(nx, ny + hy + 1, nz)) break;
 			}
 			if(hy >= 2) {
 				try {
-					Constructor ex = creatureClass.getConstructor(new Class[]{World.class});
-					EntityCreature creature = (EntityCreature)ex.newInstance(new Object[]{world});
+					Constructor<? extends EntityHallucination> ex = creatureClass.getConstructor(World.class);
+					EntityHallucination creature = ex.newInstance(world);
 					if(target instanceof EntityPlayer) {
 						EntityPlayer player = (EntityPlayer)target;
-						if(creature instanceof EntityHallucination) {
-							((EntityHallucination)creature).setTarget(player.getCommandSenderName());
-						}
+						creature.setTarget(player.getCommandSenderName());
 					}
 
 					creature.setLocationAndAngles(0.5D + (double)nx, 0.05D + (double)ny + 1.0D, 0.5D + (double)nz, 0.0F, 0.0F);
 					world.spawnEntityInWorld(creature);
 
 					return creature;
-				} catch (NoSuchMethodException var20) {
-					;
-				} catch (InvocationTargetException var21) {
-					;
-				} catch (InstantiationException var22) {
-					;
-				} catch (IllegalAccessException var23) {
-					;
+				} catch (ReflectiveOperationException | RuntimeException ignored) {
+
 				}
 			}
 		}
@@ -1583,8 +1539,10 @@ public class AMEventHandler{
 
 	@SubscribeEvent
 	public void onEntityInteract(EntityInteractEvent event){
-		if (!(event.entityLiving instanceof FakePlayer) && event.target instanceof EntityItemFrame)
+		if (!(event.entityLiving instanceof FakePlayer) && event.target instanceof EntityItemFrame && !event.entity.worldObj.isRemote){
 			AMCore.proxy.itemFrameWatcher.startWatchingFrame((EntityItemFrame)event.target);
+	}
+
 	}
 
 	@SubscribeEvent
@@ -1662,7 +1620,7 @@ public class AMEventHandler{
 		PotionEffect magicShield = event.entityLiving.getActivePotionEffect(BuffList.magicShield);
 		if (magicShield != null){
 			event.ammount *= 0.5f;
-			event.ammount *= (1.0 / (magicShield.getAmplifier() + 1));
+			event.ammount *= (1f / (magicShield.getAmplifier() + 1f));
 		}
 
 		if (event.entityLiving.isPotionActive(BuffList.manaShield)){
@@ -1685,18 +1643,16 @@ public class AMEventHandler{
 			}
 		}
 
-		Entity entitySource = event.source.getSourceOfDamage();
-		if (entitySource instanceof EntityPlayer
-				&& ((EntityPlayer)entitySource).inventory.armorInventory[2] != null
-				&& ((EntityPlayer)entitySource).inventory.armorInventory[2].getItem() == ItemsCommonProxy.earthGuardianArmor
-				&& ((EntityPlayer)entitySource).getCurrentEquippedItem() == null){
+		Entity entityAttacker = event.source.getSourceOfDamage();
+		if (entityAttacker instanceof EntityPlayer && ((EntityPlayer)entityAttacker).inventory.armorInventory[2] != null && ((EntityPlayer)entityAttacker).inventory.armorInventory[2].getItem() == ItemsCommonProxy.earthGuardianArmor
+				&& ((EntityPlayer)entityAttacker).getCurrentEquippedItem() == null){
 			event.ammount += 4;
 
-			double deltaZ = event.entityLiving.posZ - entitySource.posZ;
-			double deltaX = event.entityLiving.posX - entitySource.posX;
+			double deltaZ = event.entityLiving.posZ - entityAttacker.posZ;
+			double deltaX = event.entityLiving.posX - entityAttacker.posX;
 			double angle = Math.atan2(deltaZ, deltaX);
-			double speed = entitySource.isSprinting() ? 3 : 2;
-			double vertSpeed = entitySource.isSprinting() ? 0.5 : 0.325;
+			double speed = entityAttacker.isSprinting() ? 3 : 2;
+			double vertSpeed = entityAttacker.isSprinting() ? 0.5 : 0.325;
 
 			if (event.entityLiving instanceof EntityPlayer){
 				AMNetHandler.INSTANCE.sendVelocityAddPacket(event.entityLiving.worldObj, event.entityLiving, speed * Math.cos(angle), vertSpeed, speed * Math.sin(angle));
@@ -1707,16 +1663,16 @@ public class AMEventHandler{
 			}
 			event.entityLiving.worldObj.playSoundAtEntity(event.entityLiving, "arsmagica2:spell.cast.earth", 0.4f, event.entityLiving.worldObj.rand.nextFloat() * 0.1F + 0.9F);
 		}
-		if (entitySource instanceof EntityPlayer
-				&& ((EntityPlayer)entitySource).inventory.armorInventory[2] != null
-				&& ((EntityPlayer)entitySource).inventory.armorInventory[2].getItem() == ItemsCommonProxy.archmageArmor){
+		if (entityAttacker instanceof EntityPlayer
+				&& ((EntityPlayer)entityAttacker).inventory.armorInventory[2] != null
+				&& ((EntityPlayer)entityAttacker).inventory.armorInventory[2].getItem() == ItemsCommonProxy.archmageArmor){
 			event.ammount += 5;
 
-			double deltaZ = event.entityLiving.posZ - entitySource.posZ;
-			double deltaX = event.entityLiving.posX - entitySource.posX;
+			double deltaZ = event.entityLiving.posZ - entityAttacker.posZ;
+			double deltaX = event.entityLiving.posX - entityAttacker.posX;
 			double angle = Math.atan2(deltaZ, deltaX);
-			double speed = entitySource.isSprinting() ? 5 : 3;
-			double vertSpeed = entitySource.isSprinting() ? 1 : 0.65;
+			double speed = entityAttacker.isSprinting() ? 5 : 3;
+			double vertSpeed = entityAttacker.isSprinting() ? 1 : 0.65;
 
 			if (event.entityLiving instanceof EntityPlayer){
 				AMNetHandler.INSTANCE.sendVelocityAddPacket(event.entityLiving.worldObj, event.entityLiving, speed * Math.cos(angle), vertSpeed, speed * Math.sin(angle));
@@ -1729,34 +1685,34 @@ public class AMEventHandler{
 		}
 
 		ExtendedProperties extendedProperties = ExtendedProperties.For(event.entityLiving);
-		EntityLivingBase ent = event.entityLiving;
+		EntityLivingBase entityAttacked = event.entityLiving;
 		if (!(extendedProperties.getContingencyEffect(0).getItem() instanceof ItemSnowball)){
 			extendedProperties.procContingency(0, (event.source.getEntity() != null && event.source.getEntity() instanceof EntityLivingBase) ? (EntityLivingBase)event.source.getEntity() : null);
 		}
-		if (!(extendedProperties.getContingencyEffect(4).getItem() instanceof ItemSnowball) && ent.getHealth() <= ent.getMaxHealth() / 3){
+		if (!(extendedProperties.getContingencyEffect(4).getItem() instanceof ItemSnowball) && entityAttacked.getHealth() <= entityAttacked.getMaxHealth() / 3){
 			extendedProperties.procContingency(4, (event.source.getEntity() != null && event.source.getEntity() instanceof EntityLivingBase) ? (EntityLivingBase)event.source.getEntity() : null);
 		}
 
-		if (entitySource instanceof EntityPlayer
-				&& ((EntityPlayer)entitySource).inventory.armorInventory[3] != null
-				&& ((EntityPlayer)entitySource).inventory.armorInventory[2] != null
-				&& ((EntityPlayer)entitySource).inventory.armorInventory[1] != null
-				&& ((EntityPlayer)entitySource).inventory.armorInventory[0] != null
-				&& ((EntityPlayer)entitySource).inventory.armorInventory[3].getItem() == ItemsCommonProxy.archmageHood
-				&& ((EntityPlayer)entitySource).inventory.armorInventory[2].getItem() == ItemsCommonProxy.archmageArmor
-				&& ((EntityPlayer)entitySource).inventory.armorInventory[1].getItem() == ItemsCommonProxy.archmageLeggings
-				&& ((EntityPlayer)entitySource).inventory.armorInventory[0].getItem() == ItemsCommonProxy.archmageBoots){
-			if (entitySource.isSneaking()) {
+		if (entityAttacker instanceof EntityPlayer
+				&& ((EntityPlayer)entityAttacker).inventory.armorInventory[3] != null
+				&& ((EntityPlayer)entityAttacker).inventory.armorInventory[2] != null
+				&& ((EntityPlayer)entityAttacker).inventory.armorInventory[1] != null
+				&& ((EntityPlayer)entityAttacker).inventory.armorInventory[0] != null
+				&& ((EntityPlayer)entityAttacker).inventory.armorInventory[3].getItem() == ItemsCommonProxy.archmageHood
+				&& ((EntityPlayer)entityAttacker).inventory.armorInventory[2].getItem() == ItemsCommonProxy.archmageArmor
+				&& ((EntityPlayer)entityAttacker).inventory.armorInventory[1].getItem() == ItemsCommonProxy.archmageLeggings
+				&& ((EntityPlayer)entityAttacker).inventory.armorInventory[0].getItem() == ItemsCommonProxy.archmageBoots){
+			if (entityAttacker.isSneaking()) {
 				extendedProperties.toggleFlipped();
 				tempFlipped.put(extendedProperties, 50);
 			}
 		}
 
-		if (ent.isPotionActive(BuffList.fury.id))
+		if (entityAttacked.isPotionActive(BuffList.fury.id))
 			event.ammount /= 2;
 
-		if (entitySource instanceof EntityLivingBase
-				&& ((EntityLivingBase)entitySource).isPotionActive(BuffList.shrink))
+		if (entityAttacker instanceof EntityLivingBase
+				&& ((EntityLivingBase)entityAttacker).isPotionActive(BuffList.shrink))
 			event.ammount /= 2;
 	}
 

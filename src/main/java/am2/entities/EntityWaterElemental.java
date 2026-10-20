@@ -10,11 +10,12 @@ import am2.playerextensions.ExtendedProperties;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.ai.*;
 import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.passive.EntityWaterMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-public class EntityWaterElemental extends EntityMob{
+public class EntityWaterElemental extends EntityWaterMob{
 
 	private float hostileSpeed;
 
@@ -60,7 +61,7 @@ public class EntityWaterElemental extends EntityMob{
 	private void spawnLivingParticles(){
 		if (rand.nextBoolean()){
 			double yPos = this.posY + 1.1;
-			AMParticle effect = (AMParticle)AMCore.instance.proxy.particleManager.spawn(worldObj, "water_ball",
+			AMParticle effect = (AMParticle)AMCore.proxy.particleManager.spawn(worldObj, "water_ball",
 					this.posX + ((rand.nextFloat() * 0.2) - 0.1f),
 					yPos,
 					this.posZ + ((rand.nextFloat() * 0.4) - 0.2f));
@@ -86,6 +87,6 @@ public class EntityWaterElemental extends EntityMob{
 	public boolean getCanSpawnHere(){
 		if (!SpawnBlacklists.entityCanSpawnHere(this.posX, this.posZ, worldObj, this))
 			return false;
-		return super.getCanSpawnHere();
+		return this.posY > 45.0D && this.posY < 63.0D  && super.getCanSpawnHere();
 	}
 }

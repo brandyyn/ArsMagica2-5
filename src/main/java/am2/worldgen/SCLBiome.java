@@ -2,10 +2,10 @@ package am2.worldgen;
 
 import am2.AMCore;
 import am2.entities.EntityHellCow;
-import java.util.ArrayList;
-import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.biome.BiomeGenPlains;
+
+import java.util.ArrayList;
 
 public class SCLBiome extends BiomeGenPlains {
    public static final SCLBiome instance;

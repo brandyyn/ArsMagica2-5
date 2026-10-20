@@ -50,6 +50,8 @@ public class AffinityData implements IExtendedEntityProperties, IAffinityData{
 
 	private Affinity[] highestAffinities = new Affinity[2];
 
+	int tick = 0;
+
 	public AffinityData(){
 		setupAffinityDefaults();
 	}
@@ -71,6 +73,7 @@ public class AffinityData implements IExtendedEntityProperties, IAffinityData{
 	}
 
 	public void tickDiminishingReturns(){
+
 		if (this.diminishingReturns < 1.2f){
 			this.diminishingReturns += 0.005f;
 		}

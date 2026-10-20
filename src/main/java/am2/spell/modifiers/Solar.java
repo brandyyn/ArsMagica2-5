@@ -6,6 +6,7 @@ import am2.items.ItemEssence;
 import am2.items.ItemOre;
 import am2.items.ItemsCommonProxy;
 import am2.playerextensions.ExtendedProperties;
+import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Items;
@@ -28,12 +29,14 @@ public class Solar implements ISpellModifier{
 	@SuppressWarnings("incomplete-switch")
 	@Override
 	public float getModifier(SpellModifiers type, EntityLivingBase caster, Entity target, World world, byte[] metadata){
+		if(world.isRemote &&  caster instanceof EntityOtherPlayerMP) return 0;
 		ExtendedProperties properties = ExtendedProperties.For(caster);
 		float burnoutRatio = properties.getCurrentFatigue() / properties.getMaxFatigue();
 		float spellBonus = getSpellTypeBonus(type);
 		float burnoutBonus = Math.max(1,properties.getMaxFatigue() / 500);
 
-		return (float) Math.max(1, Math.pow(Math.pow((burnoutRatio * spellBonus), (burnoutRatio+1)),(burnoutRatio+1))* burnoutBonus);
+		return (float) Math.max(1,
+				Math.pow(Math.pow((burnoutRatio * spellBonus), (burnoutRatio+1)),(burnoutRatio+1))* 2);
 	}
 
 	@SuppressWarnings("incomplete-switch")

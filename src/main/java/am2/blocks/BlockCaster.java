@@ -2,14 +2,11 @@ package am2.blocks;
 
 import am2.AMCore;
 import am2.blocks.tileentities.TileEntityBlockCaster;
-import am2.blocks.tileentities.TileEntityCasterRune;
 import am2.guis.ArsMagicaGuiIdList;
 import am2.network.AMDataWriter;
 import am2.network.AMNetHandler;
 import am2.network.AMPacketIDs;
 import am2.texture.ResourceManager;
-import java.util.Random;
-
 import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -25,6 +22,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+
+import java.util.Random;
 
 public class BlockCaster extends AMSpecialRenderPoweredBlock {
    public BlockCaster() {

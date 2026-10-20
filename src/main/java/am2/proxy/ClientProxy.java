@@ -5,6 +5,7 @@ import am2.AMCore;
 import am2.AMKeyBindings;
 import am2.api.events.RegisterCompendiumEntries;
 import am2.api.events.RegisterSkillTreeIcons;
+import am2.api.items.armor.IManaGoggle;
 import am2.api.math.AMVector3;
 import am2.api.power.IPowerNode;
 import am2.api.power.PowerTypes;
@@ -56,7 +57,6 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -129,10 +129,10 @@ public class ClientProxy extends CommonProxy{
 		blocks.registerRenderInformation();
 
 		simpleBlockRenderHandler = new SimpleBlockRenderHandler();
-		RenderingRegistry.registerBlockHandler(blocks.commonBlockRenderID, simpleBlockRenderHandler);
+		RenderingRegistry.registerBlockHandler(BlocksCommonProxy.commonBlockRenderID, simpleBlockRenderHandler);
 
 		techneBlockRenderHandler = new TechneBlockRenderHandler();
-		RenderingRegistry.registerBlockHandler(blocks.blockRenderID, techneBlockRenderHandler);
+		RenderingRegistry.registerBlockHandler(BlocksCommonProxy.blockRenderID, techneBlockRenderHandler);
 
 
 		MinecraftForgeClient.registerItemRenderer(ItemsCommonProxy.scythe, CustomItemRenderer.instance);
@@ -254,15 +254,6 @@ public class ClientProxy extends CommonProxy{
 		return Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage().getLanguageCode();
 	}
 
-	@Override
-	public void addName(Object obj, String s){
-		LanguageRegistry.addName(obj, s);
-	}
-
-	@Override
-	public void addLocalization(String s1, String string){
-		LanguageRegistry.instance().addStringLocalization(s1, string);
-	}
 
 	@Override
 	public String getItemStackDisplayName(ItemStack stack){
@@ -349,12 +340,12 @@ public class ClientProxy extends CommonProxy{
 	@Override
 	public void drawPowerOnBlockHighlight(EntityPlayer player, MovingObjectPosition target, float partialTicks){
 		if (AMCore.proxy.getLocalPlayer().getCurrentArmor(3) != null &&
-				(AMCore.proxy.getLocalPlayer().getCurrentArmor(3).getItem() == ItemsCommonProxy.magitechGoggles ||
+				(AMCore.proxy.getLocalPlayer().getCurrentArmor(3).getItem() instanceof IManaGoggle ||
 						ArmorHelper.isInfusionPreset(AMCore.proxy.getLocalPlayer().getCurrentArmor(3), GenericImbuement.magitechGoggleIntegration))
 				){
 
 			TileEntity te = player.worldObj.getTileEntity(target.blockX, target.blockY, target.blockZ);
-			if (te != null && te instanceof IPowerNode){
+			if (te instanceof IPowerNode){
 				AMCore.proxy.setTrackedLocation(new AMVector3(target.blockX, target.blockY, target.blockZ));
 			}else{
 				AMCore.proxy.setTrackedLocation(AMVector3.zero());

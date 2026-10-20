@@ -39,7 +39,13 @@ public class AMChunkLoader implements LoadingCallback{
 	}
 
 	private Ticket getTicket(TicketIdentifier identifier){
-		return tickets.get(identifier);
+		for(TicketIdentifier ticket : tickets.keySet()){
+			int comp = identifier.compareTo(ticket);
+			if(comp == 0){
+				return tickets.get(ticket);
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -75,6 +81,7 @@ public class AMChunkLoader implements LoadingCallback{
 
 		ChunkCoordIntPair pair = new ChunkCoordIntPair(x >> 4, z >> 4);
 		ForgeChunkManager.unforceChunk(ticket, pair);
+		LogHelper.trace("Unloaded chunk at: %d, %d",pair.chunkXPos, pair.chunkZPos);
 	}
 
 	@Override
@@ -102,7 +109,7 @@ public class AMChunkLoader implements LoadingCallback{
 		}
 	}
 
-	private class TicketIdentifier implements Comparable<TicketIdentifier>{
+	private static class TicketIdentifier implements Comparable<TicketIdentifier>{
 		public final int dimension;
 		public final int x;
 		public final int y;
@@ -114,7 +121,6 @@ public class AMChunkLoader implements LoadingCallback{
 			this.y = y;
 			this.z = z;
 		}
-
 		@Override
 		public int compareTo(TicketIdentifier o){
 			if (o.x == this.x && o.y == this.y && o.z == this.z && o.dimension == this.dimension)

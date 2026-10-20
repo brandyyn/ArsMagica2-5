@@ -1,8 +1,5 @@
 package am2.worldgen;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSand;
 import net.minecraft.entity.EnumCreatureType;
@@ -24,6 +21,10 @@ import net.minecraft.world.gen.structure.MapGenMineshaft;
 import net.minecraft.world.gen.structure.MapGenScatteredFeature;
 import net.minecraft.world.gen.structure.MapGenStronghold;
 import net.minecraft.world.gen.structure.MapGenVillage;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class SCLChunkProvider implements IChunkProvider {
    private final Random rand;

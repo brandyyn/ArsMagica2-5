@@ -1,5 +1,6 @@
 package am2.items;
 
+import am2.AMCore;
 import am2.texture.ResourceManager;
 import am2.utility.EntityUtilities;
 import cpw.mods.fml.relauncher.Side;
@@ -21,7 +22,6 @@ import net.minecraft.world.World;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 public class ItemCrystalPhylactery extends ArsMagicaItem{
 
@@ -29,6 +29,7 @@ public class ItemCrystalPhylactery extends ArsMagicaItem{
 	private IIcon[] icons;
 
 	private final HashMap<String, Integer> spawnableEntities;
+	static final boolean enabled_summon = AMCore.skillConfig.isSkillEnabled("Summon");;
 
 	public static final int META_EMPTY = 0;
 	public static final int META_QUARTER = 1;
@@ -38,7 +39,7 @@ public class ItemCrystalPhylactery extends ArsMagicaItem{
 
 	public ItemCrystalPhylactery(){
 		super();
-		spawnableEntities = new HashMap<String, Integer>();
+		spawnableEntities = new HashMap<>();
 		setMaxDamage(0);
 		setMaxStackSize(1);
 	}
@@ -50,8 +51,7 @@ public class ItemCrystalPhylactery extends ArsMagicaItem{
 			String className = par1ItemStack.stackTagCompound.getString("SpawnClassName");
 			if (className != null){
 				par3List.add(String.format(StatCollector.translateToLocal("am2.tooltip.phyEss"), StatCollector.translateToLocal("entity." + className + ".name")));
-				Float f = par1ItemStack.stackTagCompound.getFloat("PercentFilled");
-				float pct = f == null ? 0 : f.floatValue();
+				float pct = par1ItemStack.stackTagCompound.getFloat("PercentFilled");
 				par3List.add(String.format(StatCollector.translateToLocal("am2.tooltip.pctFull"), pct));
 			}else{
 				par3List.add(StatCollector.translateToLocal("am2.tooltip.empty"));
@@ -75,8 +75,7 @@ public class ItemCrystalPhylactery extends ArsMagicaItem{
 		if (stack.hasTagCompound()){
 			String className = stack.stackTagCompound.getString("SpawnClassName");
 			if (className != null){
-				Float f = stack.stackTagCompound.getFloat("PercentFilled");
-				float pct = f == null ? 0 : f.floatValue();
+				float pct = stack.stackTagCompound.getFloat("PercentFilled");
 				pct += itemRand.nextFloat() * 5;
 				if (pct > 100) pct = 100;
 				stack.stackTagCompound.setFloat("PercentFilled", pct);
@@ -97,8 +96,7 @@ public class ItemCrystalPhylactery extends ArsMagicaItem{
 		if (stack.hasTagCompound()){
 			String className = stack.stackTagCompound.getString("SpawnClassName");
 			if (className != null){
-				Float f = stack.stackTagCompound.getFloat("PercentFilled");
-				float pct = f == null ? 0 : f.floatValue();
+				float pct = stack.stackTagCompound.getFloat("PercentFilled");
 				pct += amt;
 				if (pct > 100) pct = 100;
 				stack.stackTagCompound.setFloat("PercentFilled", pct);
@@ -172,7 +170,7 @@ public class ItemCrystalPhylactery extends ArsMagicaItem{
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getColorFromItemStack(ItemStack stack, int pass){
-		if (pass == 0){
+		if (enabled_summon && pass == 0){
 			int color = 0x0000FF;
 			if (stack.hasTagCompound()){
 				String className = stack.stackTagCompound.getString("SpawnClassName");
@@ -189,6 +187,7 @@ public class ItemCrystalPhylactery extends ArsMagicaItem{
 	}
 
 	public void getSpawnableEntities(World world){
+		if (!enabled_summon) return;
 		for (Object clazz : EntityList.classToStringMapping.keySet()){
 			if (EntityCreature.class.isAssignableFrom((Class)clazz)){
 				try{
@@ -200,7 +199,7 @@ public class ItemCrystalPhylactery extends ArsMagicaItem{
 						for (Object info : EntityList.entityEggs.values()){
 							EntityEggInfo eei = (EntityEggInfo)info;
 							Class spawnClass = EntityList.getClassFromID(eei.spawnedID);
-							if (spawnClass == (Class)clazz){
+							if (spawnClass == clazz){
 								color = eei.primaryColor;
 								found = true;
 								break;

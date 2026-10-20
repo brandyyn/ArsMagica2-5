@@ -4,6 +4,7 @@ import am2.LogHelper;
 import am2.buffs.BuffList;
 import am2.playerextensions.ExtendedProperties;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.FontRenderer;
@@ -26,7 +27,6 @@ import org.lwjgl.opengl.GLContext;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -47,9 +47,6 @@ public class AMGuiHelper{
 	private long millis;
 	private long lastmillis;
 	private long accumulatedMillis;
-	private static float zLevel = 300.0f;
-
-	private static int fractalLineDetail = 2;
 
 	// Buff flashing variables (for the UI)
 	//=========================================
@@ -187,7 +184,7 @@ public class AMGuiHelper{
 	}
 
 	public CompendiumBreadcrumb popCompendiumBreadcrumb(){
-		if (compendiumBreadcrumbs.size() > 0)
+		if (!compendiumBreadcrumbs.isEmpty())
 			return compendiumBreadcrumbs.pollLast();
 		return null;
 	}
@@ -203,7 +200,7 @@ public class AMGuiHelper{
 	public static void OpenCompendiumGui(ItemStack stack){
 		CompendiumBreadcrumb breadcrumb = AMGuiHelper.instance.popCompendiumBreadcrumb();
 		if (breadcrumb != null){
-			if (breadcrumb.entryType == breadcrumb.TYPE_ENTRY){
+			if (breadcrumb.entryType == CompendiumBreadcrumb.TYPE_ENTRY){
 				Minecraft.getMinecraft().displayGuiScreen(new GuiArcaneCompendium(breadcrumb));
 			}else{
 				Minecraft.getMinecraft().displayGuiScreen(new GuiCompendiumIndex(breadcrumb));
@@ -211,6 +208,9 @@ public class AMGuiHelper{
 		}else{
 			Minecraft.getMinecraft().displayGuiScreen(new GuiCompendiumIndex());
 		}
+	}
+	public static void OpenCompendiumGUI(Block block){
+		Minecraft.getMinecraft().displayGuiScreen(new GuiArcaneCompendium(block));
 	}
 
 	public static void DrawIconAtXY(IIcon IIcon, float x, float y, float zLevel, int w, int h, boolean semitransparent){
@@ -227,13 +227,7 @@ public class AMGuiHelper{
 		Minecraft.getMinecraft().renderEngine.bindTexture(rl_items);
 
 		Tessellator tessellator = Tessellator.instance;
-
-		boolean drawing = ReflectionHelper.getPrivateValue(Tessellator.class, tessellator, "field_78415_z", "isDrawing");
-		if (drawing)
-			tessellator.draw();
-
 		tessellator.startDrawingQuads();
-
 		tessellator.addVertexWithUV(x, y + h, zLevel, IIcon.getMinU(), IIcon.getMaxV());
 		tessellator.addVertexWithUV(x + w, y + h, zLevel, IIcon.getMaxU(), IIcon.getMaxV());
 		tessellator.addVertexWithUV(x + w, y, zLevel, IIcon.getMaxU(), IIcon.getMinV());
@@ -247,8 +241,6 @@ public class AMGuiHelper{
 		GL11.glPopMatrix();
 		GL11.glMatrixMode(GL11.GL_MODELVIEW);
 
-		if (drawing)
-			tessellator.startDrawingQuads();
 	}
 
 	public static void DrawItemAtXY(ItemStack stack, float x, float y, float zLevel){
@@ -258,7 +250,7 @@ public class AMGuiHelper{
 	public static void DrawItemAtXY(ItemStack stack, float x, float y, float zLevel, float scale){
 		if (stack == null)
 			return;
-		boolean success = false;
+		boolean success;
 
 		GL11.glPushAttrib(GL11.GL_TEXTURE_BIT | GL11.GL_LIGHTING_BIT);
 
@@ -280,6 +272,7 @@ public class AMGuiHelper{
 
 			if (!success){
 				itemRenderer.renderItemIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().renderEngine, stack, (int)x, (int)y);
+				GL11.glEnable(GL11.GL_ALPHA_TEST);
 			}
 		}
 		GL11.glPopAttrib();
@@ -293,7 +286,7 @@ public class AMGuiHelper{
 		int posY = y_start;
 
 		for (String word : words){
-			if (word.equals("")) continue;
+			if (word.isEmpty()) continue;
 			int linesBefore = 0;
 			int linesAfter = 0;
 
@@ -333,17 +326,15 @@ public class AMGuiHelper{
 		}
 	}
 
-	protected static void drawHoveringText(List par1List, int par2, int par3, FontRenderer font, int width, int height){
+	protected static void drawHoveringText(List<String> par1List, int par2, int par3, FontRenderer font, int width, int height){
 		if (!par1List.isEmpty()){
 			GL11.glDisable(GL12.GL_RESCALE_NORMAL);
 			RenderHelper.disableStandardItemLighting();
 			GL11.glDisable(GL11.GL_LIGHTING);
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
 			int k = 0;
-			Iterator iterator = par1List.iterator();
 
-			while (iterator.hasNext()){
-				String s = (String)iterator.next();
+			for (String s : par1List){
 				int l = font.getStringWidth(s);
 
 				if (l > k){
@@ -414,6 +405,7 @@ public class AMGuiHelper{
 		Tessellator tessellator = Tessellator.instance;
 		tessellator.startDrawingQuads();
 		tessellator.setColorRGBA_F(f1, f2, f3, f);
+		float zLevel = 300.0f;
 		tessellator.addVertex(par3, par2, zLevel);
 		tessellator.addVertex(par1, par2, zLevel);
 		tessellator.setColorRGBA_F(f5, f6, f7, f4);
@@ -466,6 +458,7 @@ public class AMGuiHelper{
 	}
 
 	public static void fractalLine2d(int src_x, int src_y, int dst_x, int dst_y, float zLevel, int color, float displace){
+		int fractalLineDetail = 2;
 		fractalLine2d(src_x, src_y, dst_x, dst_y, zLevel, color, displace, fractalLineDetail);
 	}
 
@@ -475,8 +468,8 @@ public class AMGuiHelper{
 		}else{
 			int mid_x = (dst_x + src_x) / 2;
 			int mid_y = (dst_y + src_y) / 2;
-			mid_x += (rand.nextFloat() - 0.5) * displace;
-			mid_y += (rand.nextFloat() - 0.5) * displace;
+			mid_x += (int)((rand.nextFloat() - 0.5) * displace);
+			mid_y += (int)((rand.nextFloat() - 0.5) * displace);
 			fractalLine2d(src_x, src_y, mid_x, mid_y, zLevel, color, displace / 2f, fractalDetail);
 			fractalLine2d(dst_x, dst_y, mid_x, mid_y, zLevel, color, displace / 2f, fractalDetail);
 		}
@@ -565,7 +558,7 @@ public class AMGuiHelper{
 		boolean FBOEnabled = GLContext.getCapabilities().GL_EXT_framebuffer_object;
 		if (!FBOEnabled)
 			return -1;
-		IntBuffer buffer = ByteBuffer.allocateDirect(1 * 4).order(ByteOrder.nativeOrder()).asIntBuffer(); // allocate a 1 int byte buffer
+		IntBuffer buffer = ByteBuffer.allocateDirect(4).order(ByteOrder.nativeOrder()).asIntBuffer(); // allocate a 1 int byte buffer
 		EXTFramebufferObject.glGenFramebuffersEXT(buffer); // generate
 		int myFBOId = buffer.get();
 		EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, myFBOId);
@@ -675,7 +668,7 @@ public class AMGuiHelper{
 
 		ExtendedProperties props = ExtendedProperties.For(mc.thePlayer);
 
-		if (!(mc.thePlayer.isPotionActive(BuffList.scrambleSynapses) ^ props.getIsFlipped())){
+		if (mc.thePlayer.isPotionActive(BuffList.scrambleSynapses) == props.getIsFlipped()){
 			return true;
 		}
 
@@ -717,7 +710,7 @@ public class AMGuiHelper{
 		return false;
 	}
 
-	public class CompendiumBreadcrumb{
+	public static class CompendiumBreadcrumb{
 		public final String entryName;
 		public final Object[] refData;
 		public final int entryType;

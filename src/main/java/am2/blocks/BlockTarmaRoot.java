@@ -1,7 +1,5 @@
 package am2.blocks;
 
-import java.util.HashSet;
-
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -9,6 +7,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.EnumPlantType;
 import net.minecraftforge.oredict.OreDictionary;
+
+import java.util.HashSet;
 
 public class BlockTarmaRoot extends AMFlower{
 

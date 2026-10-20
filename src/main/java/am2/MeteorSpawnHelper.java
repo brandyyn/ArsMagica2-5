@@ -47,7 +47,7 @@ public class MeteorSpawnHelper{
 
 		long time = ws.getWorldTime() % 24000;
 		if (time > 14500 && time < 21500){ //night time range (just past dusk and just before dawn)
-			if (ws.playerEntities.size() < 1) return;
+			if (ws.playerEntities.isEmpty()) return;
 
 			int playerID = rand.nextInt(ws.playerEntities.size());
 			EntityPlayer player = (EntityPlayer)ws.playerEntities.get(playerID);

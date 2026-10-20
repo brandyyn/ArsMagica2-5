@@ -15,7 +15,6 @@ import am2.particles.AMParticle;
 import am2.particles.ParticleApproachEntity;
 import am2.particles.ParticleFloatUpward;
 import am2.playerextensions.ExtendedProperties;
-import net.minecraft.block.Block;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;

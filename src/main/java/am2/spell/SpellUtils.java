@@ -28,15 +28,15 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
+import java.util.*;
+import java.util.stream.Stream;
 
 public class SpellUtils implements ISpellUtils{
 
@@ -148,7 +148,7 @@ public class SpellUtils implements ISpellUtils{
 		for (ISpellModifier modifier : getModifiersForStage(stack, stage)){
 			if (modifier.getAspectsModified().contains(check)){
 				byte[] meta = getModifierMetadataFromStack(stack, modifier, stage, ordinalCount++);
-				modifiedValue *= modifier.getModifier(check, caster, target, world, meta);
+				modifiedValue *= (int)modifier.getModifier(check, caster, target, world, meta);
 			}
 		}
 
@@ -322,15 +322,16 @@ public class SpellUtils implements ISpellUtils{
 
 	public int modifyDurationBasedOnArmor(EntityLivingBase caster, int baseDuration){
 		if (!(caster instanceof EntityPlayer)) return baseDuration;
+		float duration = (float) baseDuration;
 		int armorSet = ArmorHelper.getFullArsMagicaArmorSet((EntityPlayer)caster);
 		if (armorSet == ArsMagicaArmorMaterial.MAGE.getMaterialID()){
-			baseDuration *= 1.25f;
+			duration *= 1.25f;
 		}else if (armorSet == ArsMagicaArmorMaterial.BATTLEMAGE.getMaterialID()){
-			baseDuration *= 1.1f;
+			duration *= 1.1f;
 		}else if (armorSet == ArsMagicaArmorMaterial.ARCHMAGE.getMaterialID()){
-			baseDuration *= 2f;
+			duration *= 2f;
 		}
-		return baseDuration;
+		return (int)Math.ceil(duration);
 	}
 
 	//==============================================================================
@@ -635,8 +636,7 @@ public class SpellUtils implements ISpellUtils{
 	public int numStages(ItemStack stack){
 		if (stack == null || !stack.hasTagCompound())
 			return 0;
-		int numStages = stack.stackTagCompound.hasKey(Stages_Identifier) ? stack.stackTagCompound.getInteger(Stages_Identifier) : stack.stackTagCompound.getInteger("ShapeOrdinal_");
-		return numStages;
+		return stack.stackTagCompound.hasKey(Stages_Identifier) ? stack.stackTagCompound.getInteger(Stages_Identifier) : stack.stackTagCompound.getInteger("ShapeOrdinal_");
 	}
 	/**
 	 * @return the numbers of shapes groups in a passed stack
@@ -663,7 +663,7 @@ public class SpellUtils implements ISpellUtils{
 				components[count++] = SkillManager.instance.missingComponent;
 				continue;
 			}
-			components[count++] = component != null && component instanceof ISpellComponent ? (ISpellComponent)component : SkillManager.instance.missingComponent;
+			components[count++] = component instanceof ISpellComponent ? (ISpellComponent)component : SkillManager.instance.missingComponent;
 		}
 		return components;
 	}
@@ -684,7 +684,7 @@ public class SpellUtils implements ISpellUtils{
 				modifiers[count++] = SkillManager.instance.missingModifier;
 				continue;
 			}
-			modifiers[count++] = modifier != null && modifier instanceof ISpellModifier ? (ISpellModifier)modifier : SkillManager.instance.missingModifier;
+			modifiers[count++] = modifier instanceof ISpellModifier ? (ISpellModifier)modifier : SkillManager.instance.missingModifier;
 		}
 		return modifiers;
 	}
@@ -700,13 +700,19 @@ public class SpellUtils implements ISpellUtils{
 		if (SkillTreeManager.instance.isSkillDisabled(shape))
 			return SkillManager.instance.missingShape;
 
-		return shape != null && shape instanceof ISpellShape ? (ISpellShape)shape : SkillManager.instance.missingShape;
+		return shape instanceof ISpellShape ? (ISpellShape)shape : SkillManager.instance.missingShape;
 	}
 
 	public boolean casterHasAllReagents(EntityLivingBase caster, ArrayList<ItemStack> reagents){
-		if (caster instanceof EntityPlayer && ((EntityPlayer)caster).capabilities.isCreativeMode)
-			return true;
+		if (caster instanceof EntityPlayer){
+			EntityPlayer player = (EntityPlayer)caster;
+			if(player.capabilities.isCreativeMode || reagents == null ||  reagents.isEmpty())
 		return true;
+			InventoryPlayer inventory = player.inventory;
+			//return Stream.of(inventory.mainInventory).map(ItemStack::getItem).allMatch( item -> reagents.stream().map(ItemStack::getItem).anyMatch(item1 -> item1.equals(item)));
+			return reagents.stream().filter(Objects::nonNull).map(ItemStack::getItem).allMatch(item -> Stream.of(inventory.mainInventory).filter(Objects::nonNull).map(ItemStack::getItem).anyMatch(item::equals));
+		}
+		return false;
 	}
 
 	public boolean casterHasMana(EntityLivingBase caster, float mana){
@@ -735,7 +741,7 @@ public class SpellUtils implements ISpellUtils{
 				ISpellModifier modifier = SkillManager.instance.getModifier(modifierID);
 				if (modifier == SkillManager.instance.missingModifier)
 					continue;
-				modifierarray[index++] = modifierID.intValue();
+				modifierarray[index++] = modifierID;
 
 
 				if (meta == null) meta = new byte[0];
@@ -798,15 +804,13 @@ public class SpellUtils implements ISpellUtils{
 				xp /= 4;
 			}
 
-			if (caster instanceof EntityPlayer){
 				if (SkillData.For((EntityPlayer)caster).isEntryKnown(SkillTreeManager.instance.getSkillTreeEntry(SkillManager.instance.getSkill("AffinityGains")))){
 					shift *= 1.1f;
 					xp *= 0.9f;
 				}
 				ItemStack chestArmor = ((EntityPlayer)caster).getCurrentArmor(2);
-				if (chestArmor != null && ArmorHelper.isInfusionPreset(chestArmor, GenericImbuement.magicXP))
+			if (ArmorHelper.isInfusionPreset(chestArmor, GenericImbuement.magicXP))
 					xp *= 1.25f;
-			}
 
 			if (shift > 0){
 				AffinityChangingEvent event = new AffinityChangingEvent((EntityPlayer)caster, affinity, shift);
@@ -815,14 +819,18 @@ public class SpellUtils implements ISpellUtils{
 					aff.incrementAffinity(affinity, event.amount);
 			}
 			if (xp > 0){
-				xp *= caster.getAttributeMap().getAttributeInstance(ArsMagicaApi.xpGainModifier).getAttributeValue();
-				xp *= mana / 300; // amount of XP is proportional to amount of mana spent, unlike the previous autoclicker mod system
+				xp *= (float)caster.getAttributeMap().getAttributeInstance(ArsMagicaApi.xpGainModifier).getAttributeValue();
+//				float level = (float)ExtendedProperties.For(caster).getMagicLevel();
+//				float burnoutscaled = (ExtendedProperties.For(caster).getCurrentFatigue() /  ExtendedProperties.For(caster).getMaxFatigue());
+//				float manascaled = mana / ExtendedProperties.For(caster).getMaxMana();
+				//xp *= (float)Math.pow(Math.pow(manascaled * manascaled, 1 / burnoutscaled),levelscaled);
+				//xp *= (float)((Math.pow(manascaled,burnoutscaled) * (level/10)));
+				xp *= mana / 300;
 				ExtendedProperties.For(caster).addMagicXP(xp);
 			}
 		}
 		aff.addDiminishingReturns(governingShape.isChanneled());
 	}
-
 	public HashMap<Affinity, Float> AffinityFor(ItemStack stack){
 		HashMap<Affinity, Integer> affinityFrequency = new HashMap<Affinity, Integer>();
 		HashMap<Affinity, Float> affinities = new HashMap<Affinity, Float>();
@@ -865,29 +873,17 @@ public class SpellUtils implements ISpellUtils{
 		int[] spell_components = new int[components.length];
 		ListMultimap<Integer, byte[]> spell_modifiers = ArrayListMultimap.create();
 		for (int i = 0; i < spell_components.length; ++i){
-			if (components[i].equals("")) continue;
+			if (components[i].isEmpty()) continue;
 			spell_components[i] = SkillManager.instance.getShiftedPartID(SkillManager.instance.getSkill(components[i]));
 		}
-		for (int i = 0; i < modifiers.length; ++i){
-			if (modifiers[i].equals("")) continue;
-			int modifierID = SkillManager.instance.getShiftedPartID(SkillManager.instance.getSkill(modifiers[i]));
+		for (String modifier : modifiers){
+			if (modifier.isEmpty()) continue;
+			int modifierID = SkillManager.instance.getShiftedPartID(SkillManager.instance.getSkill(modifier));
 			byte[] meta = new byte[0];
 			spell_modifiers.put(modifierID, meta);
 		}
 
 		addSpellStageToScroll(scrollStack, spell_shape, spell_components, spell_modifiers);
-	}
-
-	/**
-	 * Modifies the damage based on the caster's magic level
-	 *
-	 * @return
-	 */
-	public float modifyDamage(EntityLivingBase caster, float damage){
-		float factor = (float)(ExtendedProperties.For(caster).getMagicLevel() < 20 ?
-				0.5 + (0.5 * ExtendedProperties.For(caster).getMagicLevel() / 19) :
-				1.0 + (1.0 * (ExtendedProperties.For(caster).getMagicLevel() - 20) / 79));
-		return damage * factor;
 	}
 
 	public void writeModVersionToStack(ItemStack stack){
@@ -920,10 +916,10 @@ public class SpellUtils implements ISpellUtils{
 	public boolean isOldVersionSpell(ItemStack stack){
 		if (!stack.hasTagCompound()) return false;
 		String version = stack.stackTagCompound.getString("spell_mod_version");
-		return version != AMCore.instance.getVersion();
+		return !version.equals(AMCore.instance.getVersion());
 	}
 
-	public class SpellRequirements{
+	public static class SpellRequirements{
 		public final float manaCost;
 		public final float burnout;
 		public final ArrayList<ItemStack> reagents;
@@ -973,12 +969,12 @@ public class SpellUtils implements ISpellUtils{
 	public ItemStack createSpellStack(ArrayList<ArrayList<KeyValuePair<ISpellPart, byte[]>>> shapeGroups, ArrayList<KeyValuePair<ISpellPart, byte[]>> spell){
 		ArrayList<KeyValuePair<ISpellPart, byte[]>> recipeCopy = (ArrayList<KeyValuePair<ISpellPart, byte[]>>)spell.clone();
 
-		if (recipeCopy.size() > 0 && !(recipeCopy.get(0).getKey() instanceof ISpellShape))
+		if (!recipeCopy.isEmpty() && !(recipeCopy.get(0).getKey() instanceof ISpellShape))
 			recipeCopy.add(0, new KeyValuePair<ISpellPart, byte[]>(SkillManager.instance.missingShape, new byte[0]));
 
 		ItemStack stack = new ItemStack(ItemsCommonProxy.spell);
 		boolean hasSummon = false;
-		while (recipeCopy.size() > 0){
+		while (!recipeCopy.isEmpty()){
 			ISpellShape shape;
 			ArrayList<Integer> components = new ArrayList<Integer>();
 			ArrayListMultimap<Integer, byte[]> modifiers = ArrayListMultimap.create();
@@ -988,7 +984,7 @@ public class SpellUtils implements ISpellUtils{
 			if (part.getKey() instanceof ISpellShape){
 				shape = (ISpellShape)part.getKey();
 
-				part = recipeCopy.size() > 0 ? recipeCopy.get(0) : null;
+				part = !recipeCopy.isEmpty() ? recipeCopy.get(0) : null;
 				while (part != null && !(part.getKey() instanceof ISpellShape)){
 					recipeCopy.remove(0);
 					if (part.getKey() instanceof ISpellComponent){
@@ -999,7 +995,7 @@ public class SpellUtils implements ISpellUtils{
 					}else if (part.getKey() instanceof ISpellModifier){
 						modifiers.put(SkillManager.instance.getShiftedPartID(part.getKey()), part.getValue());
 					}
-					part = recipeCopy.size() > 0 ? recipeCopy.get(0) : null;
+					part = !recipeCopy.isEmpty() ? recipeCopy.get(0) : null;
 				}
 
 				if (hasSummon){
@@ -1010,9 +1006,8 @@ public class SpellUtils implements ISpellUtils{
 			}
 		}
 
-		for (int i = 0; i < shapeGroups.size(); ++i){
-			ArrayList<KeyValuePair<ISpellPart, byte[]>> shapeGroup = shapeGroups.get(i);
-			if (shapeGroup.size() == 0)
+		for (ArrayList<KeyValuePair<ISpellPart, byte[]>> shapeGroup : shapeGroups){
+			if (shapeGroup.isEmpty())
 				continue;
 			int[] sgp = new int[shapeGroup.size()];
 			byte[][] sgp_m = new byte[shapeGroup.size()][];
@@ -1053,7 +1048,7 @@ public class SpellUtils implements ISpellUtils{
 	private int[] ArrayListToIntArray(ArrayList<Integer> list){
 		int[] arr = new int[list.size()];
 		for (int i = 0; i < arr.length; ++i){
-			arr[i] = list.get(i).intValue();
+			arr[i] = list.get(i);
 		}
 		return arr;
 	}

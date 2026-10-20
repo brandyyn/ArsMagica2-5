@@ -7,6 +7,8 @@ import am2.api.spell.enums.Affinity;
 import am2.api.spell.enums.ContingencyTypes;
 import am2.api.spell.enums.SpellCastResult;
 import am2.blocks.BlocksCommonProxy;
+import am2.items.ItemEssence;
+import am2.items.ItemOre;
 import am2.items.ItemsCommonProxy;
 import am2.playerextensions.ExtendedProperties;
 import am2.spell.SpellUtils;
@@ -27,14 +29,14 @@ public class Contingency_Death implements ISpellShape{
 	public Object[] getRecipeItems(){
 		return new Object[]{
 				Items.clock,
-				new ItemStack(ItemsCommonProxy.essence, 1, ItemsCommonProxy.essence.META_ENDER),
+				new ItemStack(ItemsCommonProxy.essence, 1, ItemEssence.META_ENDER),
 				Blocks.stone,
 				Blocks.stone_slab,
 				Blocks.stone_slab,
 				Blocks.stone_slab,
 				Items.blaze_powder,
 				BlocksCommonProxy.tarmaRoot,
-				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemsCommonProxy.itemOre.META_ARCANEASH),
+				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemOre.META_ARCANEASH),
 				String.format("E:%d", PowerTypes.DARK.ID()), 5000
 		};
 	}

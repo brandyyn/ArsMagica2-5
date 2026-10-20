@@ -5,7 +5,7 @@ import am2.blocks.tileentities.TileEntitySummoner;
 import am2.containers.slots.AM2Container;
 import am2.containers.slots.SlotFocusOnly;
 import am2.containers.slots.SlotGhostRune;
-import am2.containers.slots.SlotOneItemClassOnly;
+import am2.containers.slots.SlotSpell;
 import am2.items.ItemFocus;
 import am2.items.ItemFocusCharge;
 import am2.items.ItemFocusMana;
@@ -28,7 +28,7 @@ public class ContainerSummoner extends AM2Container{
 		addSlotToContainer(new SlotFocusOnly(summoner, 0, 62, 28)); //inventory, index, x, y
 		addSlotToContainer(new SlotFocusOnly(summoner, 1, 80, 28));
 		addSlotToContainer(new SlotFocusOnly(summoner, 2, 98, 28));
-		addSlotToContainer(new SlotOneItemClassOnly(summoner, 3, 80, 68, ItemSpellBase.class, 1));
+		addSlotToContainer(new SlotSpell(summoner, 3, 80, 68));
 
 		addSlotToContainer(new SlotGhostRune(summoner, 4, 62, 8));
 		addSlotToContainer(new SlotGhostRune(summoner, 5, 80, 8));

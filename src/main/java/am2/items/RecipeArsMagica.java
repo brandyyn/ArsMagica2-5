@@ -2,12 +2,13 @@ package am2.items;
 
 import am2.AMCore;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
 
 public class RecipeArsMagica{
-	private ItemStack[] craftingComponents;
-	private ItemStack output;
+	private final ItemStack[] craftingComponents;
+	private final ItemStack output;
 	private int recipeID;
-	private int componentLength;
+	private final int componentLength;
 
 	public RecipeArsMagica(ItemStack[] craftingComponents, ItemStack output){
 		componentLength = craftingComponents.length;

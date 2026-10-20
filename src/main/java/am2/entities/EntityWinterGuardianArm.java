@@ -1,7 +1,6 @@
 package am2.entities;
 
 import am2.AMCore;
-import am2.PlayerTracker;
 import am2.bosses.EntityWinterGuardian;
 import am2.buffs.BuffEffectFrostSlowed;
 import am2.items.ItemsCommonProxy;

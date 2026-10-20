@@ -189,7 +189,7 @@ public class EntitySpellEffect extends Entity{
 						double x = this.posX - Math.cos(3.141 / 180 * (_rotation)) * dist;
 						double z = this.posZ - Math.sin(3.141 / 180 * (_rotation)) * dist;
 
-						AMParticle effect = (AMParticle)AMCore.instance.proxy.particleManager.spawn(worldObj, AMParticleIcons.instance.getParticleForAffinity(SpellUtils.instance.mainAffinityFor(spellStack)), x, posY, z);
+						AMParticle effect = (AMParticle)AMCore.proxy.particleManager.spawn(worldObj, AMParticleIcons.instance.getParticleForAffinity(SpellUtils.instance.mainAffinityFor(spellStack)), x, posY, z);
 						if (effect != null){
 							effect.setIgnoreMaxAge(false);
 							effect.setMaxAge(20);
@@ -421,7 +421,7 @@ public class EntitySpellEffect extends Entity{
 				double x = this.posX - Math.cos(3.141 / 180 * (rotationYaw)) * i;
 				double z = this.posZ - Math.sin(3.141 / 180 * (rotationYaw)) * i;
 
-				AMParticle effect = (AMParticle)AMCore.instance.proxy.particleManager.spawn(worldObj, AMParticleIcons.instance.getParticleForAffinity(SpellUtils.instance.mainAffinityFor(spellStack)), x, posY, z);
+				AMParticle effect = (AMParticle)AMCore.proxy.particleManager.spawn(worldObj, AMParticleIcons.instance.getParticleForAffinity(SpellUtils.instance.mainAffinityFor(spellStack)), x, posY, z);
 				if (effect != null){
 					effect.setIgnoreMaxAge(false);
 					effect.setMaxAge(20);
@@ -440,7 +440,7 @@ public class EntitySpellEffect extends Entity{
 				x = this.posX - Math.cos(Math.toRadians(rotationYaw)) * -i;
 				z = this.posZ - Math.sin(Math.toRadians(rotationYaw)) * -i;
 
-				effect = (AMParticle)AMCore.instance.proxy.particleManager.spawn(worldObj, AMParticleIcons.instance.getParticleForAffinity(SpellUtils.instance.mainAffinityFor(spellStack)), x, posY, z);
+				effect = (AMParticle)AMCore.proxy.particleManager.spawn(worldObj, AMParticleIcons.instance.getParticleForAffinity(SpellUtils.instance.mainAffinityFor(spellStack)), x, posY, z);
 				if (effect != null){
 					effect.setIgnoreMaxAge(false);
 					effect.addRandomOffset(1, 1, 1);
@@ -461,9 +461,7 @@ public class EntitySpellEffect extends Entity{
 
 			ticksToEffect--;
 			if (spellStack == null){
-				if (!worldObj.isRemote){
-					this.setDead();
-				}
+				this.setDead();
 				return;
 			}
 
@@ -599,13 +597,4 @@ public class EntitySpellEffect extends Entity{
 		return this.dataWatcher.getWatchableObjectInt(WATCHER_TYPE) == TYPE_ROF;
 	}
 
-	@Override
-	public boolean canBePushed(){
-		return false;
-	}
-
-	@Override
-	public boolean canBeCollidedWith(){
-		return false;
-	}
 }

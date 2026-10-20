@@ -5,6 +5,7 @@ import am2.api.spell.component.interfaces.ISpellShape;
 import am2.api.spell.enums.Affinity;
 import am2.api.spell.enums.SpellCastResult;
 import am2.api.spell.enums.SpellModifiers;
+import am2.items.ItemOre;
 import am2.items.ItemsCommonProxy;
 import am2.spell.SpellHelper;
 import am2.spell.SpellUtils;
@@ -27,12 +28,7 @@ public class Touch implements ISpellShape{
 	@Override
 	public SpellCastResult beginStackStage(ItemSpellBase item, ItemStack stack, EntityLivingBase caster, EntityLivingBase target, World world, double x, double y, double z, int side, boolean giveXP, int useCount){
 		if (target != null){
-			Entity e = target;
-			if (e instanceof EntityDragonPart && ((EntityDragonPart)e).entityDragonObj instanceof EntityLivingBase)
-				e = (EntityLivingBase)((EntityDragonPart)e).entityDragonObj;
-
-			SpellCastResult result = SpellHelper.instance.applyStageToEntity(stack, caster, world, e, 0, giveXP);
-			return result;
+			return SpellHelper.instance.applyStageToEntity(stack, caster, world, target, 0, giveXP);
 		}
 
 		boolean targetWater = SpellUtils.instance.modifierIsPresent(SpellModifiers.TARGET_NONSOLID_BLOCKS, stack, 0);
@@ -45,7 +41,7 @@ public class Touch implements ISpellShape{
 				Entity e = mop.entityHit;
 				if (e instanceof EntityDragonPart && ((EntityDragonPart)e).entityDragonObj instanceof EntityLivingBase)
 					e = (EntityLivingBase)((EntityDragonPart)e).entityDragonObj;
-				SpellCastResult result = SpellHelper.instance.applyStageToEntity(stack, caster, world, (target == null) ? e : target, 0, giveXP);
+				SpellCastResult result = SpellHelper.instance.applyStageToEntity(stack, caster, world, e, 0, giveXP);
 				if (result != SpellCastResult.SUCCESS){
 					return result;
 				}
@@ -70,7 +66,7 @@ public class Touch implements ISpellShape{
 	@Override
 	public Object[] getRecipeItems(){
 		return new Object[]{
-				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemsCommonProxy.itemOre.META_VINTEUMDUST),
+				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemOre.META_VINTEUMDUST),
 				Items.feather,
 				Items.fish,
 				Items.clay_ball

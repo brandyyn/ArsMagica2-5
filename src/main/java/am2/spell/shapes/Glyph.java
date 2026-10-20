@@ -7,7 +7,9 @@ import am2.api.spell.component.interfaces.ISpellShape;
 import am2.api.spell.enums.Affinity;
 import am2.api.spell.enums.SpellCastResult;
 import am2.api.spell.enums.SpellModifiers;
-import am2.items.ItemBindingCatalyst;
+import am2.items.ItemEssence;
+import am2.items.ItemOre;
+import am2.items.ItemRune;
 import am2.items.ItemsCommonProxy;
 import am2.network.AMNetHandler;
 import am2.particles.AMParticle;
@@ -19,13 +21,11 @@ import am2.spell.SkillTreeManager;
 import am2.spell.SpellHelper;
 import am2.spell.SpellUtils;
 import am2.spell.modifiers.Colour;
-import am2.utility.InventoryUtilities;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
 public class Glyph implements ISpellShape {
@@ -46,7 +46,7 @@ public class Glyph implements ISpellShape {
 				double z1 = z + 0.5F;
 				String variables = x1 + "," + y1 + "," + z1;
 				if (ep.hasExtraVariable("SPELLPOS")){
-					if (caster instanceof EntityPlayer && SkillData.For((EntityPlayer)caster).isEntryKnown(SkillTreeManager.instance.getSkillTreeEntry(SkillManager.instance.getSkill("ExtraGlyphs")))){
+					if (SkillData.For((EntityPlayer)caster).isEntryKnown(SkillTreeManager.instance.getSkillTreeEntry(SkillManager.instance.getSkill("ExtraGlyphs")))){
 						if (!ep.hasExtraVariable("SPELLPOS2")){
 							ep.addToExtraVariables("SPELLPOS2", variables);
 						}else if (!ep.hasExtraVariable("SPELLPOS3")){
@@ -83,12 +83,12 @@ public class Glyph implements ISpellShape {
 		} else{ // activate glyphs
 //			if (!world.isRemote) {
 				if (ep.hasExtraVariable("SPELLPOS")){
-					if (caster instanceof EntityPlayer && SkillData.For((EntityPlayer)caster).isEntryKnown(SkillTreeManager.instance.getSkillTreeEntry(SkillManager.instance.getSkill("ExtraGlyphs")))){
+					if (SkillData.For((EntityPlayer)caster).isEntryKnown(SkillTreeManager.instance.getSkillTreeEntry(SkillManager.instance.getSkill("ExtraGlyphs")))){
 						if (ep.hasExtraVariable("SPELLPOS3")){
 							String pos = ep.getExtraVariable("SPELLPOS3");
-							double actualX = Double.valueOf(pos.split(",")[0]);
-							double actualY = Double.valueOf(pos.split(",")[1]);
-							double actualZ = Double.valueOf(pos.split(",")[2]);
+							double actualX = Double.parseDouble(pos.split(",")[0]);
+							double actualY = Double.parseDouble(pos.split(",")[1]);
+							double actualZ = Double.parseDouble(pos.split(",")[2]);
 							// activate glyph 3
 							ItemStack newItemStack = getNewStack(stack,0);
 							SpellHelper.instance.applyStackStage(newItemStack, caster, null, actualX, actualY, actualZ, 0, world, true, giveXP, 0);
@@ -98,9 +98,9 @@ public class Glyph implements ISpellShape {
 							return SpellCastResult.SUCCESS;
 						}else if (ep.hasExtraVariable("SPELLPOS2")){
 							String pos = ep.getExtraVariable("SPELLPOS2");
-							double actualX = Double.valueOf(pos.split(",")[0]);
-							double actualY = Double.valueOf(pos.split(",")[1]);
-							double actualZ = Double.valueOf(pos.split(",")[2]);
+							double actualX = Double.parseDouble(pos.split(",")[0]);
+							double actualY = Double.parseDouble(pos.split(",")[1]);
+							double actualZ = Double.parseDouble(pos.split(",")[2]);
 							// activate glyph 2
 							ItemStack newItemStack = getNewStack(stack,0);
 							SpellHelper.instance.applyStackStage(newItemStack, caster, null, actualX, actualY, actualZ, 0, world, true, giveXP, 0);
@@ -111,9 +111,9 @@ public class Glyph implements ISpellShape {
 						}
 					}
 					String pos = ep.getExtraVariable("SPELLPOS");
-					double actualX = Double.valueOf(pos.split(",")[0]);
-					double actualY = Double.valueOf(pos.split(",")[1]);
-					double actualZ = Double.valueOf(pos.split(",")[2]);
+					double actualX = Double.parseDouble(pos.split(",")[0]);
+					double actualY = Double.parseDouble(pos.split(",")[1]);
+					double actualZ = Double.parseDouble(pos.split(",")[2]);
 					// activate glyph 1
 					ItemStack newItemStack = getNewStack(stack,0);
 					SpellHelper.instance.applyStackStage(newItemStack, caster, null, actualX, actualY, actualZ, 0, world, true, giveXP, 0);
@@ -154,10 +154,10 @@ public class Glyph implements ISpellShape {
 	@Override
 	public Object[] getRecipeItems(){
 		return new Object[]{
-				new ItemStack(ItemsCommonProxy.rune, 1, ItemsCommonProxy.rune.META_WHITE),
-				new ItemStack(ItemsCommonProxy.rune, 1, ItemsCommonProxy.rune.META_BLACK),
-				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemsCommonProxy.itemOre.META_CHIMERITE),
-				new ItemStack(ItemsCommonProxy.essence, 1, ItemsCommonProxy.essence.META_AIR),
+				new ItemStack(ItemsCommonProxy.rune, 1, ItemRune.META_WHITE),
+				new ItemStack(ItemsCommonProxy.rune, 1, ItemRune.META_BLACK),
+				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemOre.META_CHIMERITE),
+				new ItemStack(ItemsCommonProxy.essence, 1, ItemEssence.META_AIR),
 				Items.feather,
 				Items.arrow,
 				Items.golden_axe,

@@ -9,12 +9,12 @@ import am2.api.spell.component.interfaces.ISpellShape;
 import am2.items.ItemsCommonProxy;
 import am2.playerextensions.ExtendedProperties;
 import am2.proxy.tick.ClientTickHandler;
-import am2.utility.WebRequestUtils;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.Language;
 import net.minecraft.entity.Entity;
@@ -25,14 +25,14 @@ import net.minecraft.stats.Achievement;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
-import org.apache.commons.io.FileUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 @SideOnly(Side.CLIENT)
@@ -73,15 +73,19 @@ public class ArcaneCompendium implements ILoreHelper{
 			return;
 
 		try{
-			if (Minecraft.getMinecraft().thePlayer != null && ExtendedProperties.For(Minecraft.getMinecraft().thePlayer) != null) {
-				System.out.println("Saving Unlock Data!");
-				for (CompendiumEntry entry : compendium.values()){
-					String id = "U";
-					if (entry.isLocked)
-						id += "L";
-					if (entry.isNew)
-						id += "N";
-					ExtendedProperties.For(Minecraft.getMinecraft().thePlayer).setCompendiumEntry(entry.getID(), id);
+			EntityClientPlayerMP player = Minecraft.getMinecraft().thePlayer;
+			if(player != null){
+				ExtendedProperties props = ExtendedProperties.For(player);
+				if (props != null){
+					LogHelper.debug("Saving Unlock Data!");
+					for (CompendiumEntry entry : compendium.values()){
+						String id = "U";
+						if (entry.isLocked)
+							id += "L";
+						if (entry.isNew)
+							id += "N";
+						props.setCompendiumEntry(entry.getID(), id);
+					}
 				}
 			}
 		}catch (Exception e){
@@ -102,7 +106,7 @@ public class ArcaneCompendium implements ILoreHelper{
 		try{
 			if (Minecraft.getMinecraft().thePlayer != null && ExtendedProperties.For(Minecraft.getMinecraft().thePlayer) != null) {
 				hasLoaded = true;
-				System.out.println("Loading Unlock Data!");
+				LogHelper.debug("Loading Unlock Data!");
 				ExtendedProperties.For(Minecraft.getMinecraft().thePlayer).requestEntriesUpdateFromServer();
 			}
 		}catch (Exception e){
@@ -239,14 +243,14 @@ public class ArcaneCompendium implements ILoreHelper{
 		IResource resource = null;
 		try{
 			resource = Minecraft.getMinecraft().getResourceManager().getResource(rLoc);
-		}catch (IOException e){
+		}catch (IOException ignored){
 		}finally{
 			if (resource == null){
 				LogHelper.info("Unable to find localized compendium.  Defaulting to en_US");
 				rLoc = new ResourceLocation("arsmagica2", "docs/ArcaneCompendium_en_US.xml");
 				try{
 					resource = Minecraft.getMinecraft().getResourceManager().getResource(rLoc);
-				}catch (IOException e){
+				}catch (IOException ignored){
 				}
 			}
 		}
@@ -258,11 +262,7 @@ public class ArcaneCompendium implements ILoreHelper{
 	}
 
 	public LinkedHashSet<CompendiumEntryType> getCategories(){
-		LinkedHashSet<CompendiumEntryType> toReturn = new LinkedHashSet();
-		for (CompendiumEntryType type : CompendiumEntryTypes.categoryList()){
-			toReturn.add(type);
-		}
-		return toReturn;
+		return new LinkedHashSet<>(Arrays.asList(CompendiumEntryTypes.categoryList()));
 	}
 
 	public ArrayList<CompendiumEntry> getEntriesForCategory(String category){
@@ -293,7 +293,6 @@ public class ArcaneCompendium implements ILoreHelper{
 			entry.setIsLocked(false);
 			if (ExtendedProperties.For(Minecraft.getMinecraft().thePlayer).getMagicLevel() > 0)
 				Minecraft.getMinecraft().guiAchievement.func_146256_a(compendiumData);
-
 			saveUnlockData();
 		}
 	}
@@ -414,21 +413,7 @@ public class ArcaneCompendium implements ILoreHelper{
 			LogHelper.warn("The parent ID %s was not found.  Entry %s will be added with no parent.", parent, entryKey);
 		}
 
-		CompendiumEntry newEntry = null;
-
-		if (entryItem instanceof Item){
-			newEntry = new CompendiumEntryItem();
-		}else if (entryItem instanceof Block){
-			newEntry = new CompendiumEntryBlock();
-		}else if (entryItem instanceof ISpellShape){
-			newEntry = new CompendiumEntrySpellShape();
-		}else if (entryItem instanceof ISpellComponent){
-			newEntry = new CompendiumEntrySpellComponent();
-		}else if (entryItem instanceof ISpellModifier){
-			newEntry = new CompendiumEntrySpellModifier();
-		}else if (entryItem instanceof Entity){
-			newEntry = new CompendiumEntryMob();
-		}
+		CompendiumEntry newEntry = getCompendiumEntry(entryItem);
 
 		newEntry.id = entryKey;
 		newEntry.name = entryName;
@@ -436,8 +421,7 @@ public class ArcaneCompendium implements ILoreHelper{
 		newEntry.isLocked = true;
 		newEntry.isNew = true;
 		newEntry.parent = parentEntry;
-		for (String s : relatedKeys)
-			newEntry.relatedItems.add(s);
+		newEntry.relatedItems.addAll(Arrays.asList(relatedKeys));
 
 		if (parentEntry != null){
 			parentEntry.subItems.add(newEntry);
@@ -457,5 +441,24 @@ public class ArcaneCompendium implements ILoreHelper{
 		} catch (Exception e) {e.printStackTrace();}
 
 		LogHelper.debug("Successfully added compendium entry %s", entryKey);
+	}
+
+	public static CompendiumEntry getCompendiumEntry(Object entryItem){
+		CompendiumEntry newEntry = null;
+
+		if (entryItem instanceof Item){
+			newEntry = new CompendiumEntryItem();
+		}else if (entryItem instanceof Block){
+			newEntry = new CompendiumEntryBlock();
+		}else if (entryItem instanceof ISpellShape){
+			newEntry = new CompendiumEntrySpellShape();
+		}else if (entryItem instanceof ISpellComponent){
+			newEntry = new CompendiumEntrySpellComponent();
+		}else if (entryItem instanceof ISpellModifier){
+			newEntry = new CompendiumEntrySpellModifier();
+		}else if (entryItem instanceof Entity){
+			newEntry = new CompendiumEntryMob();
+		}
+		return newEntry;
 	}
 }

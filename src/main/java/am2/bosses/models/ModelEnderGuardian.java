@@ -11,9 +11,6 @@ import org.lwjgl.opengl.GL11;
 import thehippomaster.AnimationAPI.IAnimatedEntity;
 import thehippomaster.AnimationAPI.client.Animator;
 
-//
-//import thehippomaster.AnimationAPI.client.Animator;
-
 public class ModelEnderGuardian extends ModelBase{
 	//fields
 	AM2ModelRenderer Collar;

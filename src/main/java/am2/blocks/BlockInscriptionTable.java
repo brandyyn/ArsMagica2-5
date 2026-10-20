@@ -20,8 +20,6 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import java.util.Random;
-
 public class BlockInscriptionTable extends AMSpecialRenderBlockContainer{
 
 	public BlockInscriptionTable(){

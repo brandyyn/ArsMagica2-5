@@ -65,17 +65,13 @@ public class RitualShapeHelper{
 		if (items.size() != check.length)
 			return false;
 
-		ArrayList<ItemStack> itemList = new ArrayList<ItemStack>();
-		for (ItemStack stack : check)
-			itemList.add(stack);
+		ArrayList<ItemStack> itemList = new ArrayList<ItemStack>(Arrays.asList(check));
 
-		Iterator it = itemList.iterator();
-		while (it.hasNext()){
-			ItemStack stack = (ItemStack)it.next();
-			Iterator eIt = items.iterator();
+		for (ItemStack stack : itemList){
+			Iterator<EntityItem> eIt = items.iterator();
 			boolean found = false;
 			while (eIt.hasNext()){
-				EntityItem eItem = (EntityItem)eIt.next();
+				EntityItem eItem = eIt.next();
 				if (InventoryUtilities.compareItemStacks(eItem.getEntityItem(), stack, true, false, true, true)){
 					found = true;
 					eIt.remove();
@@ -314,16 +310,11 @@ public class RitualShapeHelper{
 		purification.addAllowedBlock(2, 0, -2, BlocksCommonProxy.candle);
 	}
 
-	private class EntityItemComparator implements Comparator<EntityItem>{
+	private static class EntityItemComparator implements Comparator<EntityItem>{
 
 		@Override
 		public int compare(EntityItem o1, EntityItem o2){
-			if (o1.ticksExisted == o2.ticksExisted)
-				return 0;
-			else if (o1.ticksExisted > o2.ticksExisted)
-				return -1;
-			else
-				return 1;
+			return Integer.compare(o2.ticksExisted, o1.ticksExisted);
 		}
 
 	}

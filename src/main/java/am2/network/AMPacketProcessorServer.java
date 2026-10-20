@@ -2,6 +2,7 @@ package am2.network;
 
 import am2.AMCore;
 import am2.LogHelper;
+import am2.PlayerTracker;
 import am2.api.math.AMVector3;
 import am2.api.power.IPowerNode;
 import am2.api.power.PowerTypes;
@@ -54,76 +55,76 @@ public class AMPacketProcessorServer{
 
 			switch (packetID){
 			case AMPacketIDs.SPELL_SHAPE_GROUP_CHANGE:
-				handleCastingModeChange(remaining, (EntityPlayerMP)player);
+				handleCastingModeChange(remaining, player);
 				break;
 			case AMPacketIDs.MAGIC_LEVEL_UP:
-				handleMagicLevelUp(remaining, (EntityPlayerMP)player);
+				handleMagicLevelUp(remaining, player);
 				break;
 			case AMPacketIDs.SYNCMAPTOSERVER:
 				handleSyncMapServer(remaining);
 				break;
 			case AMPacketIDs.SYNCCOMPENDIUM:
-				handleSyncCompendium(remaining, (EntityPlayerMP)player);
+				handleSyncCompendium(remaining, player);
 				break;
 			case AMPacketIDs.SYNCCOMPENDIUMREQUEST:
-				handleSyncCompendiumRequest(remaining, (EntityPlayerMP)player);
+				handleSyncCompendiumRequest(remaining, player);
 				break;
 			case AMPacketIDs.REQUESTWORLDDATACHANGE:
-				handleRequestWorldDataChange(remaining, (EntityPlayerMP)player);
+				handleRequestWorldDataChange(remaining, player);
 				break;
 			case AMPacketIDs.SYNC_BETA_PARTICLES:
-				handleSyncBetaParticles(remaining, (EntityPlayerMP)player);
+				handleSyncBetaParticles(remaining, player);
 				break;
 			case AMPacketIDs.POSSIBLE_CLIENT_EXPROP_DESYNC:
 				handlePossibleClientExpropDesync(remaining);
 				break;
 			case AMPacketIDs.REQUEST_BETA_PARTICLES:
-				handleRequestBetaParticles(remaining, (EntityPlayerMP)player);
+				handleRequestBetaParticles(remaining, player);
 				break;
 			case AMPacketIDs.SPELL_CUSTOMIZE:
-				handleSpellCustomize(remaining, (EntityPlayerMP)player);
+				handleSpellCustomize(remaining, player);
 				break;
 			case AMPacketIDs.SPELLBOOK_CHANGE_ACTIVE_SLOT:
-				handleSpellBookChangeActiveSlot(remaining, (EntityPlayerMP)player);
+				handleSpellBookChangeActiveSlot(remaining, player);
 				break;
 			case AMPacketIDs.SYNC_SPELL_KNOWLEDGE:
-				handleSyncSpellKnowledge(remaining, (EntityPlayerMP)player);
+				handleSyncSpellKnowledge(remaining, player);
 				break;
 			case AMPacketIDs.DECO_BLOCK_UPDATE:
-				handleDecoBlockUpdate(remaining, (EntityPlayerMP)player);
+				handleDecoBlockUpdate(remaining, player);
 				break;
 			case AMPacketIDs.INSCRIPTION_TABLE_UPDATE:
-				handleInscriptionTableUpdate(remaining, (EntityPlayerMP)player);
+				handleInscriptionTableUpdate(remaining, player);
 				break;
 			case AMPacketIDs.CASTER_BLOCK_UPDATE:
-				handleCasterUpdate(remaining, (EntityPlayerMP)player);
+				handleCasterUpdate(remaining, player);
 				break;
 			case AMPacketIDs.TK_DISTANCE_SYNC:
-				ExtendedProperties.For((EntityPlayerMP)player).TK_Distance = new AMDataReader(remaining).getFloat();
+				ExtendedProperties.For(player).TK_Distance = new AMDataReader(remaining).getFloat();
 				break;
 			case AMPacketIDs.SAVE_KEYSTONE_COMBO:
-				handleSaveKeystoneCombo(remaining, (EntityPlayerMP)player);
+				handleSaveKeystoneCombo(remaining, player);
 				break;
 			case AMPacketIDs.SET_KEYSTONE_COMBO:
-				handleSetKeystoneCombo(remaining, (EntityPlayerMP)player);
+				handleSetKeystoneCombo(remaining, player);
 				break;
 			case AMPacketIDs.SET_MAG_WORK_REC:
-				handleSetMagiciansWorkbenchRecipe(remaining, (EntityPlayerMP)player);
+				handleSetMagiciansWorkbenchRecipe(remaining, player);
 				break;
 			case AMPacketIDs.RUNE_BAG_GUI_OPEN:
-				handleRuneBagGUIOpen(remaining, (EntityPlayerMP)player);
+				handleRuneBagGUIOpen(remaining, player);
 				break;
 			case AMPacketIDs.M_BENCH_LOCK_RECIPE:
-				handleMBenchLockRecipe(remaining, (EntityPlayerMP)player);
+				handleMBenchLockRecipe(remaining, player);
 				break;
 			case AMPacketIDs.IMBUE_ARMOR:
-				handleImbueArmor(remaining, (EntityPlayerMP)player);
+				handleImbueArmor(remaining, player);
 				break;
 			case AMPacketIDs.REQUEST_PWR_PATHS:
-				handlePowerPathSync(remaining, (EntityPlayerMP)player);
+				handlePowerPathSync(remaining, player);
 				break;
 			case AMPacketIDs.SYNC_EXTENDED_PROPS:
-				handleExpropOperation(remaining, (EntityPlayerMP)player);
+				handleExpropOperation(remaining, player);
 				break;
 			case AMPacketIDs.AFFINITY_ACTIVATE:
 				handleAffinityActivate(remaining, player);
@@ -135,8 +136,7 @@ public class AMPacketProcessorServer{
 			t.printStackTrace();
 		}finally{
 			try{
-				if (bbis != null)
-					bbis.close();
+				bbis.close();
 			}catch (Throwable t){
 				t.printStackTrace();
 			}
@@ -149,11 +149,10 @@ public class AMPacketProcessorServer{
 			AMDataWriter writer = new AMDataWriter();
 			NBTTagCompound compendium_data = new NBTTagCompound();
 			int c = 0;
-			for (Object o : ep.getAllCompendiumEntries().keySet()) {
-				String iS = (String) o;
-				String iValue = ep.getAllCompendiumEntries().get(iS);
+			for (String o : ep.getAllCompendiumEntries().keySet()) {
+				String iValue = ep.getAllCompendiumEntries().get(o);
 				compendium_data.setString("compentry" + c, iValue);
-				compendium_data.setString("compentryname" + c, iS);
+				compendium_data.setString("compentryname" + c, o);
 				c++;
 			}
 			compendium_data.setInteger("compendiumsize", ep.getAllCompendiumEntries().size());
@@ -184,7 +183,7 @@ public class AMPacketProcessorServer{
 		World world = player.worldObj;
 		AMDataReader rdr = new AMDataReader(data, false);
 		TileEntity te = world.getTileEntity(rdr.getInt(), rdr.getInt(), rdr.getInt());
-		if (te == null || !(te instanceof TileEntityBlockCaster)) return;
+		if (!(te instanceof TileEntityBlockCaster)) return;
 		AMDataWriter writer = new AMDataWriter();
 		writer.add(te.xCoord);
 		writer.add(te.yCoord);
@@ -210,7 +209,7 @@ public class AMPacketProcessorServer{
 		if (nom == 1){
 			AMVector3 loc = new AMVector3(rdr.getFloat(), rdr.getFloat(), rdr.getFloat());
 			TileEntity te = player.worldObj.getTileEntity((int)loc.x, (int)loc.y, (int)loc.z);
-			if (te != null && te instanceof IPowerNode){
+			if (te instanceof IPowerNode){
 				AMNetHandler.INSTANCE.sendPowerResponseToClient(PowerNodeRegistry.For(player.worldObj).getDataCompoundForNode((IPowerNode)te), player, te);
 			}
 		}
@@ -219,7 +218,7 @@ public class AMPacketProcessorServer{
 	private void handleImbueArmor(byte[] data, EntityPlayerMP player){
 		AMDataReader rdr = new AMDataReader(data, false);
 		TileEntity te = player.worldObj.getTileEntity(rdr.getInt(), rdr.getInt(), rdr.getInt());
-		if (te != null && te instanceof TileEntityArmorImbuer){
+		if (te instanceof TileEntityArmorImbuer){
 			((TileEntityArmorImbuer)te).imbueCurrentArmor(rdr.getString());
 		}
 	}
@@ -231,7 +230,7 @@ public class AMPacketProcessorServer{
 		int z = rdr.getInt();
 
 		TileEntity te = player.worldObj.getTileEntity(x, y, z);
-		if (te != null && te instanceof TileEntityMagiciansWorkbench){
+		if (te instanceof TileEntityMagiciansWorkbench){
 			((TileEntityMagiciansWorkbench)te).setRecipeLocked(rdr.getInt(), rdr.getBoolean());
 			te.getWorldObj().markBlockForUpdate(te.xCoord, te.yCoord, te.zCoord);
 		}
@@ -250,7 +249,7 @@ public class AMPacketProcessorServer{
 	}
 
 	private void handleSetMagiciansWorkbenchRecipe(byte[] data, EntityPlayerMP player){
-		if (player.openContainer != null && player.openContainer instanceof ContainerMagiciansWorkbench){
+		if (player.openContainer instanceof ContainerMagiciansWorkbench){
 			((ContainerMagiciansWorkbench)player.openContainer).moveRecipeToCraftingGrid(new AMDataReader(data, false).getInt());
 		}
 	}
@@ -279,7 +278,7 @@ public class AMPacketProcessorServer{
 		World world = player.worldObj;
 		AMDataReader rdr = new AMDataReader(data, false);
 		TileEntity te = world.getTileEntity(rdr.getInt(), rdr.getInt(), rdr.getInt());
-		if (te == null || !(te instanceof TileEntityInscriptionTable)) return;
+		if (!(te instanceof TileEntityInscriptionTable)) return;
 		((TileEntityInscriptionTable)te).HandleUpdatePacket(rdr.getRemainingBytes());
 
 		world.markBlockForUpdate(te.xCoord, te.yCoord, te.zCoord);
@@ -289,8 +288,8 @@ public class AMPacketProcessorServer{
 		World world = player.worldObj;
 		AMDataReader rdr = new AMDataReader(data, false);
 		TileEntity te = world.getTileEntity(rdr.getInt(), rdr.getInt(), rdr.getInt());
-		if (te == null || !(te instanceof TileEntityParticleEmitter)) return;
-		((TileEntityParticleEmitter)te).readFromNBT(rdr.getNBTTagCompound());
+		if (!(te instanceof TileEntityParticleEmitter)) return;
+		te.readFromNBT(rdr.getNBTTagCompound());
 
 		world.markBlockForUpdate(te.xCoord, te.yCoord, te.zCoord);
 	}
@@ -314,8 +313,6 @@ public class AMPacketProcessorServer{
 			newIndex = ItemsCommonProxy.spellBook.SetNextSlot(stack);
 		else if (subID == ItemSpellBook.ID_PREV_SPELL)
 			newIndex = ItemsCommonProxy.spellBook.SetPrevSlot(stack);
-		else
-			return;
 	}
 
 	private void handleSpellCustomize(byte[] data, EntityPlayerMP player){
@@ -342,9 +339,9 @@ public class AMPacketProcessorServer{
 		int entityID = rdr.getInt();
 		EntityLivingBase entity = getEntityByID(entityID);
 
-		if (player == null || entity == null || !(entity instanceof EntityPlayer)) return;
+		if (player == null || !(entity instanceof EntityPlayer)) return;
 
-		if (!AMCore.proxy.playerTracker.hasAA((EntityPlayer)entity)) return;
+		if (!PlayerTracker.hasAA((EntityPlayer)entity)) return;
 
 		byte[] expropData = ExtendedProperties.For(entity).getAuraData();
 
@@ -361,7 +358,7 @@ public class AMPacketProcessorServer{
 
 		EntityLivingBase e = getEntityByID(entityID);
 
-		if (e != null && e instanceof EntityPlayer){
+		if (e instanceof EntityPlayer){
 			ExtendedProperties props = ExtendedProperties.For(e);
 			if (!props.detectPossibleDesync()){
 				props.setFullSync();
@@ -373,7 +370,7 @@ public class AMPacketProcessorServer{
 	private void handleSyncBetaParticles(byte[] data, EntityPlayerMP player){
 		AMDataReader rdr = new AMDataReader(data, false);
 
-		if (player == null || !AMCore.proxy.playerTracker.hasAA(player)){
+		if (!PlayerTracker.hasAA(player)){
 			return;
 		}
 

@@ -6,6 +6,8 @@ import am2.api.spell.enums.Affinity;
 import am2.api.spell.enums.ContingencyTypes;
 import am2.api.spell.enums.SpellCastResult;
 import am2.blocks.BlocksCommonProxy;
+import am2.items.ItemEssence;
+import am2.items.ItemOre;
 import am2.items.ItemsCommonProxy;
 import am2.playerextensions.ExtendedProperties;
 import am2.spell.SpellUtils;
@@ -27,9 +29,9 @@ public class Contingency_Health implements ISpellShape{
 				Items.clock,
 				"P:0 & !1 & 2 & !3",
 				BlocksCommonProxy.tarmaRoot,
-				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemsCommonProxy.itemOre.META_BLUETOPAZ),
+				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemOre.META_BLUETOPAZ),
 				"E:*", 5000,
-				new ItemStack(ItemsCommonProxy.essence, 1, ItemsCommonProxy.essence.META_LIFE)
+				new ItemStack(ItemsCommonProxy.essence, 1, ItemEssence.META_LIFE)
 		};
 	}
 

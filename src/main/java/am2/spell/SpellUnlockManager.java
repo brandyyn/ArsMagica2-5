@@ -50,27 +50,27 @@ public class SpellUnlockManager{
 
 	public void init(){
 		entries = new ArrayList<UnlockEntry>();
-		entries.add(new UnlockEntry(7,SkillManager.instance.getSkill("FallingStar"), SkillManager.instance.getSkill("MagicDamage"), SkillManager.instance.getSkill("Gravity"), SkillManager.instance.getSkill("AstralDistortion")));
-		entries.add(new UnlockEntry(8,SkillManager.instance.getSkill("Blizzard"), SkillManager.instance.getSkill("Storm"), SkillManager.instance.getSkill("FrostDamage"), SkillManager.instance.getSkill("Freeze"), SkillManager.instance.getSkill("Damage")));
-		entries.add(new UnlockEntry(9,SkillManager.instance.getSkill("FireRain"), SkillManager.instance.getSkill("Storm"), SkillManager.instance.getSkill("FireDamage"), SkillManager.instance.getSkill("Ignition"), SkillManager.instance.getSkill("Damage")));
-		entries.add(new UnlockEntry(10,SkillManager.instance.getSkill("ConcentrateTime"), SkillManager.instance.getSkill("Accelerate"), SkillManager.instance.getSkill("Haste"), SkillManager.instance.getSkill("Lingering")));
-		entries.add(new UnlockEntry(2,SkillManager.instance.getSkill("Dismembering"), SkillManager.instance.getSkill("Piercing"), SkillManager.instance.getSkill("Damage")));
+		entries.add(new UnlockEntry(7, SkillManager.instance.getSkill("FallingStar"), SkillManager.instance.getSkill("MagicDamage"), SkillManager.instance.getSkill("Gravity"), SkillManager.instance.getSkill("AstralDistortion")));
+		entries.add(new UnlockEntry(8, SkillManager.instance.getSkill("Blizzard"), SkillManager.instance.getSkill("Storm"), SkillManager.instance.getSkill("FrostDamage"), SkillManager.instance.getSkill("Freeze"), SkillManager.instance.getSkill("Damage")));
+		entries.add(new UnlockEntry(9, SkillManager.instance.getSkill("FireRain"), SkillManager.instance.getSkill("Storm"), SkillManager.instance.getSkill("FireDamage"), SkillManager.instance.getSkill("Ignition"), SkillManager.instance.getSkill("Damage")));
+		entries.add(new UnlockEntry(10, SkillManager.instance.getSkill("ConcentrateTime"), SkillManager.instance.getSkill("Accelerate"), SkillManager.instance.getSkill("Haste"), SkillManager.instance.getSkill("Lingering")));
+		entries.add(new UnlockEntry(2, SkillManager.instance.getSkill("Dismembering"), SkillManager.instance.getSkill("Piercing"), SkillManager.instance.getSkill("Damage")));
 
-		entries.add(new UnlockEntry(4,SkillManager.instance.getSkill("ManaLink"), SkillManager.instance.getSkill("ManaDrain"), SkillManager.instance.getSkill("Entangle")));
-		entries.add(new UnlockEntry(4,SkillManager.instance.getSkill("ManaShield"), SkillManager.instance.getSkill("Shield"), SkillManager.instance.getSkill("Reflect"), SkillManager.instance.getSkill("LifeTap")));
-		entries.add(new UnlockEntry(10,SkillManager.instance.getSkill("DiluteTime"), SkillManager.instance.getSkill("Freeze"), SkillManager.instance.getSkill("Slowfall"), SkillManager.instance.getSkill("Slow"), SkillManager.instance.getSkill("Weakness"), SkillManager.instance.getSkill("Lingering")));
-		entries.add(new UnlockEntry(5,SkillManager.instance.getSkill("BuffPower"), SkillManager.instance.getSkill("Haste"), SkillManager.instance.getSkill("Slowfall"), SkillManager.instance.getSkill("SwiftSwim"), SkillManager.instance.getSkill("GravityWell"), SkillManager.instance.getSkill("Leap")));
+		entries.add(new UnlockEntry(4, SkillManager.instance.getSkill("ManaLink"), SkillManager.instance.getSkill("ManaDrain"), SkillManager.instance.getSkill("Entangle")));
+		entries.add(new UnlockEntry(4, SkillManager.instance.getSkill("ManaShield"), SkillManager.instance.getSkill("Shield"), SkillManager.instance.getSkill("Reflect"), SkillManager.instance.getSkill("LifeTap")));
+		entries.add(new UnlockEntry(10, SkillManager.instance.getSkill("DiluteTime"), SkillManager.instance.getSkill("Freeze"), SkillManager.instance.getSkill("Slowfall"), SkillManager.instance.getSkill("Slow"), SkillManager.instance.getSkill("Weakness"), SkillManager.instance.getSkill("Lingering")));
+		entries.add(new UnlockEntry(5, SkillManager.instance.getSkill("BuffPower"), SkillManager.instance.getSkill("Haste"), SkillManager.instance.getSkill("Slowfall"), SkillManager.instance.getSkill("SwiftSwim"), SkillManager.instance.getSkill("GravityWell"), SkillManager.instance.getSkill("Leap")));
 
-		entries.add(new UnlockEntry(1,SkillManager.instance.getSkill("Daylight"), SkillManager.instance.getSkill("TrueSight"), SkillManager.instance.getSkill("DivineIntervention"), SkillManager.instance.getSkill("Light")));
-		entries.add(new UnlockEntry(6,SkillManager.instance.getSkill("Moonrise"), SkillManager.instance.getSkill("NightVision"), SkillManager.instance.getSkill("EnderIntervention"), SkillManager.instance.getSkill("Lunar")));
-		entries.add(new UnlockEntry(10,SkillManager.instance.getSkill("FortifyTime"), SkillManager.instance.getSkill("Shield"), SkillManager.instance.getSkill("ChronoAnchor"), SkillManager.instance.getSkill("Duration")));
-		entries.add(new UnlockEntry(3,SkillManager.instance.getSkill("Prosperity"), SkillManager.instance.getSkill("Dig"), SkillManager.instance.getSkill("FeatherTouch"), SkillManager.instance.getSkill("MiningPower")));
+		entries.add(new UnlockEntry(1, SkillManager.instance.getSkill("Daylight"), SkillManager.instance.getSkill("TrueSight"), SkillManager.instance.getSkill("DivineIntervention"), SkillManager.instance.getSkill("Light")));
+		entries.add(new UnlockEntry(6, SkillManager.instance.getSkill("Moonrise"), SkillManager.instance.getSkill("NightVision"), SkillManager.instance.getSkill("EnderIntervention"), SkillManager.instance.getSkill("Lunar")));
+		entries.add(new UnlockEntry(10, SkillManager.instance.getSkill("FortifyTime"), SkillManager.instance.getSkill("Shield"), SkillManager.instance.getSkill("ChronoAnchor"), SkillManager.instance.getSkill("Duration")));
+		entries.add(new UnlockEntry(3, SkillManager.instance.getSkill("Prosperity"), SkillManager.instance.getSkill("Dig"), SkillManager.instance.getSkill("FeatherTouch"), SkillManager.instance.getSkill("MiningPower")));
 	}
 
-	class UnlockEntry{
-		private ISkillTreeEntry unlock;
-		private ISkillTreeEntry[] requiredComponents;
-		private int guardian;
+	static class UnlockEntry{
+		private final ISkillTreeEntry unlock;
+		private final ISkillTreeEntry[] requiredComponents;
+		private final int guardian;
 
 		public UnlockEntry(int guardian,ISkillTreeEntry unlock, ISkillTreeEntry... components){
 			this.unlock = unlock;
@@ -89,17 +89,18 @@ public class SpellUnlockManager{
 				return true;
 			}
 			boolean killed = false;
+			ExtendedProperties props = ExtendedProperties.For(caster);
 					switch(guardian){
-					case 1 : if(ExtendedProperties.For(caster).guardian1) killed = true; break;
-					case 2 : if(ExtendedProperties.For(caster).guardian2) killed = true; break;
-					case 3 : if(ExtendedProperties.For(caster).guardian3) killed = true; break;
-					case 4 : if(ExtendedProperties.For(caster).guardian4) killed = true; break;
-					case 5 : if(ExtendedProperties.For(caster).guardian5) killed = true; break;
-					case 6 : if(ExtendedProperties.For(caster).guardian6) killed = true; break;
-					case 7 : if(ExtendedProperties.For(caster).guardian7) killed = true; break;
-					case 8 : if(ExtendedProperties.For(caster).guardian8) killed = true; break;
-					case 9 : if(ExtendedProperties.For(caster).guardian9) killed = true; break;
-					case 10 : if(ExtendedProperties.For(caster).guardian10) killed = true; break;
+					case 1 : if(props.guardian1) killed = true; break;
+					case 2 : if(props.guardian2) killed = true; break;
+					case 3 : if(props.guardian3) killed = true; break;
+					case 4 : if(props.guardian4) killed = true; break;
+					case 5 : if(props.guardian5) killed = true; break;
+					case 6 : if(props.guardian6) killed = true; break;
+					case 7 : if(props.guardian7) killed = true; break;
+					case 8 : if(props.guardian8) killed = true; break;
+					case 9 : if(props.guardian9) killed = true; break;
+					case 10 : if(props.guardian10) killed = true; break;
 					}
 			return killed;
 		}

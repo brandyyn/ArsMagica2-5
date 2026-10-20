@@ -22,8 +22,6 @@ import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.common.util.Constants;
 
-import java.util.Random;
-
 public class TileEntityAstralBarrier extends TileEntityAMPower implements IInventory, IKeystoneLockable{
 
 	private ItemStack[] inventory;

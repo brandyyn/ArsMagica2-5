@@ -25,26 +25,29 @@ public class SpellValidator{
 
 	public ValidationResult spellDefIsValid(ArrayList<ArrayList<ISpellPart>> shapeGroups, ArrayList<ArrayList<ISpellPart>> segmented){
 		boolean noParts = true;
-		for (int i = 0; i < shapeGroups.size(); ++i)
-			if (shapeGroups.get(i).size() > 0)
+		for (ArrayList<ISpellPart> shapeGroup : shapeGroups)
+			if (!shapeGroup.isEmpty()){
 				noParts = false;
-		for (int i = 0; i < segmented.size(); ++i)
-			if (segmented.get(i).size() > 0)
+				break;
+			}
+		for (ArrayList<ISpellPart> iSpellParts : segmented)
+			if (!iSpellParts.isEmpty()){
 				noParts = false;
+				break;
+			}
 		if (noParts) return new ValidationResult(null, "");
 
 		boolean validatedAny = false;
-		for (int x = 0; x < shapeGroups.size(); ++x){
-			if (shapeGroups.get(x).size() > 0){
-				if (segmented.size() == 0){
-					ValidationResult result = internalValidation(splitToStages(shapeGroups.get(x)));
+		for (ArrayList<ISpellPart> shapeGroup : shapeGroups){
+			if (!shapeGroup.isEmpty()){
+				if (segmented.isEmpty()){
+					ValidationResult result = internalValidation(splitToStages(shapeGroup));
 					if (result != null)
 						return result;
 				}
-				ArrayList<ISpellPart> concatenated = new ArrayList<ISpellPart>();
-				concatenated.addAll(shapeGroups.get(x));
-				for (int i = 0; i < segmented.size(); ++i){
-					concatenated.addAll(segmented.get(i));
+				ArrayList<ISpellPart> concatenated = new ArrayList<ISpellPart>(shapeGroup);
+				for (ArrayList<ISpellPart> iSpellParts : segmented){
+					concatenated.addAll(iSpellParts);
 				}
 				ValidationResult result = internalValidation(splitToStages(concatenated));
 				if (result != null)
@@ -96,7 +99,6 @@ public class SpellValidator{
 			}
 			if (part instanceof ISpellComponent){
 				one_component = true;
-				continue;
 			}
 		}
 
@@ -111,9 +113,8 @@ public class SpellValidator{
 
 	public static ArrayList<ArrayList<ISpellPart>> splitToStages(ArrayList<ISpellPart> currentRecipe){
 		ArrayList<ArrayList<ISpellPart>> segmented = new ArrayList<ArrayList<ISpellPart>>();
-		int idx = (currentRecipe.size() > 0 && currentRecipe.get(0) instanceof ISpellShape) ? -1 : 0;
-		for (int i = 0; i < currentRecipe.size(); ++i){
-			ISpellPart part = currentRecipe.get(i);
+		int idx = (!currentRecipe.isEmpty() && currentRecipe.get(0) instanceof ISpellShape) ? -1 : 0;
+		for (ISpellPart part : currentRecipe){
 			if (part instanceof ISpellShape)
 				idx++;
 			if (segmented.size() - 1 < idx) //while loop not necessary as this will keep up
@@ -127,7 +128,7 @@ public class SpellValidator{
 		return false;
 	}
 
-	public class ValidationResult{
+	public static class ValidationResult{
 		public final boolean valid;
 		public final ISpellPart offendingPart;
 		public final String message;

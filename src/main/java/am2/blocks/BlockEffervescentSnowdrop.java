@@ -1,9 +1,6 @@
 package am2.blocks;
 
 import am2.AMCore;
-import am2.buffs.BuffEffectFury;
-import am2.buffs.BuffEffectLevitation;
-import am2.buffs.BuffList;
 import am2.particles.AMParticle;
 import am2.particles.ParticleExpandingCollapsingRingAtPoint;
 import am2.particles.ParticleFadeOut;

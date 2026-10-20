@@ -1,6 +1,7 @@
 package am2.api.spell.enums;
 
 import net.minecraft.item.Item;
+import net.minecraft.util.EnumChatFormatting;
 
 public enum Affinity{
 	NONE(0,
@@ -190,4 +191,32 @@ public enum Affinity{
 			return 0;
 		}
 	}
+	public EnumChatFormatting getColor(){
+		switch (this){
+		case AIR:
+			return EnumChatFormatting.GRAY;
+		case ARCANE:
+			return EnumChatFormatting.LIGHT_PURPLE;
+		case EARTH:
+			return EnumChatFormatting.DARK_GRAY;
+		case ENDER:
+			return EnumChatFormatting.DARK_PURPLE;
+		case FIRE:
+			return EnumChatFormatting.RED;
+		case ICE:
+			return EnumChatFormatting.WHITE;
+		case LIFE:
+			return EnumChatFormatting.GREEN;
+		case LIGHTNING:
+			return EnumChatFormatting.YELLOW;
+		case NATURE:
+			return EnumChatFormatting.DARK_GREEN;
+		case WATER:
+			return EnumChatFormatting.BLUE;
+		case NONE:
+		default:
+			return EnumChatFormatting.RESET;
+		}
+	}
+
 }

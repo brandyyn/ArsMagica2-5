@@ -2,8 +2,6 @@ package am2.blocks.tileentities;
 
 import am2.api.power.PowerTypes;
 
-import java.util.Random;
-
 public class TileEntityEssenceConduit extends TileEntityAMPower{
 
 	private float rotationX;

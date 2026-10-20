@@ -26,11 +26,11 @@ public class FlickerOperatorRegistry implements IFlickerRegistry{
 		return true;
 	}
 
-	public boolean registerFlickerOperator(IFlickerFunctionality singleton, Affinity... affinities){
+	public void registerFlickerOperator(IFlickerFunctionality singleton, Affinity... affinities){
 		int mask = 0;
 		for (Affinity aff : affinities)
 			mask |= aff.getAffinityMask();
-		return registerFlickerOperator(singleton, mask);
+		registerFlickerOperator(singleton, mask);
 	}
 
 	public int getMaskForOperator(IFlickerFunctionality operator){
@@ -50,7 +50,7 @@ public class FlickerOperatorRegistry implements IFlickerRegistry{
 		int[] maskList = new int[registeredOperators.size()];
 		int count = 0;
 		for (Integer i : registeredOperators.keySet()){
-			maskList[count++] = i != null ? i.intValue() : -1;
+			maskList[count++] = i != null ? i : -1;
 		}
 		return maskList;
 	}

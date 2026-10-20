@@ -6,6 +6,7 @@ import am2.api.spell.enums.Affinity;
 import am2.api.spell.enums.SpellCastResult;
 import am2.api.spell.enums.SpellModifiers;
 import am2.entities.EntitySpellProjectile;
+import am2.items.ItemOre;
 import am2.items.ItemsCommonProxy;
 import am2.playerextensions.ExtendedProperties;
 import am2.spell.SpellUtils;
@@ -41,25 +42,25 @@ public class Projectile implements ISpellShape{
 				if (ep.hasExtraVariable("spellposuse")){
 					if (ep.hasExtraVariable("SPELLPOS")) {
 						String pos = ep.getExtraVariable("SPELLPOS");
-						double actualX = Double.valueOf(pos.split(",")[0]);
-						double actualY = Double.valueOf(pos.split(",")[1]);
-						double actualZ = Double.valueOf(pos.split(",")[2]);
+						double actualX = Double.parseDouble(pos.split(",")[0]);
+						double actualY = Double.parseDouble(pos.split(",")[1]);
+						double actualZ = Double.parseDouble(pos.split(",")[2]);
 						projectile.setPosition(actualX, actualY, actualZ);
 						ep.removeFromExtraVariables("SPELLPOS");
 						projectile.setGlyphCast(true);
 					} else if (ep.hasExtraVariable("SPELLPOS2")) {
 						String pos = ep.getExtraVariable("SPELLPOS2");
-						double actualX = Double.valueOf(pos.split(",")[0]);
-						double actualY = Double.valueOf(pos.split(",")[1]);
-						double actualZ = Double.valueOf(pos.split(",")[2]);
+						double actualX = Double.parseDouble(pos.split(",")[0]);
+						double actualY = Double.parseDouble(pos.split(",")[1]);
+						double actualZ = Double.parseDouble(pos.split(",")[2]);
 						projectile.setPosition(actualX, actualY, actualZ);
 						ep.removeFromExtraVariables("SPELLPOS2");
 						projectile.setGlyphCast(true);
 					} else if (ep.hasExtraVariable("SPELLPOS3")) { // 3
 						String pos = ep.getExtraVariable("SPELLPOS3");
-						double actualX = Double.valueOf(pos.split(",")[0]);
-						double actualY = Double.valueOf(pos.split(",")[1]);
-						double actualZ = Double.valueOf(pos.split(",")[2]);
+						double actualX = Double.parseDouble(pos.split(",")[0]);
+						double actualY = Double.parseDouble(pos.split(",")[1]);
+						double actualZ = Double.parseDouble(pos.split(",")[2]);
 						projectile.setPosition(actualX, actualY, actualZ);
 						ep.removeFromExtraVariables("SPELLPOS3");
 						projectile.setGlyphCast(true);
@@ -88,7 +89,7 @@ public class Projectile implements ISpellShape{
 	@Override
 	public Object[] getRecipeItems(){
 		return new Object[]{
-				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemsCommonProxy.itemOre.META_VINTEUMDUST),
+				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemOre.META_VINTEUMDUST),
 				Items.arrow,
 				Items.snowball
 		};

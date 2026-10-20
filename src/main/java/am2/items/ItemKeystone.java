@@ -7,6 +7,7 @@ import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
@@ -108,39 +109,34 @@ public class ItemKeystone extends ArsMagicaItem{
 	}
 
 	public void UpdateStackTagCompound(ItemStack itemStack, ItemStack[] values){
-		if (itemStack.stackTagCompound == null){
-			itemStack.setTagCompound(new NBTTagCompound());
-		}
-		for (int i = 0; i < values.length; ++i){
-			ItemStack stack = values[i];
-			if (stack == null){
-				itemStack.stackTagCompound.setInteger("keystonemeta" + i, -1);
-			}else{
-				itemStack.stackTagCompound.setInteger("keystonemeta" + i, stack.getItemDamage());
+		NBTTagList stacks = new NBTTagList();
+		for(int slot = 0; slot < values.length; ++slot){
+			if(values[slot] != null){
+				NBTTagCompound item = new NBTTagCompound();
+				item.setByte("Slot",(byte) slot);
+				values[slot].writeToNBT(item);
+				stacks.appendTag(item);
 			}
 		}
+		itemStack.setTagInfo("Inventory", stacks);
+
+
 	}
 
-	public ItemStack[] ReadFromStackTagCompound(ItemStack itemStack){
-		if (itemStack.stackTagCompound == null){
-			return new ItemStack[InventoryKeyStone.inventorySize];
-		}
-		ItemStack[] items = new ItemStack[InventoryKeyStone.inventorySize];
-		for (int i = 0; i < items.length; ++i){
-			int meta = 0;
-			if (!itemStack.stackTagCompound.hasKey("keystonemeta" + i)){
-				items[i] = null;
-				continue;
-			}else if (itemStack.stackTagCompound.getInteger("keystonemeta" + i) == -1){
-				items[i] = null;
-				continue;
-			}else{
-				meta = itemStack.stackTagCompound.getInteger("keystonemeta" + i);
-			}
+	public ItemStack[] ReadFromStackTagCompound(ItemStack item){
+		ItemStack[] stackList = new ItemStack[19];
+		if(item.hasTagCompound()) {
+			NBTTagList var2 = item.stackTagCompound.getTagList("Inventory", 10);
 
-			items[i] = new ItemStack(ItemsCommonProxy.rune, 1, meta);
+			for(int var3 = 0; var3 < var2.tagCount(); ++var3) {
+				NBTTagCompound var4 = var2.getCompoundTagAt(var3);
+				int var5 = var4.getByte("Slot") & 255;
+				if(var5 >= 0 && var5 < stackList.length) {
+					stackList[var5] = ItemStack.loadItemStackFromNBT(var4);
+				}
+			}
 		}
-		return items;
+		return stackList;
 	}
 
 	public InventoryKeyStone ConvertToInventory(ItemStack keyStoneStack){

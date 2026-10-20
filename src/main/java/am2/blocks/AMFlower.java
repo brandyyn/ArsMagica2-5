@@ -1,5 +1,6 @@
 package am2.blocks;
 
+import am2.api.items.ICompendium;
 import am2.texture.ResourceManager;
 import net.minecraft.block.BlockFlower;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -12,7 +13,7 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class AMFlower extends BlockFlower{
+public class AMFlower extends BlockFlower implements ICompendium{
 
 	protected AMFlower(){
 		super(1);

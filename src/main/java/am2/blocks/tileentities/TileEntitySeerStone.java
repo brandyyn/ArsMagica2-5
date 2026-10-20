@@ -27,7 +27,6 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public class TileEntitySeerStone extends TileEntityAMPower implements IInventory, IKeystoneLockable{
 

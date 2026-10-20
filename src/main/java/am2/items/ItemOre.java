@@ -1,5 +1,6 @@
 package am2.items;
 
+import am2.particles.AMParticleIcons;
 import am2.texture.ResourceManager;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -108,7 +109,7 @@ public class ItemOre extends ArsMagicaItem{
 		case META_COGNITIVEDUST:
 			return StatCollector.translateToLocal("item.arsmagica2:cognitivedust.name");
 		case META_NIGHTMAREESSENCE:
-			return StatCollector.translateToLocal("item.arsmagica2:nightmareessence.name");
+			return StatCollector.translateToLocal("item.arsmagica2:nightmareEssence.name");
 		case META_FRACTALFRAGMENT:
 			return StatCollector.translateToLocal("item.arsmagica2:fractalfragment.name");
 		case META_SOULFRAGMENT:
@@ -121,20 +122,21 @@ public class ItemOre extends ArsMagicaItem{
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void registerIcons(IIconRegister par1IconRegister){
-		textures = new String[]{"vinteum_dust", "arcane_compound", "arcane_ash", "purified_vinteum", "chimerite_gem", "blue_topaz_gem", "sunstone_gem", "moonstone_gem", "animalFat", "celestial_fish", "cosmic_dust", "moonstone_fragment", "sunstone_fragment", "hellfish", "pyrogenic_sediment", "spatial_star", "temporal_cluster", "stormSawtooth_stage_2", "rainRockrose_stage_2", "imbuedMoonflower_stage_2", "cognitive_dust", "nightmare_essence", "fractal_fragment", "soul_fragment"};
+		textures = new String[]{"vinteum_dust", "arcane_compound", "arcane_ash", "purified_vinteum", "chimerite_gem", "blue_topaz_gem", "sunstone_gem", "moonstone_gem", "animalFat", "celestial_fish", "cosmic_dust", "moonstone_fragment", "sunstone_fragment", "hellfish", "pyrogenic_sediment", "spatial_star", "temporal_cluster", "stormSawtooth_stage_2", "rainRockrose_stage_2", "imbuedMoonflower_stage_2", "cognitive_dust", "essence_nightmare", "fractal_fragment", "soul_fragment"};
 
 		icons = new IIcon[textures.length];
-
-		int count = 0;
-		for (String s : textures){
-			icons[count++] = ResourceManager.RegisterTexture(s, par1IconRegister);
+		for(int i = 0; i < textures.length; i++){
+			icons[i] = ResourceManager.RegisterTexture(textures[i], par1IconRegister);
 		}
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public IIcon getIconFromDamage(int meta){
-		return icons[meta % icons.length];
+		if(meta < icons.length){
+			return icons[meta];
+		}
+		return AMParticleIcons.instance.getIconByName("mystic");
 	}
 
 	@Override

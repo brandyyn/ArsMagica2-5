@@ -48,11 +48,7 @@ public class BossSpawnHelper{
 		World world = villager.worldObj;
 
 		long time = world.getWorldTime() % 24000;
-		if (time < 12500 || time > 23500) //night time
-			return;
-
-		int phase = getMoonPhaseProxiedProperly(world.provider.getWorldTime());
-		if (phase != 0) // full moon
+		if (time < 12500 || time > 23500) //nighttime
 			return;
 
 		//initial validation

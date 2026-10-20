@@ -6,15 +6,18 @@ import am2.blocks.BlocksCommonProxy;
 import am2.entities.EntityManager;
 import am2.items.*;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
+import thaumcraft.common.config.ConfigBlocks;
 
 public class TC4Interop{
 	public static void initialize(){
 		LogHelper.info("Initializing Thaumcraft Compatibility");
 		initTCAspects();
 		initPortableHoleBlacklists();
+		initOreDict();
 	}
 
 	private static void initTCAspects(){
@@ -230,45 +233,51 @@ public class TC4Interop{
 		ThaumcraftApi.registerObjectTag(new ItemStack(ItemsCommonProxy.lifeWard, 1, -1), new AspectList().add(Aspect.LIFE, 15).add(Aspect.HEAL, 10).add(Aspect.BEAST, 5));
 
 		//mobs
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.ManaCreeperMobID, new AspectList().add(Aspect.PLANT, 2).add(Aspect.MAGIC, 2).add(Aspect.VOID, 2));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.DryadMobID, new AspectList().add(Aspect.PLANT, 4).add(Aspect.TREE, 4).add(Aspect.MAN, 2));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.HecateMobID, new AspectList().add(Aspect.DEATH, 2).add(Aspect.SOUL, 2));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.MageVillagerMobID, new AspectList().add(Aspect.MAN, 3).add(Aspect.MAGIC, 2));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.ManaElemMobID, new AspectList().add(Aspect.MAGIC, 6));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.WaterElementalMobID, new AspectList().add(Aspect.WATER, 2).add(Aspect.MOTION, 2).add(Aspect.DEATH, 1));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.LightMageMobID, new AspectList().add(Aspect.MAN, 3).add(Aspect.MAGIC, 2));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.DarkMageMobID, new AspectList().add(Aspect.MAN, 3).add(Aspect.MAGIC, 2));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.HellCowID, new AspectList().add(Aspect.BEAST, 4).add(Aspect.FIRE, 4));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.EarthGolemMobID, new AspectList().add(Aspect.EARTH, 2).add(Aspect.EARTH, 2).add(Aspect.ARMOR, 1));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.FireElementalMobID, new AspectList().add(Aspect.FIRE, 2).add(Aspect.ENTROPY, 2).add(Aspect.ENERGY, 1));
+		ThaumcraftApi.registerEntityTag(EntityManager.ManaCreeperMobID, new AspectList().add(Aspect.PLANT, 2).add(Aspect.MAGIC, 2).add(Aspect.VOID, 2));
+		ThaumcraftApi.registerEntityTag(EntityManager.DryadMobID, new AspectList().add(Aspect.PLANT, 4).add(Aspect.TREE, 4).add(Aspect.MAN, 2));
+		ThaumcraftApi.registerEntityTag(EntityManager.HecateMobID, new AspectList().add(Aspect.DEATH, 2).add(Aspect.SOUL, 2));
+		ThaumcraftApi.registerEntityTag(EntityManager.MageVillagerMobID, new AspectList().add(Aspect.MAN, 3).add(Aspect.MAGIC, 2));
+		ThaumcraftApi.registerEntityTag(EntityManager.ManaElemMobID, new AspectList().add(Aspect.MAGIC, 6));
+		ThaumcraftApi.registerEntityTag(EntityManager.WaterElementalMobID, new AspectList().add(Aspect.WATER, 2).add(Aspect.MOTION, 2).add(Aspect.DEATH, 1));
+		ThaumcraftApi.registerEntityTag(EntityManager.LightMageMobID, new AspectList().add(Aspect.MAN, 3).add(Aspect.MAGIC, 2));
+		ThaumcraftApi.registerEntityTag(EntityManager.DarkMageMobID, new AspectList().add(Aspect.MAN, 3).add(Aspect.MAGIC, 2));
+		ThaumcraftApi.registerEntityTag(EntityManager.HellCowID, new AspectList().add(Aspect.BEAST, 4).add(Aspect.FIRE, 4));
+		ThaumcraftApi.registerEntityTag(EntityManager.EarthGolemMobID, new AspectList().add(Aspect.EARTH, 2).add(Aspect.EARTH, 2).add(Aspect.ARMOR, 1));
+		ThaumcraftApi.registerEntityTag(EntityManager.FireElementalMobID, new AspectList().add(Aspect.FIRE, 2).add(Aspect.ENTROPY, 2).add(Aspect.ENERGY, 1));
 
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.AirSledID, new AspectList().add(Aspect.FLIGHT, 4).add(Aspect.AIR, 2));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.BroomID, new AspectList().add(Aspect.ORDER, 1).add(Aspect.MIND, 1).add(Aspect.MAGIC, 1));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.DarklingID, new AspectList().add(Aspect.DARKNESS, 2).add(Aspect.BEAST, 1));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.FlickerID, new AspectList().add(Aspect.ENTROPY, 3).add(Aspect.ENERGY, 1));
+		ThaumcraftApi.registerEntityTag(EntityManager.AirSledID, new AspectList().add(Aspect.FLIGHT, 4).add(Aspect.AIR, 2));
+		ThaumcraftApi.registerEntityTag(EntityManager.BroomID, new AspectList().add(Aspect.ORDER, 1).add(Aspect.MIND, 1).add(Aspect.MAGIC, 1));
+		ThaumcraftApi.registerEntityTag(EntityManager.DarklingID, new AspectList().add(Aspect.DARKNESS, 2).add(Aspect.BEAST, 1));
+		ThaumcraftApi.registerEntityTag(EntityManager.FlickerID, new AspectList().add(Aspect.ENTROPY, 3).add(Aspect.ENERGY, 1));
 
 		//bosses
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.ArcaneGuardianMobID, new AspectList().add(Aspect.MAGIC, 4).add(Aspect.ENERGY, 4).add(Aspect.LIFE, 3));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.AirGuardianMobID, new AspectList().add(Aspect.AIR, 4).add(Aspect.MOTION, 4).add(Aspect.LIFE, 3));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.EarthGuardianMobID, new AspectList().add(Aspect.EARTH, 4).add(Aspect.EARTH, 4).add(Aspect.LIFE, 3));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.EnderGuardianMobID, new AspectList().add(Aspect.DEATH, 3).add(Aspect.DARKNESS, 3).add(Aspect.ENTROPY, 4).add(Aspect.ELDRITCH, 4));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.FireGuardianMobID, new AspectList().add(Aspect.FIRE, 4).add(Aspect.EARTH, 4).add(Aspect.LIFE, 3));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.LifeGuardianMobID, new AspectList().add(Aspect.LIFE, 5).add(Aspect.HEAL, 3));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.LightningGuardianMobID, new AspectList().add(Aspect.ENERGY, 5).add(Aspect.ENTROPY, 3).add(Aspect.LIFE, 3));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.NatureGuardianMobID, new AspectList().add(Aspect.PLANT, 4).add(Aspect.TREE, 4).add(Aspect.LIFE, 3));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.WaterGuardianMobID, new AspectList().add(Aspect.WATER, 4).add(Aspect.SENSES, 4).add(Aspect.LIFE, 3));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.WinterGuardianMobID, new AspectList().add(Aspect.COLD, 4).add(Aspect.ENTROPY, 4).add(Aspect.LIFE, 3));
+		ThaumcraftApi.registerEntityTag(EntityManager.ArcaneGuardianMobID, new AspectList().add(Aspect.MAGIC, 4).add(Aspect.ENERGY, 4).add(Aspect.LIFE, 3));
+		ThaumcraftApi.registerEntityTag(EntityManager.AirGuardianMobID, new AspectList().add(Aspect.AIR, 4).add(Aspect.MOTION, 4).add(Aspect.LIFE, 3));
+		ThaumcraftApi.registerEntityTag(EntityManager.EarthGuardianMobID, new AspectList().add(Aspect.EARTH, 4).add(Aspect.EARTH, 4).add(Aspect.LIFE, 3));
+		ThaumcraftApi.registerEntityTag(EntityManager.EnderGuardianMobID, new AspectList().add(Aspect.DEATH, 3).add(Aspect.DARKNESS, 3).add(Aspect.ENTROPY, 4).add(Aspect.ELDRITCH, 4));
+		ThaumcraftApi.registerEntityTag(EntityManager.FireGuardianMobID, new AspectList().add(Aspect.FIRE, 4).add(Aspect.EARTH, 4).add(Aspect.LIFE, 3));
+		ThaumcraftApi.registerEntityTag(EntityManager.LifeGuardianMobID, new AspectList().add(Aspect.LIFE, 5).add(Aspect.HEAL, 3));
+		ThaumcraftApi.registerEntityTag(EntityManager.LightningGuardianMobID, new AspectList().add(Aspect.ENERGY, 5).add(Aspect.ENTROPY, 3).add(Aspect.LIFE, 3));
+		ThaumcraftApi.registerEntityTag(EntityManager.NatureGuardianMobID, new AspectList().add(Aspect.PLANT, 4).add(Aspect.TREE, 4).add(Aspect.LIFE, 3));
+		ThaumcraftApi.registerEntityTag(EntityManager.WaterGuardianMobID, new AspectList().add(Aspect.WATER, 4).add(Aspect.SENSES, 4).add(Aspect.LIFE, 3));
+		ThaumcraftApi.registerEntityTag(EntityManager.WinterGuardianMobID, new AspectList().add(Aspect.COLD, 4).add(Aspect.ENTROPY, 4).add(Aspect.LIFE, 3));
 
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.HAL1ID, new AspectList().add(Aspect.MAGIC, 5).add(Aspect.ENTROPY, 4).add(Aspect.ELDRITCH, 3).add(Aspect.FIRE, 3));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.HAL2ID, new AspectList().add(Aspect.MAGIC, 4).add(Aspect.ENTROPY, 4).add(Aspect.ELDRITCH, 3));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.HAL3ID, new AspectList().add(Aspect.MAGIC, 4).add(Aspect.ENTROPY, 4).add(Aspect.ELDRITCH, 3));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.HAL4ID, new AspectList().add(Aspect.MAGIC, 5).add(Aspect.MIND, 6).add(Aspect.ELDRITCH, 3).add(Aspect.MOTION, 3));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.HAL5ID, new AspectList().add(Aspect.MAGIC, 5).add(Aspect.MIND, 4).add(Aspect.ELDRITCH, 7).add(Aspect.ORDER, 3));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.HAL6ID, new AspectList().add(Aspect.MAGIC, 4).add(Aspect.ENTROPY, 4).add(Aspect.ELDRITCH, 3));
-		ThaumcraftApi.registerEntityTag(EntityManager.instance.HAL7ID, new AspectList().add(Aspect.MAGIC, 4).add(Aspect.ENTROPY, 4).add(Aspect.ELDRITCH, 3));
+		ThaumcraftApi.registerEntityTag(EntityManager.HAL1ID, new AspectList().add(Aspect.MAGIC, 5).add(Aspect.ENTROPY, 4).add(Aspect.ELDRITCH, 3).add(Aspect.FIRE, 3));
+		ThaumcraftApi.registerEntityTag(EntityManager.HAL2ID, new AspectList().add(Aspect.MAGIC, 4).add(Aspect.ENTROPY, 4).add(Aspect.ELDRITCH, 3));
+		ThaumcraftApi.registerEntityTag(EntityManager.HAL3ID, new AspectList().add(Aspect.MAGIC, 4).add(Aspect.ENTROPY, 4).add(Aspect.ELDRITCH, 3));
+		ThaumcraftApi.registerEntityTag(EntityManager.HAL4ID, new AspectList().add(Aspect.MAGIC, 5).add(Aspect.MIND, 6).add(Aspect.ELDRITCH, 3).add(Aspect.MOTION, 3));
+		ThaumcraftApi.registerEntityTag(EntityManager.HAL5ID, new AspectList().add(Aspect.MAGIC, 5).add(Aspect.MIND, 4).add(Aspect.ELDRITCH, 7).add(Aspect.ORDER, 3));
+		ThaumcraftApi.registerEntityTag(EntityManager.HAL6ID, new AspectList().add(Aspect.MAGIC, 4).add(Aspect.ENTROPY, 4).add(Aspect.ELDRITCH, 3));
+		ThaumcraftApi.registerEntityTag(EntityManager.HAL7ID, new AspectList().add(Aspect.MAGIC, 4).add(Aspect.ENTROPY, 4).add(Aspect.ELDRITCH, 3));
 	}
 
 	private static void initPortableHoleBlacklists(){
 		ThaumcraftApi.portableHoleBlackList.add(BlocksCommonProxy.everstone);
+	}
+	private static void initOreDict(){
+		OreDictionary.registerOre("plankMagical", new ItemStack(ConfigBlocks.blockWoodenDevice,1,6));
+		OreDictionary.registerOre("plankMagical", new ItemStack(ConfigBlocks.blockWoodenDevice,1,7));
+		OreDictionary.registerOre("stairMagical", ConfigBlocks.blockStairsGreatwood);
+		OreDictionary.registerOre("stairMagical", ConfigBlocks.blockStairsSilverwood);
 	}
 }

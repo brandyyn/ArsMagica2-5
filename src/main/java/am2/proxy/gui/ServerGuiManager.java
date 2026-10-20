@@ -5,13 +5,10 @@ import am2.blocks.tileentities.*;
 import am2.containers.*;
 import am2.guis.ArsMagicaGuiIdList;
 import am2.items.*;
-import am2.network.AMNetHandler;
-import am2.network.AMPacketIDs;
 import am2.playerextensions.RiftStorage;
 import am2.utility.InventoryUtilities;
 import cpw.mods.fml.common.network.IGuiHandler;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -114,7 +111,7 @@ public class ServerGuiManager implements IGuiHandler{
 			if (!(te instanceof TileEntityMagiciansWorkbench)){
 				return null;
 			}
-			return new ContainerMagiciansWorkbench(player.inventory, (TileEntityMagiciansWorkbench)te);
+			return new ContainerMagiciansWorkbench(player.inventory, (TileEntityMagiciansWorkbench)te, world);
 		case ArsMagicaGuiIdList.GUI_RIFT:
 			return new ContainerRiftStorage(player.inventory, RiftStorage.For(player));
 		case ArsMagicaGuiIdList.GUI_SPELL_CUSTOMIZATION:

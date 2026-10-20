@@ -34,7 +34,7 @@ public class Drown implements ISpellComponent{
 			return false;
 		float baseDamage = 12;
 		double damage = SpellUtils.instance.getModifiedDouble_Add(baseDamage, stack, caster, target, world, 0, SpellModifiers.DAMAGE);
-		return SpellHelper.instance.attackTargetSpecial(stack, target, DamageSources.causeEntityDrownDamage(caster), SpellUtils.instance.modifyDamage(caster, (float)damage));
+		return SpellHelper.instance.attackTargetSpecial(stack, target, DamageSources.causeEntityDrownDamage(caster), (float)damage);
 	}
 
 	@Override

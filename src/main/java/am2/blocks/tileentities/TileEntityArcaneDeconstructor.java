@@ -171,7 +171,7 @@ public class TileEntityArcaneDeconstructor extends TileEntityAMPower implements 
 				int[] parts = SpellUtils.instance.getShapeGroupParts(checkStack, i);
 				for (int partID : parts){
 					ISkillTreeEntry entry = SkillManager.instance.getSkill(partID);
-					if (entry != null && entry instanceof ISpellPart){
+					if (entry instanceof ISpellPart){
 						Object[] componentParts = ((ISpellPart)entry).getRecipeItems();
 						if (componentParts != null){
 							for (Object o : componentParts){
@@ -188,14 +188,14 @@ public class TileEntityArcaneDeconstructor extends TileEntityAMPower implements 
 				}
 			}
 
-			deconstructionRecipe = recipeItems.toArray(new ItemStack[recipeItems.size()]);
+			deconstructionRecipe = recipeItems.toArray(new ItemStack[0]);
 			return true;
 		}else{
 			IRecipe recipe = RecipeUtilities.getRecipeFor(checkStack);
 			if (recipe == null)
 				return false;
 			Object[] recipeParts = RecipeUtilities.getRecipeItems(recipe);
-			if (recipeParts != null && checkStack != null && recipe.getRecipeOutput() != null){
+			if (recipeParts != null && recipe.getRecipeOutput() != null){
 				if (recipe.getRecipeOutput().getItem() == checkStack.getItem() && recipe.getRecipeOutput().getItemDamage() == checkStack.getItemDamage() && recipe.getRecipeOutput().stackSize > 1)
 					return false;
 
@@ -207,7 +207,7 @@ public class TileEntityArcaneDeconstructor extends TileEntityAMPower implements 
 					}
 				}
 			}
-			deconstructionRecipe = recipeItems.toArray(new ItemStack[recipeItems.size()]);
+			deconstructionRecipe = recipeItems.toArray(new ItemStack[0]);
 			return true;
 		}
 	}
@@ -221,7 +221,7 @@ public class TileEntityArcaneDeconstructor extends TileEntityAMPower implements 
 		else if (o instanceof Block)
 			output = new ItemStack((Block)o);
 		else if (o instanceof ArrayList)
-			output = objectToItemStack(((ArrayList)o).get(0));
+			output = objectToItemStack(((ArrayList<?>)o).get(0));
 
 		if (output != null){
 			if (output.stackSize == 0)
@@ -242,7 +242,7 @@ public class TileEntityArcaneDeconstructor extends TileEntityAMPower implements 
 					if (i == 0 && j == 0 && k == 0)
 						continue;
 					TileEntity te = worldObj.getTileEntity(xCoord + i, yCoord + j, zCoord + k);
-					if (te != null && te instanceof IInventory){
+					if (te instanceof IInventory){
 						for (int side = 0; side < 6; ++side){
 							if (InventoryUtilities.mergeIntoInventory((IInventory)te, stack, stack.stackSize, side))
 								return;
@@ -394,8 +394,8 @@ public class TileEntityArcaneDeconstructor extends TileEntityAMPower implements 
 		NBTTagList nbttaglist = nbttagcompound.getTagList("DeconstructorInventory", Constants.NBT.TAG_COMPOUND);
 		inventory = new ItemStack[getSizeInventory()];
 		for (int i = 0; i < nbttaglist.tagCount(); i++){
-			String tag = String.format("ArrayIndex", i);
-			NBTTagCompound nbttagcompound1 = (NBTTagCompound)nbttaglist.getCompoundTagAt(i);
+			String tag = String.format("ArrayIndex:%s", i);
+			NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
 			byte byte0 = nbttagcompound1.getByte(tag);
 			if (byte0 >= 0 && byte0 < inventory.length){
 				inventory[byte0] = ItemStack.loadItemStackFromNBT(nbttagcompound1);
@@ -414,7 +414,7 @@ public class TileEntityArcaneDeconstructor extends TileEntityAMPower implements 
 		NBTTagList nbttaglist = new NBTTagList();
 		for (int i = 0; i < inventory.length; i++){
 			if (inventory[i] != null){
-				String tag = String.format("ArrayIndex", i);
+				String tag = String.format("ArrayIndex:%s", i);
 				NBTTagCompound nbttagcompound1 = new NBTTagCompound();
 				nbttagcompound1.setByte(tag, (byte)i);
 				inventory[i].writeToNBT(nbttagcompound1);

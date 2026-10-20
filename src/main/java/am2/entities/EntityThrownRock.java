@@ -4,6 +4,7 @@ import am2.AMCore;
 import am2.api.math.AMVector3;
 import am2.api.spell.component.interfaces.ISpellModifier;
 import am2.api.spell.enums.SpellModifiers;
+import am2.blocks.BlockAMOre;
 import am2.blocks.BlocksCommonProxy;
 import am2.damage.DamageSources;
 import am2.items.ItemsCommonProxy;
@@ -22,7 +23,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
@@ -232,8 +232,8 @@ public class EntityThrownRock extends EntityLiving{
 		Entity entity = null;
 		List list = worldObj.getEntitiesWithinAABBExcludingEntity(this, boundingBox.addCoord(motionX, motionY, motionZ).expand(1.0D, 1.0D, 1.0D));
 		double d = 0.0D;
-		for (int j = 0; j < list.size(); j++){
-			Entity entity1 = (Entity)list.get(j);
+		for (Object o : list){
+			Entity entity1 = (Entity)o;
 			if (!entity1.canBeCollidedWith() || entity1.isEntityEqual(throwingEntity) && ticksExisted < 25){
 				continue;
 			}
@@ -262,13 +262,17 @@ public class EntityThrownRock extends EntityLiving{
 		posZ += motionZ;
 		float f = MathHelper.sqrt_double(motionX * motionX + motionZ * motionZ);
 		rotationYaw = (float)((Math.atan2(motionX, motionZ) * 180D) / 3.1415927410125732D);
-		for (rotationPitch = (float)((Math.atan2(motionY, f) * 180D) / 3.1415927410125732D); rotationPitch - prevRotationPitch < -180F; prevRotationPitch -= 360F){
+		for (rotationPitch = (float)((Math.atan2(motionY, f) * 180D) / 3.1415927410125732D); rotationPitch - prevRotationPitch < -180F;){
+			prevRotationPitch -= 360F;
 		}
-		for (; rotationPitch - prevRotationPitch >= 180F; prevRotationPitch += 360F){
+		while (rotationPitch - prevRotationPitch >= 180F){
+			prevRotationPitch += 360F;
 		}
-		for (; rotationYaw - prevRotationYaw < -180F; prevRotationYaw -= 360F){
+		while (rotationYaw - prevRotationYaw < -180F){
+			prevRotationYaw -= 360F;
 		}
-		for (; rotationYaw - prevRotationYaw >= 180F; prevRotationYaw += 360F){
+		while (rotationYaw - prevRotationYaw >= 180F){
+			prevRotationYaw += 360F;
 		}
 		rotationPitch = prevRotationPitch + (rotationPitch - prevRotationPitch) * 0.2F;
 		rotationYaw = prevRotationYaw + (rotationYaw - prevRotationYaw) * 0.2F;
@@ -298,11 +302,9 @@ public class EntityThrownRock extends EntityLiving{
 			}
 		}else{
 
-			if (movingobjectposition.entityHit != null && movingobjectposition.entityHit instanceof EntityLivingBase){
+			if (movingobjectposition.entityHit instanceof EntityLivingBase){
 				if (movingobjectposition.entityHit == throwingEntity || throwingEntity == null) return;
-				if (throwingEntity != null){
 					movingobjectposition.entityHit.attackEntityFrom(DamageSource.causeMobDamage(throwingEntity), 10);
-				}
 			}else if (movingobjectposition.typeOfHit == MovingObjectType.BLOCK){
 				if (this.getIsMoonstoneMeteor()){
 
@@ -337,9 +339,9 @@ public class EntityThrownRock extends EntityLiving{
 			y++;
 
 		if (rand.nextInt(4) < 2 || force)
-			world.setBlock(x, y, z, BlocksCommonProxy.AMOres, BlocksCommonProxy.AMOres.META_MOONSTONE_ORE, 2);
+			world.setBlock(x, y, z, BlocksCommonProxy.AMOres, BlockAMOre.META_MOONSTONE_ORE, 2);
 		else
-			world.setBlock(x, y, z, Blocks.stone);
+			world.setBlock(x, y, z, BlocksCommonProxy.cosmicRock);
 	}
 
 	@Override

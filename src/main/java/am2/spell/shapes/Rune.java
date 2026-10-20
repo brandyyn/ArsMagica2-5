@@ -6,6 +6,7 @@ import am2.api.spell.enums.Affinity;
 import am2.api.spell.enums.SpellCastResult;
 import am2.api.spell.enums.SpellModifiers;
 import am2.blocks.BlocksCommonProxy;
+import am2.items.ItemRune;
 import am2.items.ItemsCommonProxy;
 import am2.spell.SpellUtils;
 import net.minecraft.entity.EntityLivingBase;
@@ -51,13 +52,13 @@ public class Rune implements ISpellShape{
 	public Object[] getRecipeItems(){
 		//Blue Rune, Red Rune, White Rune, Black Rune, Orange Rune, Purple Rune, Yellow Rune
 		return new Object[]{
-				new ItemStack(ItemsCommonProxy.rune, 1, ItemsCommonProxy.rune.META_BLUE),
-				new ItemStack(ItemsCommonProxy.rune, 1, ItemsCommonProxy.rune.META_RED),
-				new ItemStack(ItemsCommonProxy.rune, 1, ItemsCommonProxy.rune.META_WHITE),
-				new ItemStack(ItemsCommonProxy.rune, 1, ItemsCommonProxy.rune.META_BLACK),
-				new ItemStack(ItemsCommonProxy.rune, 1, ItemsCommonProxy.rune.META_ORANGE),
-				new ItemStack(ItemsCommonProxy.rune, 1, ItemsCommonProxy.rune.META_PURPLE),
-				new ItemStack(ItemsCommonProxy.rune, 1, ItemsCommonProxy.rune.META_YELLOW)
+				new ItemStack(ItemsCommonProxy.rune, 1, ItemRune.META_BLUE),
+				new ItemStack(ItemsCommonProxy.rune, 1, ItemRune.META_RED),
+				new ItemStack(ItemsCommonProxy.rune, 1, ItemRune.META_WHITE),
+				new ItemStack(ItemsCommonProxy.rune, 1, ItemRune.META_BLACK),
+				new ItemStack(ItemsCommonProxy.rune, 1, ItemRune.META_ORANGE),
+				new ItemStack(ItemsCommonProxy.rune, 1, ItemRune.META_PURPLE),
+				new ItemStack(ItemsCommonProxy.rune, 1, ItemRune.META_YELLOW)
 		};
 	}
 

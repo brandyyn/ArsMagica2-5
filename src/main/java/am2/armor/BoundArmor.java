@@ -1,16 +1,12 @@
 package am2.armor;
 
 import am2.api.spell.enums.ContingencyTypes;
-import am2.items.ItemSpellStaff;
 import am2.items.ItemsCommonProxy;
 import am2.playerextensions.ExtendedProperties;
-import am2.spell.SpellUtils;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemSnowball;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
 public class BoundArmor extends AMArmor{
@@ -23,7 +19,7 @@ public class BoundArmor extends AMArmor{
 	}
 
 	public void onArmorTick(World world, EntityPlayer player, ItemStack itemStack){
-		if (player.ticksExisted % 100 == 0 && player instanceof EntityPlayer){
+		if (player.ticksExisted % 100 == 0){
 			ExtendedProperties p = ExtendedProperties.For(player);
 			if (getSpellStack(itemStack) != null && p.getContingencyEffect(
 					itemStack.getUnlocalizedName().contains("helm") ? 1 :

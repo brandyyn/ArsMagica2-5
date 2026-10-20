@@ -16,17 +16,13 @@ import am2.entities.EntityManager;
 import am2.entities.SpawnBlacklists;
 import am2.interop.TC4Interop;
 import am2.items.ItemsCommonProxy;
-import am2.network.AMNetHandler;
-import am2.network.SeventhSanctum;
-import am2.network.TickrateMessage;
-import am2.network.TickrateMessageHandler;
+import am2.network.*;
 import am2.playerextensions.AffinityData;
 import am2.playerextensions.ExtendedProperties;
 import am2.playerextensions.RiftStorage;
 import am2.playerextensions.SkillData;
 import am2.power.PowerNodeCache;
 import am2.proxy.CommonProxy;
-import am2.spell.SkillManager;
 import am2.spell.SkillTreeManager;
 import am2.spell.SpellUtils;
 import am2.utility.KeystoneUtilities;
@@ -63,7 +59,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 //@Mod(modid = "arsmagica2", modLanguage = "java", name = "Ars Magica 2", version = "1.6.7", dependencies = "required-after:AnimationAPI")
-@Mod(modid = "arsmagica2", modLanguage = "java", name = "Ars Magica 2", version = "1.6.7", dependencies = "required-after:AnimationAPI;after:CoFHCore")
+@Mod(modid = "arsmagica2",
+		name = "Ars Magica 2",
+		version = "1.8.5",
+		dependencies = "required-after:AnimationAPI;after:CoFHCore")
 public class AMCore{
 
 	@Instance(value = "arsmagica2")
@@ -75,18 +74,25 @@ public class AMCore{
 	public static SkillConfiguration skillConfig;
 	public static final int ANY_META = 32767;
 	public static SimpleNetworkWrapper NETWORK;
+	public static SimpleNetworkWrapper ITEMFRAMENETWORK;
 
 	private String compendiumBase;
+	public static boolean thaumcraft = Loader.isModLoaded("Thaumcraft");
+	public static boolean cofh = Loader.isModLoaded("CoFHCore");
+	public static boolean forestry = Loader.isModLoaded("Forestry");
+	public static boolean magicbees = Loader.isModLoaded("Magicbees");
 
 	public AMCore(){
 	}
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event){
-
 		String configBase = event.getSuggestedConfigurationFile().getAbsolutePath();
 		configBase = popPathFolder(configBase);
 		compendiumBase = popPathFolder(configBase);
+		if(cofh){
+			LogHelper.info("COFH Core compat loaded successfully.");
+		}
 
 		configBase += File.separatorChar + "AM2" + File.separatorChar;
 
@@ -96,6 +102,9 @@ public class AMCore{
 
 		NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("AM2TickrateChanger");
 		NETWORK.registerMessage(TickrateMessageHandler.class, TickrateMessage.class, 0, Side.CLIENT);
+
+		ITEMFRAMENETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("AM2ItemFrameWatcher");
+		ITEMFRAMENETWORK.registerMessage(CompendiumProgressMessageHandler.class, CompendiumProgressMessage.class, 0, Side.CLIENT);
 
 		AMNetHandler.INSTANCE.init();
 
@@ -150,17 +159,19 @@ public class AMCore{
 		SeventhSanctum.instance.init();
 //		if (Loader.isModLoaded("BetterDungeons"))
 //			BetterDungeons.init();
-		if (Loader.isModLoaded("Thaumcraft"))
+		if (thaumcraft){
+			LogHelper.info("Thaumcraft compat loaded successfully.");
 			TC4Interop.initialize();
+		}
+
 //		if (Loader.isModLoaded("MineFactoryReloaded"))
 //			MFRInterop.init();
 
-		try {
-			Class.forName("forestry.api.recipes.RecipeManagers", false, getClass().getClassLoader());
-			Class.forName("magicbees.bees.BeeProductHelper", false, getClass().getClassLoader());
-			Class.forName("magicbees.bees.BeeSpecies", false, getClass().getClassLoader());
+
+		if(forestry && magicbees){
+				LogHelper.info("Magic bees compat loaded successfully.");
 			AMBeeCompat.init();
-		} catch (ClassNotFoundException e) {
+		}else{
 			LogHelper.info("A compatible MagicBees version was not found, compat not loading.");
 		}
 
@@ -267,7 +278,8 @@ public class AMCore{
 	@EventHandler
 	public void onIMCReceived(FMLInterModComms.IMCEvent event){
 		for (IMCMessage msg : event.getMessages()){
-			if (msg.key == "dsb"){
+			switch (msg.key){
+			case "dsb":{
 				LogHelper.info("Received dimension spawn blacklist IMC!  Processing.");
 				String[] split = msg.getStringValue().split("|");
 				if (split.length != 2){
@@ -279,7 +291,9 @@ public class AMCore{
 				}catch (NumberFormatException nex){
 					LogHelper.warn("Could not parse dsb IMC - improper dimension ID (not a number)!  Syntax is 'ClassName|DimensionID', for example:  EntityDryad|22");
 				}
-			}else if (msg.key == "bsb"){
+				break;
+			}
+			case "bsb":{
 				LogHelper.info("Received biome spawn blacklist IMC!  Processing.");
 				String[] split = msg.getStringValue().split("|");
 				if (split.length != 2){
@@ -291,27 +305,31 @@ public class AMCore{
 				}catch (NumberFormatException nex){
 					LogHelper.warn("Could not parse bsb IMC - improper biome ID (not a number)!  Syntax is 'ClassName|BiomeID', for example:  EntityDryad|22");
 				}
-			}else if (msg.key == "dwg"){
+				break;
+			}
+			case "dwg":
 				LogHelper.info("Received dimension worldgen blacklist IMC!  Processing.");
 				try{
 					SpawnBlacklists.addBlacklistedDimensionForWorldgen(Integer.parseInt(msg.getStringValue()));
 				}catch (NumberFormatException nex){
 					LogHelper.warn("Could not parse dwg IMC - improper dimension ID (not a number)!  Syntax is 'dimensionID', for example:  2");
 				}
-			}else if (msg.key == "adb"){
+				break;
+			case "adb":
 				LogHelper.info("Received dispel blacklist IMC!  Processing.");
 				try{
 					BuffList.instance.addDispelExclusion(Integer.parseInt(msg.getStringValue()));
 				}catch (NumberFormatException nex){
 					LogHelper.warn("Could not parse adb IMC - improper potion ID (not a number)!  Syntax is 'potionID', for example:  10");
 				}
+				break;
 			}
 		}
 	}
 
 	public void initAPI(){
 		LogHelper.info("Initializing API Hooks...");
-		ArsMagicaApi.instance.setSpellPartManager(SkillManager.instance);
+		//ArsMagicaApi.instance.setSpellPartManager(new SpellManager());
 		ArsMagicaApi.instance.setEnchantmentHelper(new AMEnchantmentHelper());
 		ArsMagicaApi.instance.setSkillTreeManager(SkillTreeManager.instance);
 		ArsMagicaApi.instance.setKeystoneHelper(KeystoneUtilities.instance);

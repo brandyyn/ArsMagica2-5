@@ -5,6 +5,8 @@ import am2.api.spell.component.interfaces.ISpellShape;
 import am2.api.spell.enums.Affinity;
 import am2.api.spell.enums.SpellCastResult;
 import am2.blocks.BlocksCommonProxy;
+import am2.items.ItemEssence;
+import am2.items.ItemOre;
 import am2.items.ItemsCommonProxy;
 import am2.spell.SpellHelper;
 import am2.spell.SpellUtils;
@@ -26,10 +28,7 @@ public class Channel implements ISpellShape{
 	public SpellCastResult beginStackStage(ItemSpellBase item, ItemStack stack, EntityLivingBase caster, EntityLivingBase target, World world, double x, double y, double z, int side, boolean giveXP, int useCount){
 		boolean shouldApplyEffect = useCount % 10 == 0 || SpellUtils.instance.componentIsPresent(stack, Telekinesis.class, 0) || SpellUtils.instance.componentIsPresent(stack, Attract.class, 0) || SpellUtils.instance.componentIsPresent(stack, Repel.class, 0);
 		if (shouldApplyEffect){
-			SpellCastResult result = SpellHelper.instance.applyStageToEntity(stack, caster, world, caster, 0, giveXP);
-			if (result != SpellCastResult.SUCCESS){
-				return result;
-			}
+			return SpellHelper.instance.applyStageToEntity(stack, caster, world, caster, 0, giveXP);
 		}
 
 		return SpellCastResult.SUCCESS;
@@ -44,8 +43,8 @@ public class Channel implements ISpellShape{
 	public Object[] getRecipeItems(){
 		//Arcane Ash, Arcane Essence, Tarma Root, 500 any power
 		return new Object[]{
-				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemsCommonProxy.itemOre.META_ARCANEASH),
-				new ItemStack(ItemsCommonProxy.essence, 1, ItemsCommonProxy.essence.META_ARCANE),
+				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemOre.META_ARCANEASH),
+				new ItemStack(ItemsCommonProxy.essence, 1, ItemEssence.META_ARCANE),
 				BlocksCommonProxy.tarmaRoot,
 				"E:*", 500
 		};

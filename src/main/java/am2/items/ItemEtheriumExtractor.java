@@ -3,12 +3,8 @@ package am2.items;
 import am2.blocks.BlockWitchwoodLog;
 import am2.blocks.BlockWitchwoodLogDrained;
 import am2.blocks.BlocksCommonProxy;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBucket;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 

@@ -8,8 +8,6 @@ import am2.spell.SpellUtils;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.item.ItemStack;
 
-import java.util.Random;
-
 public class EntityAIChaosWaterBolt extends EntityAIBase{
 	private final EntityWaterGuardian host;
 	private int cooldownTicks = 0;

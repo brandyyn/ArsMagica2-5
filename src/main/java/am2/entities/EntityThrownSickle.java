@@ -1,6 +1,5 @@
 package am2.entities;
 
-import am2.PlayerTracker;
 import am2.bosses.EntityNatureGuardian;
 import am2.damage.DamageSources;
 import am2.items.ItemsCommonProxy;

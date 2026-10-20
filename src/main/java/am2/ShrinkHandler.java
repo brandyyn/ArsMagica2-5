@@ -22,14 +22,7 @@ public class ShrinkHandler{
 			return;
 
 
-		ExtendedProperties exProps = null;
-
-		try{
-			exProps = ExtendedProperties.For(player);
-		}catch (Throwable t){
-			return;
-		}
-
+		ExtendedProperties exProps = ExtendedProperties.For(player);
 		if (exProps.originalSize == null){
 			exProps.originalSize = new AMVector2(player.width, player.height);
 		}

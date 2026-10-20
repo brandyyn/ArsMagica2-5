@@ -1,7 +1,7 @@
 package am2.containers;
 
-import am2.api.spell.ItemSpellBase;
-import am2.containers.slots.SlotOneItemClassOnly;
+import am2.containers.slots.SlotLock;
+import am2.containers.slots.SlotSpell;
 import am2.items.ItemSpellBook;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -13,25 +13,23 @@ import net.minecraft.world.World;
 public class ContainerSpellBook extends Container{
 	private ItemStack bookStack;
 	private InventorySpellBook spellBookStack;
-	private int bookSlot;
 	public int specialSlotIndex;
 
 	public ContainerSpellBook(InventoryPlayer inventoryplayer, ItemStack bookStack, InventorySpellBook inventoryspellbook){
-		//addSlot(new Slot(spellBook,0, 21, 36)); //inventory, index, x, y
 		this.spellBookStack = inventoryspellbook;
 		this.bookStack = bookStack;
-		this.bookSlot = inventoryplayer.currentItem;
+
 
 		int slotIndex = 0;
 		//Spell Book Pages - active spells
 		for (int i = 0; i < 8; ++i){
-			addSlotToContainer(new SlotOneItemClassOnly(spellBookStack, slotIndex++, 18, 5 + (i * 18), ItemSpellBase.class, 1));
+			addSlotToContainer(new SlotSpell(spellBookStack, slotIndex++, 18, 5 + (i * 18)));
 		}
 
 		//Spell Book Pages - reserve spells
 		for (int i = 0; i < 4; ++i){
 			for (int k = 0; k < 8; k++){
-				addSlotToContainer(new SlotOneItemClassOnly(spellBookStack, slotIndex++, 138 + (i * 26), 5 + (k * 18), ItemSpellBase.class, 1));
+				addSlotToContainer(new SlotSpell(spellBookStack, slotIndex++, 138 + (i * 26), 5 + (k * 18)));
 			}
 		}
 
@@ -45,20 +43,13 @@ public class ContainerSpellBook extends Container{
 		//display player action bar
 		for (int j1 = 0; j1 < 9; j1++){
 			if (inventoryplayer.getStackInSlot(j1) == bookStack){
-				specialSlotIndex = j1 + 67;
+				specialSlotIndex = j1;
+				addSlotToContainer(new SlotLock(inventoryplayer,specialSlotIndex,48 + j1 * 18, 229));
 				continue;
 			}
 			addSlotToContainer(new Slot(inventoryplayer, j1, 48 + j1 * 18, 229));
 		}
 
-	}
-
-	public ItemStack[] GetActiveSpells(){
-		ItemStack[] itemStack = new ItemStack[7];
-		for (int i = 0; i < 7; ++i){
-			itemStack[i] = spellBookStack.getStackInSlot(i);
-		}
-		return itemStack;
 	}
 
 	public ItemStack[] GetFullInventory(){
@@ -78,10 +69,25 @@ public class ContainerSpellBook extends Container{
 			ItemSpellBook spellBook = (ItemSpellBook)spellBookItemStack.getItem();
 			ItemStack[] items = GetFullInventory();
 			spellBook.UpdateStackTagCompound(spellBookItemStack, items);
-			entityplayer.inventory.setInventorySlotContents(entityplayer.inventory.currentItem, spellBookItemStack);
+			if(entityplayer.getHeldItem() != null && entityplayer.getHeldItem().isItemEqual(bookStack)){
+				entityplayer.setCurrentItemOrArmor(0,spellBookItemStack);
+			}
 		}
 
 		super.onContainerClosed(entityplayer);
+	}
+
+	@Override
+	public ItemStack slotClick(int slotId, int keyOrdinal, int clickType, EntityPlayer player) {
+		if(clickType == 2 && keyOrdinal >= 0 && keyOrdinal < 9) {
+			int hotbarSlotIndex = this.inventorySlots.size() - (9 - keyOrdinal);
+			Slot hotbarTargetSlot = getSlot(hotbarSlotIndex);
+			Slot hoverSlot = getSlot(slotId);
+			if(hotbarTargetSlot instanceof SlotLock || hoverSlot instanceof SlotLock) {
+				return null;
+			}
+		}
+		return super.slotClick(slotId, keyOrdinal, clickType, player);
 	}
 
 	@Override
@@ -97,56 +103,10 @@ public class ContainerSpellBook extends Container{
 			ItemStack itemstack1 = slot.getStack();
 			itemstack = itemstack1.copy();
 			if (i < 40){
-				if (!mergeItemStack(itemstack1, 40, 75, true)){
+				if (!mergeItemStack(itemstack1, 40, this.inventorySlots.size(), true)){
 					return null;
 				}
-			}else if (i >= 40 && i < 67) //range 27 - player inventory
-			{
-				if (itemstack.getItem() instanceof ItemSpellBase){
-					for (int n = 0; n < 40; n++){
-						Slot scrollSlot = (Slot)inventorySlots.get(n);
-						if (scrollSlot.getHasStack()) continue;
-
-						ItemStack newStack = new ItemStack(itemstack1.getItem(), 1, itemstack1.getItemDamage());
-						newStack.setTagCompound(itemstack1.getTagCompound());
-
-						scrollSlot.putStack(newStack);
-						scrollSlot.onSlotChanged();
-						itemstack1.stackSize--;
-						if (itemstack1.stackSize == 0){
-							slot.putStack(null);
-							slot.onSlotChanged();
-						}
-						return null;
-					}
-				}
-				if (!mergeItemStack(itemstack1, 67, 75, false)){
-					return null;
-				}
-			}else if (i >= 67 && i < 76) //range 9 - player action bar
-			{
-				if (itemstack.getItem() instanceof ItemSpellBase){
-					for (int n = 0; n < 40; n++){
-						Slot scrollSlot = (Slot)inventorySlots.get(n);
-						if (scrollSlot.getHasStack()) continue;
-
-						ItemStack newStack = new ItemStack(itemstack1.getItem(), 1, itemstack1.getItemDamage());
-						newStack.setTagCompound(itemstack1.getTagCompound());
-
-						scrollSlot.putStack(newStack);
-						scrollSlot.onSlotChanged();
-						itemstack1.stackSize--;
-						if (itemstack1.stackSize == 0){
-							slot.putStack(null);
-							slot.onSlotChanged();
-						}
-						return null;
-					}
-				}
-				if (!mergeItemStack(itemstack1, 40, 67, false)){
-					return null;
-				}
-			}else if (!mergeItemStack(itemstack1, 40, 75, false)){
+			}else if (!mergeItemStack(itemstack1, 0, 40, false)){
 				return null;
 			}
 			if (itemstack1.stackSize == 0){

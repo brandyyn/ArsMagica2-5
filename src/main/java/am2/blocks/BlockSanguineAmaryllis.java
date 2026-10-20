@@ -8,19 +8,10 @@ import am2.particles.ParticleExpandingCollapsingRingAtPoint;
 import am2.particles.ParticleFadeOut;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.block.Block;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.EnumPlantType;
-import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 

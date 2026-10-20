@@ -16,7 +16,7 @@ public enum BossActions{
 
 	private final int maxActionTime;
 
-	private BossActions(int maxTime){
+	BossActions(int maxTime){
 		maxActionTime = maxTime;
 	}
 

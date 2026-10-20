@@ -79,20 +79,20 @@ public class EntityManaElemental extends EntityMob{
 		return ItemsCommonProxy.manaCake;
 	}
 
-	@Override
-	protected String getLivingSound(){
-		return "arsmagica2:mob.manaelemental.living";
-	}
-
-	@Override
-	protected String getHurtSound(){
-		return "arsmagica2:mob.manaelemental.hit";
-	}
-
-	@Override
-	protected String getDeathSound(){
-		return "arsmagica2:mob.manaelemental.death";
-	}
+//	@Override
+//	protected String getLivingSound(){
+//		return "arsmagica2:mob.manaelemental.living";
+//	}
+//
+//	@Override
+//	protected String getHurtSound(){
+//		return "arsmagica2:mob.manaelemental.hit";
+//	}
+//
+//	@Override
+//	protected String getDeathSound(){
+//		return "arsmagica2:mob.manaelemental.death";
+//	}
 
 	private void initAI(){
 		this.getNavigator().setAvoidsWater(true);

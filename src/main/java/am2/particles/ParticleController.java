@@ -2,8 +2,6 @@ package am2.particles;
 
 import net.minecraft.world.World;
 
-import java.util.Random;
-
 public abstract class ParticleController{
 
 	protected AMParticle particle;

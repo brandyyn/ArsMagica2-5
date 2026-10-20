@@ -4,8 +4,6 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 
-import java.util.Random;
-
 public final class ParticleOrbitEntity extends ParticleController{
 
 	private final Entity target;

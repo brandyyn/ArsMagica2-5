@@ -1,7 +1,6 @@
 package am2.containers.slots;
 
 import am2.EnervatorRecipeHelper;
-import am2.items.ItemEssence;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;

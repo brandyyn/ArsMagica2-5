@@ -19,12 +19,12 @@ import org.lwjgl.input.Keyboard;
 
 public class AMKeyBindings{
 
-	public static KeyBinding ShapeGroupKey = new KeyBinding("key.ShapeGroups", Keyboard.KEY_C, "key.am2.category");
-	public static KeyBinding SpellBookNextSpellKey = new KeyBinding("key.SpellBookNext", Keyboard.KEY_X, "key.am2.category");
-	public static KeyBinding SpellBookPrevSpellKey = new KeyBinding("key.SpellBookPrev", Keyboard.KEY_Z, "key.am2.category");
-	public static KeyBinding AuraCustomizationKey = new KeyBinding("key.AuraCustomization", Keyboard.KEY_B, "key.am2.category");
-	public static KeyBinding ManaToggleKey = new KeyBinding("key.ToggleManaDisplay", Keyboard.KEY_O, "key.am2.category");
-	public static KeyBinding AffinityActivationKey = new KeyBinding("key.ActivateAffinityAbility", Keyboard.KEY_X, "key.am2.category");
+	public static final KeyBinding ShapeGroupKey = new KeyBinding("key.ShapeGroups", Keyboard.KEY_C, "key.am2.category");
+	public static final KeyBinding SpellBookNextSpellKey = new KeyBinding("key.SpellBookNext", Keyboard.KEY_X, "key.am2.category");
+	public static final KeyBinding SpellBookPrevSpellKey = new KeyBinding("key.SpellBookPrev", Keyboard.KEY_Z, "key.am2.category");
+	public static final KeyBinding AuraCustomizationKey = new KeyBinding("key.AuraCustomization", Keyboard.KEY_B, "key.am2.category");
+	public static final KeyBinding ManaToggleKey = new KeyBinding("key.ToggleManaDisplay", Keyboard.KEY_O, "key.am2.category");
+	public static final KeyBinding AffinityActivationKey = new KeyBinding("key.ActivateAffinityAbility", Keyboard.KEY_X, "key.am2.category");
 
 	public AMKeyBindings(){
 		ClientRegistry.registerKeyBinding(ShapeGroupKey);
@@ -69,7 +69,7 @@ public class AMKeyBindings{
 
 			AMNetHandler.INSTANCE.sendShapeGroupChangePacket(shapeGroup, clientPlayer.getEntityId());
 
-		}else if (this.SpellBookNextSpellKey.isPressed()){
+		}else if (SpellBookNextSpellKey.isPressed()){
 			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 			ItemStack curItem = player.inventory.getStackInSlot(player.inventory.currentItem);
 			if (curItem == null){
@@ -79,7 +79,7 @@ public class AMKeyBindings{
 				//send packet to server
 				AMNetHandler.INSTANCE.sendSpellbookSlotChange(player, player.inventory.currentItem, ItemSpellBook.ID_NEXT_SPELL);
 			}
-		}else if (this.SpellBookPrevSpellKey.isPressed()){
+		}else if (SpellBookPrevSpellKey.isPressed()){
 			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 			ItemStack curItem = player.inventory.getStackInSlot(player.inventory.currentItem);
 			if (curItem == null){
@@ -90,7 +90,7 @@ public class AMKeyBindings{
 				AMNetHandler.INSTANCE.sendSpellbookSlotChange(player, player.inventory.currentItem, ItemSpellBook.ID_PREV_SPELL);
 			}
 		}else if (AuraCustomizationKey.isPressed()){
-			if (AMCore.proxy.playerTracker.hasAA(clientPlayer)){
+			if (PlayerTracker.hasAA(clientPlayer)){
 				Minecraft.getMinecraft().displayGuiScreen(new AuraCustomizationMenu());
 			}
 		}else if (AffinityActivationKey.isPressed()){

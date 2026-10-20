@@ -2,7 +2,6 @@ package am2.blocks.tileentities;
 
 import am2.api.power.PowerTypes;
 import am2.items.ItemCrystalPhylactery;
-import am2.items.ItemsCommonProxy;
 import am2.power.PowerNodeRegistry;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;

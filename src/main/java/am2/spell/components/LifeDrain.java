@@ -35,7 +35,7 @@ public class LifeDrain implements ISpellComponent{
 		}
 		int magnitude = SpellUtils.instance.getModifiedInt_Add(4, stack, caster, target, world, 0, SpellModifiers.DAMAGE);
 
-		boolean success = SpellHelper.instance.attackTargetSpecial(stack, target, DamageSource.causeIndirectMagicDamage(caster, caster), SpellUtils.instance.modifyDamage(caster, magnitude));
+		boolean success = SpellHelper.instance.attackTargetSpecial(stack, target, DamageSource.causeIndirectMagicDamage(caster, caster), magnitude);
 
 		if (success){
 			caster.heal((int)Math.ceil(magnitude / 4));

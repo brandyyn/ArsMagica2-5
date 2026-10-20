@@ -3,7 +3,6 @@ package am2.worldgen;
 import am2.blocks.BlocksCommonProxy;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSapling;
-import net.minecraft.block.material.MaterialLiquid;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;

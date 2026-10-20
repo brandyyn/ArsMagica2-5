@@ -4,6 +4,8 @@ import am2.AMCore;
 import am2.MeteorSpawnHelper;
 import am2.api.math.AMVector3;
 import am2.api.spell.enums.SkillPointTypes;
+import am2.blocks.BlockAMOre;
+import am2.blocks.BlocksCommonProxy;
 import am2.entities.*;
 import am2.particles.AMLineArc;
 import am2.playerextensions.ExtendedProperties;
@@ -18,6 +20,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -281,7 +284,12 @@ public class ItemRune extends ArsMagicaItem{
 	//===========================================
 
 	public void doCurrentDebugOperation(ItemStack stack, World world, EntityPlayer player){
-		displayBlockMeta(stack, world, player);
+		MovingObjectPosition mop = getMovingObjectPositionFromPlayer(world,player,true);
+		if(mop!= null && mop.typeOfHit == MovingObjectType.BLOCK){
+			buildAltar(world,mop.blockX, mop.blockY, mop.blockZ, mop.sideHit,new ItemStack(Blocks.planks),new ItemStack(Blocks.oak_stairs),new ItemStack(BlocksCommonProxy.AMOres, 1, BlockAMOre.META_MOONSTONE_BLOCK),ItemRune::placeBlock);
+		}
+		//spawnMoonstoneMeteor(stack,world,player);
+
 	}
 
 	public void displayBlockMeta(ItemStack stack, World world, EntityPlayer player){
@@ -296,6 +304,13 @@ public class ItemRune extends ArsMagicaItem{
 						));
 			}
 		}
+	}
+	public void displaymana(EntityPlayer player){
+
+			int mana = ExtendedProperties.For(player).getMagicLevel();
+			player.addChatMessage(new ChatComponentText(String.valueOf(mana)));
+
+
 	}
 
 	public void spawnRibbonParticle(ItemStack stack, World world, EntityPlayer player){
@@ -448,5 +463,85 @@ public class ItemRune extends ArsMagicaItem{
 			wall.SetCasterAndStack(player, spellStack);
 			world.spawnEntityInWorld(wall);
 		}
+	}
+	/* code taken from am2playground*/
+	public static void buildAltar(World world, int x, int y, int z, int w, ItemStack struct, ItemStack stairs, ItemStack aug, Builder builder) {
+		boolean ns = w % 2 == 0;
+
+		for(int i = 0; i < 25; ++i) {
+			if (i == 12) {
+				builder.apply(world, x, y, z, aug);
+			} else {
+				builder.apply(world, x - 2 + i % 5, y, z - 2 + i / 5, struct);
+			}
+		}
+
+		for(int sx = -1; sx < 2; sx += 2) {
+			for(int sz = -1; sz < 2; sz += 2) {
+				for(int dy = 0; dy < 3; ++dy) {
+					if (ns) {
+						builder.apply(world, x + 2 * sx, y + dy + 1, z + sz, struct);
+					} else {
+						builder.apply(world, x + sx, y + dy + 1, z + 2 * sz, struct);
+					}
+				}
+
+				if (ns) {
+					builder.apply(world, x + 2 * sx, y + 4, z + sz, aug);
+				} else {
+					builder.apply(world, x + sx, y + 4, z + 2 * sz, aug);
+				}
+			}
+		}
+
+		int side = ns ? 0 : 1;
+		ItemStack wall = new ItemStack(BlocksCommonProxy.magicWall);
+
+		for(int i = -1; i < 2; i += 2) {
+			for(int dy = 0; dy < 3; ++dy) {
+				builder.apply(world, x + 2 * (1 - side) * i, y + dy + 1, z + 2 * side * i, wall);
+			}
+		}
+
+		builder.apply(world, x + (1 - side), y + 4, z + side, struct);
+		builder.apply(world, x - (1 - side), y + 4, z - side, struct);
+		int sgn = ns ? 1 : -1;
+		ItemStack rotatedStairs = stairs.copy();
+		rotatedStairs.setItemDamage(5 + 2 * side);
+		builder.apply(world, x - 1, y + 3, z - 1, rotatedStairs);
+		builder.apply(world, x - sgn, y + 3, z + sgn, rotatedStairs);
+		rotatedStairs.setItemDamage(4 + 2 * side);
+		builder.apply(world, x + sgn, y + 3, z - sgn, rotatedStairs);
+		builder.apply(world, x + 1, y + 3, z + 1, rotatedStairs);
+		rotatedStairs.setItemDamage(2 * side);
+		builder.apply(world, x - 2 * (1 - side), y + 4, z - 2 * side, rotatedStairs);
+		rotatedStairs.setItemDamage(1 + 2 * side);
+		builder.apply(world, x + 2 * (1 - side), y + 4, z + 2 * side, rotatedStairs);
+		rotatedStairs.setItemDamage(2 * (1 - side));
+
+		for(int i = -1; i <= 1; ++i) {
+			builder.apply(world, x + (ns ? i : -1), y + 4, z + (ns ? -1 : i), rotatedStairs);
+		}
+
+		rotatedStairs.setItemDamage(3 - 2 * side);
+
+		for(int i = -1; i <= 1; ++i) {
+			builder.apply(world, x + (ns ? i : 1), y + 4, z + (ns ? 1 : i), rotatedStairs);
+		}
+
+		builder.apply(world, x, y + 4, z, new ItemStack(BlocksCommonProxy.craftingAltar));
+		int rot = 4 * (w / 2 % 2) - 2;
+		int div = (w & 3) / 2;
+		int leverSide = ns ? 4 - div : 1 + div;
+		builder.apply(world, x - rot, y + 2, z + sgn * rot, new ItemStack(Blocks.lever, 1, leverSide));
+		int lecternSide = 4 - w;
+		builder.apply(world, x + sgn * rot, y + 1, z + rot, new ItemStack(BlocksCommonProxy.blockLectern, 1, lecternSide));
+	}
+	private static void placeBlock(World world, int x, int y, int z, ItemStack block) {
+		world.setBlock(x, y, z, Block.getBlockFromItem(block.getItem()), block.getItemDamage(), 3);
+	}
+
+	public interface Builder {
+		void apply(World var1, int var2, int var3, int var4, ItemStack var5);
 	}
 }

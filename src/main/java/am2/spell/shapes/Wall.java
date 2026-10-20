@@ -7,6 +7,7 @@ import am2.api.spell.enums.SpellCastResult;
 import am2.api.spell.enums.SpellModifiers;
 import am2.blocks.BlocksCommonProxy;
 import am2.entities.EntitySpellEffect;
+import am2.items.ItemOre;
 import am2.items.ItemsCommonProxy;
 import am2.spell.SpellUtils;
 import net.minecraft.entity.EntityLivingBase;
@@ -19,7 +20,7 @@ public class Wall implements ISpellShape{
 	@Override
 	public Object[] getRecipeItems(){
 		return new Object[]{
-				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemsCommonProxy.itemOre.META_VINTEUMDUST),
+				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemOre.META_VINTEUMDUST),
 				BlocksCommonProxy.magicWall,
 				Blocks.cobblestone_wall,
 				Blocks.fence,

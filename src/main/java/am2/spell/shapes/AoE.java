@@ -9,6 +9,8 @@ import am2.api.spell.enums.Affinity;
 import am2.api.spell.enums.SpellCastResult;
 import am2.api.spell.enums.SpellModifiers;
 import am2.entities.EntitySpellProjectile;
+import am2.items.ItemEssence;
+import am2.items.ItemOre;
 import am2.items.ItemsCommonProxy;
 import am2.particles.*;
 import am2.spell.SpellHelper;
@@ -90,7 +92,7 @@ public class AoE implements ISpellShape{
 		}
 
 		for (int i = 0; i < 360; i += AMCore.config.FullGFX() ? 20 : AMCore.config.LowGFX() ? 40 : 60){
-			AMParticle effect = (AMParticle)AMCore.instance.proxy.particleManager.spawn(world, pfxName, x, y + 1.5f, z);
+			AMParticle effect = (AMParticle)AMCore.proxy.particleManager.spawn(world, pfxName, x, y + 1.5f, z);
 			if (effect != null){
 				effect.setIgnoreMaxAge(true);
 				effect.AddParticleController(new ParticleMoveOnHeading(effect, i, 0, speed, 1, false));
@@ -133,10 +135,9 @@ public class AoE implements ISpellShape{
 	private SpellCastResult applyStageVerticalX(ItemStack stack, EntityLivingBase caster, World world, int x, int y, int z, int face, int radius, boolean giveXP){
 		for (int i = -radius; i <= radius; ++i){
 			for (int j = -radius; j <= radius; ++j){
-				int searchY = y;
-				Block block = world.getBlock(x, searchY + i, z + j);
+				Block block = world.getBlock(x, y + i, z + j);
 				if (block == Blocks.air) continue;
-				SpellCastResult result = SpellHelper.instance.applyStageToGround(stack, caster, world, x, searchY + i, z + j, face, x, searchY + i, z + j, 0, giveXP);
+				SpellCastResult result = SpellHelper.instance.applyStageToGround(stack, caster, world, x, y + i, z + j, face, x, y + i, z + j, 0, giveXP);
 				if (result != SpellCastResult.SUCCESS)
 					return result;
 			}
@@ -147,10 +148,9 @@ public class AoE implements ISpellShape{
 	private SpellCastResult applyStageVerticalZ(ItemStack stack, EntityLivingBase caster, World world, int x, int y, int z, int face, int radius, boolean giveXP){
 		for (int i = -radius; i <= radius; ++i){
 			for (int j = -radius; j <= radius; ++j){
-				int searchY = y;
-				Block block = world.getBlock(x + j, searchY + i, z);
+				Block block = world.getBlock(x + j, y + i, z);
 				if (block == Blocks.air) continue;
-				SpellCastResult result = SpellHelper.instance.applyStageToGround(stack, caster, world, x + j, searchY + i, z, face, x + j, searchY + i, z, 0, giveXP);
+				SpellCastResult result = SpellHelper.instance.applyStageToGround(stack, caster, world, x + j, y + i, z, face, x + j, y + i, z, 0, giveXP);
 				if (result != SpellCastResult.SUCCESS)
 					return result;
 			}
@@ -166,8 +166,8 @@ public class AoE implements ISpellShape{
 	@Override
 	public Object[] getRecipeItems(){
 		return new Object[]{
-				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemsCommonProxy.itemOre.META_MOONSTONE),
-				new ItemStack(ItemsCommonProxy.essence, 1, ItemsCommonProxy.essence.META_AIR),
+				new ItemStack(ItemsCommonProxy.itemOre, 1, ItemOre.META_MOONSTONE),
+				new ItemStack(ItemsCommonProxy.essence, 1, ItemEssence.META_AIR),
 				String.format("E:%d|%d|%d", PowerTypes.LIGHT.ID(), PowerTypes.NEUTRAL.ID(), PowerTypes.DARK.ID()), 1000,
 				Blocks.tnt
 		};

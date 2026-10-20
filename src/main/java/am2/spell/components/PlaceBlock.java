@@ -1,7 +1,6 @@
 package am2.spell.components;
 
-import am2.RitualShapeHelper;
-import am2.api.blocks.MultiblockStructureDefinition.BlockDec;
+import am2.api.blocks.BlockDec;
 import am2.api.spell.component.interfaces.ISpellComponent;
 import am2.api.spell.enums.Affinity;
 import am2.items.ItemsCommonProxy;
@@ -45,7 +44,7 @@ public class PlaceBlock implements ISpellComponent{
 
 	private BlockDec getPlaceBlock(ItemStack stack){
 		if (stack.hasTagCompound() && stack.stackTagCompound.hasKey(KEY_BLOCKID)){
-			return RitualShapeHelper.instance.hourglass.new BlockDec(Block.getBlockById(stack.stackTagCompound.getInteger(KEY_BLOCKID)), stack.stackTagCompound.getInteger(KEY_META));
+			return new BlockDec(Block.getBlockById(stack.stackTagCompound.getInteger(KEY_BLOCKID)), stack.stackTagCompound.getInteger(KEY_META));
 		}
 		return null;
 	}
